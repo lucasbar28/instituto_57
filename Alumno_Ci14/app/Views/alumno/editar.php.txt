@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Alumno</title>
+</head>
+<body>
+    <h1>Editar Alumno</h1>
+    <form action="/alumnos/actualizar/<?= $alumno['id'] ?>" method="POST">
+        <label>Nombre:</label>
+        <input type="text" name="nombre" value="<?= $alumno['nombre'] ?>" required><br><br>
+        
+        <label>Edad:</label>
+        <input type="number" name="edad" value="<?= $alumno['edad'] ?>" required><br><br>
+        
+        <button type="submit">Actualizar</button>
+    </form>
+    <br>
+    <a href="/alumnos">Volver a Lista</a>
+</body>
+</html>

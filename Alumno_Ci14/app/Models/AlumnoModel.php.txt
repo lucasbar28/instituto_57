@@ -1,0 +1,20 @@
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class AlumnoModel extends Model
+{
+    // Nombre de la tabla
+    protected $table      = 'alumnos';
+    // Clave primaria
+    protected $primaryKey = 'id';
+
+    // Campos que se pueden editar
+    protected $allowedFields = ['nombre', 'edad'];
+
+    // Método para buscar un alumno por su nombre
+    public function getByName($nombre)
+    {
+        return $this->where(['nombre' => $nombre])->first();
+    }
+}

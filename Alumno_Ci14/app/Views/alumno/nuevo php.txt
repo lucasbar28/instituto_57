@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuevo Alumno</title>
+</head>
+<body>
+    <h1>Agregar Alumno</h1>
+    <form action="/alumnos/guardar" method="POST">
+        <label>Nombre:</label>
+        <input type="text" name="nombre" required><br><br>
+        
+        <label>Edad:</label>
+        <input type="number" name="edad" required><br><br>
+        
+        <button type="submit">Guardar</button>
+    </form>
+    <br>
+    <a href="/alumnos">Volver a Lista</a>
+</body>
+</html>
