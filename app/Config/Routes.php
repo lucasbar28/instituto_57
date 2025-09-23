@@ -12,3 +12,4 @@ $routes->get('profesores', 'Profesores::index');
 $routes->get('carreras', 'Carreras::index'); 
 $routes->get('categorias', 'Categorias::index'); 
 $routes->get('cursos', 'Cursos::index'); 
+$routes->post('inscripcion/guardar', 'Inscripcion::guardar');
