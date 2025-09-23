@@ -4,11 +4,11 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class CategoriaModel extends Model
+class EstudianteModel extends Model
 {
-    protected $table = 'categorias';
-    protected $primaryKey = 'id_categoria';
-    protected $allowedFields = ['nombre', 'descripcion'];
+    protected $table = 'alumnos';
+    protected $primaryKey = 'id_alumno';
+    protected $allowedFields = ['nombre_completo', 'dni_matricula', 'email', 'telefono', 'id_usuario', 'id_carrera'];
 
     protected $afterInsert = ['guardarComoJSON'];
 
@@ -19,7 +19,7 @@ class CategoriaModel extends Model
 
             $json_data = json_encode($registro, JSON_PRETTY_PRINT);
             
-            $file_name = 'export_categoria_' . date('YmdHis') . '.json';
+            $file_name = 'export_alumno_' . date('YmdHis') . '.json';
             $file_path = WRITEPATH . 'exports/' . $file_name;
 
             if (!is_dir(WRITEPATH . 'exports')) {
