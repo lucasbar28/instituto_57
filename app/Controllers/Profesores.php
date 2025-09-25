@@ -10,7 +10,6 @@ class Profesores extends Controller
 {
     public function index()
     {
-        helper('url');
         $model = new ProfesorModel();
         $data['profesores'] = $model->findAll();
         return view('profesores', $data);
@@ -18,7 +17,6 @@ class Profesores extends Controller
 
     public function crear()
     {
-        helper('url');
         return view('profesores_form');
     }
 
@@ -44,13 +42,12 @@ class Profesores extends Controller
             'especialidad'    => $this->request->getPost('especialidad'),
             'email'           => $this->request->getPost('email'),
             'telefono'        => $this->request->getPost('telefono'),
-            'id_usuario'      => $id_usuario // Enlazar el profesor con el ID del usuario
+            'id_usuario'      => $id_usuario
         ];
         
         // 3. Guardar el registro del profesor
         $profesorModel->save($profesorData);
         
-        // Redirigir a la página principal de profesores
         return redirect()->to(base_url('profesores'));
     }
 } 

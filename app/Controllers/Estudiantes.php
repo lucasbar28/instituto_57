@@ -11,7 +11,6 @@ class Estudiantes extends Controller
 {
     public function index()
     {
-        helper('url');
         $model = new EstudianteModel();
         $data['estudiantes'] = $model->findAll();
         return view('estudiantes', $data);
@@ -19,7 +18,6 @@ class Estudiantes extends Controller
 
     public function crear()
     {
-        helper('url');
         $carreraModel = new CarreraModel();
         $data['carreras'] = $carreraModel->findAll();
         return view('estudiantes_form', $data);
@@ -48,13 +46,12 @@ class Estudiantes extends Controller
             'email'           => $this->request->getPost('email'),
             'telefono'        => $this->request->getPost('telefono'),
             'id_carrera'      => $this->request->getPost('id_carrera'),
-            'id_usuario'      => $id_usuario // Enlazar el alumno con el ID del usuario
+            'id_usuario'      => $id_usuario
         ];
         
         // 3. Guardar el registro del estudiante
         $estudianteModel->save($estudianteData);
         
-        // Redirigir a la página principal de estudiantes
         return redirect()->to(base_url('estudiantes'));
     }
 } 
