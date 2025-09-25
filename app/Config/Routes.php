@@ -15,3 +15,5 @@ $routes->get('cursos', 'Cursos::index');
 $routes->post('inscripcion/guardar', 'Inscripcion::guardar');
 $routes->get('estudiantes/crear', 'Estudiantes::crear');
 $routes->post('estudiantes/guardar', 'Estudiantes::guardar');
+$routes->get('profesores/crear', 'Profesores::crear');
+$routes->post('profesores/guardar', 'Profesores::guardar'); 

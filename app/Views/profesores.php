@@ -1,22 +1,28 @@
-<h1>Lista de Profesores</h1>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Profesor</title>
+</head>
+<body>
 
-<table border="1">
-    <thead>
-        <tr>
-            <th>Nombre Completo</th>
-            <th>Especialidad</th>
-            <th>Email</th>
-            <th>Teléfono</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($profesores as $profesor): ?>
-        <tr>
-            <td><?= $profesor['nombre_completo'] ?></td>
-            <td><?= $profesor['especialidad'] ?></td>
-            <td><?= $profesor['email'] ?></td>
-            <td><?= $profesor['telefono'] ?></td>
-        </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table> 
+    <h1>Agregar Nuevo Profesor</h1>
+
+    <form action="<?= base_url('profesores/guardar') ?>" method="post">
+        <label for="nombre_completo">Nombre Completo:</label>
+        <input type="text" name="nombre_completo" required><br><br>
+
+        <label for="especialidad">Especialidad:</label>
+        <input type="text" name="especialidad" required><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" required><br><br>
+
+        <label for="telefono">Teléfono:</label>
+        <input type="text" name="telefono"><br><br>
+
+        <button type="submit">Guardar Profesor</button>
+    </form>
+</body>
+</html> 

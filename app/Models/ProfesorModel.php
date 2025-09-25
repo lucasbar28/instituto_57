@@ -8,7 +8,7 @@ class ProfesorModel extends Model
 {
     protected $table = 'profesores';
     protected $primaryKey = 'id_profesor';
-    protected $allowedFields = ['nombre_completo', 'especialidad', 'email', 'telefono'];
+    protected $allowedFields = ['nombre_completo', 'especialidad', 'email', 'telefono', 'id_usuario'];
 
     protected $afterInsert = ['guardarComoJSON'];
 
