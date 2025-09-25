@@ -11,6 +11,7 @@ class Estudiantes extends Controller
 {
     public function index()
     {
+        helper('url');
         $model = new EstudianteModel();
         $data['estudiantes'] = $model->findAll();
         return view('estudiantes', $data);
@@ -18,6 +19,7 @@ class Estudiantes extends Controller
 
     public function crear()
     {
+        helper('url');
         $carreraModel = new CarreraModel();
         $data['carreras'] = $carreraModel->findAll();
         return view('estudiantes_form', $data);

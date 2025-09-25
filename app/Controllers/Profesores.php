@@ -10,6 +10,7 @@ class Profesores extends Controller
 {
     public function index()
     {
+        helper('url');
         $model = new ProfesorModel();
         $data['profesores'] = $model->findAll();
         return view('profesores', $data);
@@ -17,6 +18,7 @@ class Profesores extends Controller
 
     public function crear()
     {
+        helper('url');
         return view('profesores_form');
     }
 
