@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agregar Estudiante</title>
+    <link rel="stylesheet" href="<?= base_url('css/style.css') ?>">
 </head>
 <body>
 
@@ -24,13 +25,15 @@
 
         <label for="id_carrera">Carrera:</label>
         <select name="id_carrera" required>
-            <?php foreach ($carreras as $carrera): ?>
-                <option value="<?= esc($carrera['id_carrera']) ?>"><?= esc($carrera['nombre_carrera']) ?></option>
-            <?php endforeach; ?>
+            <?php if (!empty($carreras)): ?>
+                <?php foreach ($carreras as $carrera): ?>
+                    <option value="<?= esc($carrera['id_carrera']) ?>"><?= esc($carrera['nombre_carrera']) ?></option>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </select>
         <br><br>
 
         <button type="submit">Guardar Estudiante</button>
     </form>
 </body>
-</html>  
+</html> 
