@@ -8,22 +8,37 @@
 </head>
 <body>
 
-    <h1>Agregar Nuevo Profesor</h1>
+<div class="container">
+    <div class="page-header">
+        <h1>Agregar Nuevo Profesor</h1>
+    </div>
 
-    <form action="<?= base_url('profesores/guardar') ?>" method="post">
-        <label for="nombre_completo">Nombre Completo:</label>
-        <input type="text" name="nombre_completo" required><br><br>
+    <div class="section-box">
+        <form action="<?= base_url('profesores/guardar') ?>" method="post">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="nombre_completo">Nombre Completo:</label>
+                    <input type="text" name="nombre_completo" class="form-control" required>
+                </div>
 
-        <label for="especialidad">Especialidad:</label>
-        <input type="text" name="especialidad" required><br><br>
+                <div class="form-group">
+                    <label for="especialidad">Especialidad:</label>
+                    <input type="text" name="especialidad" class="form-control" required>
+                </div>
 
-        <label for="email">Email:</label>
-        <input type="email" name="email" required><br><br>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
 
-        <label for="telefono">Teléfono:</label>
-        <input type="text" name="telefono"><br><br>
-
-        <button type="submit">Guardar Profesor</button>
-    </form>
+                <div class="form-group">
+                    <label for="telefono">Teléfono:</label>
+                    <input type="text" name="telefono" class="form-control">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Guardar Profesor</button>
+        </form>
+    </div>
+</div>
 </body>
 </html> 
