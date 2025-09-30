@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregar Profesor</title>
-    <link rel="stylesheet" href="<?= base_url('css/styles.css') ?>"> 
-</head>
-<body>
+<?php 
+    // 1. Incluir el HEAD y la etiqueta de apertura <body>
+    echo view('templates/head', ['title' => 'Agregar Profesor']);
+    
+    // 2. Incluir el NAVBAR
+    echo view('templates/navbar');
+?>
 
 <div class="container">
     <div class="page-header">
@@ -40,5 +38,8 @@
         </form>
     </div>
 </div>
-</body>
-</html> 
+
+<?php 
+    // 3. Incluir el FOOTER y las etiquetas de cierre
+    echo view('templates/footer');
+?>
