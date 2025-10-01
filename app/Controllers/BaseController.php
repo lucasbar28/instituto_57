@@ -9,16 +9,6 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
-/**
- * Class BaseController
- *
- * BaseController provides a convenient place for loading components
- * and performing functions that are needed by all your controllers.
- * Extend this class in any new controllers:
- *     class Home extends BaseController
- *
- * For security be sure to declare any new methods as protected or private.
- */
 abstract class BaseController extends Controller
 {
     /**
@@ -33,15 +23,14 @@ abstract class BaseController extends Controller
      * class instantiation. These helpers will be available
      * to all other controllers that extend BaseController.
      *
-     * @var list<string>
+     * @var array
      */
-    protected $helpers = [];
+    protected $helpers = ['url'];
 
     /**
-     * Be sure to declare properties for any property fetch you initialized.
-     * The creation of dynamic property is deprecated in PHP 8.2.
+     * Be sure to declare properties for any helpers that will be
+     * loaded in the constructor.
      */
-    // protected $session;
 
     /**
      * @return void
@@ -50,9 +39,5 @@ abstract class BaseController extends Controller
     {
         // Do Not Edit This Line
         parent::initController($request, $response, $logger);
-
-        // Preload any models, libraries, etc, here.
-
-        // E.g.: $this->session = service('session');
     }
-}
+} 
