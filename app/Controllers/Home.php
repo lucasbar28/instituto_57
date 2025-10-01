@@ -4,8 +4,9 @@ namespace App\Controllers;
 
 class Home extends BaseController
 {
-    public function index(): string
+    public function index()
     {
-        return view('welcome_message');
+        // Esto le dice a CodeIgniter que cargue el archivo app/Views/home.php
+        return view('home'); 
     }
-}
+} 
