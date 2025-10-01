@@ -10,7 +10,10 @@ $routes->get('login', 'Login::index');
 $routes->post('auth', 'Login::auth'); 
 $routes->get('profesores', 'Profesores::index');
 $routes->get('carreras', 'Carreras::index'); 
-$routes->get('categorias', 'Categorias::index'); 
+// Rutas para la gestión de Categorías
+$routes->get('categorias', 'Categorias::index');
+$routes->get('categorias/crear', 'Categorias::crear');
+$routes->post('categorias/guardar', 'Categorias::guardar'); 
 $routes->get('cursos', 'Cursos::index'); 
 $routes->post('inscripcion/guardar', 'Inscripcion::guardar');
 $routes->get('estudiantes/crear', 'Estudiantes::crear');
