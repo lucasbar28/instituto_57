@@ -23,7 +23,7 @@
                 <?php foreach ($estudiantes as $estudiante): ?>
                 <tr>
                     <td><?= esc($estudiante['nombre_completo']) ?></td>
-                    <td><?= esc($estudiante['dni']) ?></td>
+                    <td><?= esc($estudiante['dni_matricula']) ?></td> 
                     <td><?= esc($estudiante['email']) ?></td>
                     <td><?= esc($estudiante['telefono']) ?></td>
                 </tr>
