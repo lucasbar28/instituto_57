@@ -21,8 +21,7 @@
             <thead>
                 <tr>
                     <th>Nombre Completo</th>
-                    <th>DNI / Matrícula</th>
-                    <th>Email</th>
+                    <th>DNI / Matrícula</th> <th>Email</th>
                     <th>Teléfono</th>
                     <th>Acciones</th>
                 </tr>

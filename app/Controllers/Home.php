@@ -20,5 +20,4 @@ class Home extends BaseController
         // Esto le dice a CodeIgniter que cargue el archivo app/Views/home.php
         return view('home'); 
     }
-} 
 
