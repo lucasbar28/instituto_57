@@ -54,11 +54,11 @@
       <div class="step-card">
         <div class="step-number">3</div>
         <h3>Organiza Categorías</h3>
-        <p>Clasifica las carreras por áreas de conocimiento para mejor gestión.</p>
+        <p>Clasifica  las carreras por áreas de conocimiento para mejor gestión.</p>
         <a href="<?= base_url('categorias') ?>" class="step-link">Ir a Categorías <i class="fas fa-arrow-right"></i></a>
       </div>
     </div>
-  </div>
+  </div> 
 </section>
 
 <?= view('templates/footer') ?>
