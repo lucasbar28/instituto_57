@@ -1,0 +1,848 @@
+/* Variables CSS */
+:root {
+  --color-bg: #f5f7fa;
+  --color-bg-light: #ffffff;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-text: #1f2937;
+  --color-muted: #6b7280;
+  --border-radius: 0.5rem;
+  --box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  --box-shadow-hover: 0 4px 6px rgba(0,0,0,0.1);
+  --transition: all 0.2s ease;
+  --gradient-primary: linear-gradient(to right, #2563eb, #3b82f6); /* Nuevo degradado */
+}
+
+/* Estilos base */
+body {
+  font-family: 'Inter', Arial, sans-serif;
+  line-height: 1.6;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Evita el desplazamiento horizontal */
+}
+
+/* NAVEGACIÓN */
+.navbar {
+  background-color: var(--color-bg-light);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.navbar-logo {
+  color: var(--color-accent);
+  font-weight: 700;
+  font-size: 1.5rem;
+  text-decoration: none;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.navbar-links a {
+  color: var(--color-text);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.navbar-links a:hover {
+  color: var(--color-accent);
+  transform: translateY(-2px); /* Pequeño efecto de elevación al pasar el ratón */
+}
+
+.navbar-links a.active {
+  color: var(--color-accent);
+  font-weight: 600;
+  border-bottom: 2px solid var(--color-accent); /* Indicador de página activa */
+  padding-bottom: 3px;
+}
+
+/* ENCABEZADOS DE PÁGINA */
+.page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-top: 2rem; /* Espaciado superior */
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  color: var(--color-accent);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem; /* Espacio entre el icono y el texto */
+}
+
+.page-subtitle {
+  font-size: 1.1rem;
+  color: var(--color-muted);
+}
+
+
+/* CONTENEDORES */
+.container {
+  max-width: 1200px;
+  padding: 2rem;
+  margin: 0 auto;
+}
+
+.section-box {
+  background: var(--color-bg-light);
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08); /* Sombra mejorada */
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease; /* Transición para el hover */
+}
+
+.section-box:hover {
+  box-shadow: 0 10px 15px rgba(0,0,0,0.15), 0 3px 5px rgba(0,0,0,0.08); /* Sombra que se "eleva" */
+  transform: translateY(-5px); /* Pequeña elevación visual */
+}
+
+/* Encabezados de sección dentro de las cajas */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap; /* Para envolver en pantallas pequeñas */
+  gap: 1rem;
+}
+
+.section-header h2 {
+  font-size: 1.8rem;
+  color: var(--color-accent);
+  margin: 0; /* Eliminar margen predeterminado */
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+/* FORMULARIOS */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Columnas un poco más grandes */
+  gap: 1.5rem; /* Espacio entre campos */
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: 0.95rem;
+}
+
+.form-control {
+  width: calc(100% - 1.5rem); /* Ajuste para padding */
+  padding: 0.75rem;
+  border: 1px solid #d1d5db; /* Borde más suave */
+  border-radius: var(--border-radius);
+  transition: all 0.3s ease; /* Transición más suave */
+  font-family: 'Inter', sans-serif; /* Consistencia de fuente */
+  font-size: 1rem;
+}
+
+.form-control:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); /* Sombra de enfoque más visible */
+  outline: none;
+}
+
+/* TABLAS */
+.data-table {
+  width: 100%;
+  border-collapse: separate; /* Cambiado a separate para border-radius en celdas */
+  border-spacing: 0; /* Elimina espacio entre celdas */
+  font-size: 0.9rem;
+  margin: 1rem 0;
+  border-radius: var(--border-radius); /* Bordes redondeados en la tabla */
+  overflow: hidden; /* Asegura que los bordes redondeados se apliquen */
+}
+
+.data-table th, .data-table td {
+  padding: 1rem; /* Más padding para celdas */
+  text-align: left;
+}
+
+.data-table thead th {
+  background-color: var(--color-accent);
+  color: white;
+  font-weight: 600;
+  position: sticky;
+  top: 0; /* Para que el encabezado se quede fijo al desplazarse */
+  z-index: 1;
+}
+
+.data-table tbody tr:nth-child(even) {
+  background-color: #f9fafb; /* Filas zebra */
+}
+
+.data-table tbody tr:hover {
+  background-color: #eef2f6; /* Efecto hover en filas */
+  transition: background-color 0.2s ease;
+}
+
+.data-table td {
+  border-bottom: 1px solid #e5e7eb; /* Borde más suave */
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none; /* No hay borde en la última fila */
+}
+
+.table-responsive {
+  overflow-x: auto;
+  margin: 1rem 0;
+  border-radius: var(--border-radius); /* Asegurar bordes redondeados */
+  box-shadow: var(--box-shadow); /* Sombra para la tabla */
+}
+
+/* BOTONES */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem; /* Espacio un poco mayor entre icono y texto */
+  padding: 0.8rem 1.5rem; /* Más padding */
+  border-radius: 50px; /* Botones más redondeados */
+  font-weight: 600; /* Texto más negrita */
+  transition: all 0.3s ease; /* Transición más pronunciada */
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Sombra en botones */
+}
+
+.btn-primary {
+  background: var(--gradient-primary); /* Aplicando el degradado */
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px); /* Mayor elevación al pasar el ratón */
+  box-shadow: 0 8px 12px rgba(0,0,0,0.2); /* Sombra más grande al pasar el ratón */
+}
+
+.btn-secondary {
+  background-color: #6b7280;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.btn-secondary:hover {
+  background-color: #4b5563;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.12);
+}
+
+.btn:active {
+  transform: translateY(1px); /* Efecto de presión al hacer clic */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.btn-block {
+  width: 100%;
+  margin-top: 1.5rem; /* Espacio para el botón de bloque */
+}
+
+/* Botones de acción en tabla */
+.action-buttons {
+    white-space: nowrap; /* Evita que los botones se rompan en varias líneas */
+}
+
+.btn-action {
+  padding: 0.6rem 1.1rem; /* Más padding para los botones de acción */
+  border-radius: var(--border-radius);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  display: inline-flex; /* Para alinear icono y texto */
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-edit {
+  background-color: #f59e0b; /* Naranja */
+  color: white;
+}
+
+.btn-edit:hover {
+  background-color: #d97706; /* Naranja más oscuro */
+  transform: translateY(-1px);
+}
+
+.btn-delete {
+  background-color: #dc2626; /* Rojo más intenso */
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #b91c1c; /* Rojo más oscuro */
+  transform: translateY(-1px);
+}
+
+
+/* TARJETAS */
+.student-card {
+  background: var(--color-bg-light);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Sombra mejorada */
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+}
+
+.student-card:hover {
+    box-shadow: 0 8px 12px rgba(0,0,0,0.15); /* Sombra al pasar el ratón */
+    transform: translateY(-3px);
+}
+
+/* IMÁGENES */
+.intro img {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  border-radius: var(--border-radius);
+  margin: 1rem auto;
+  display: block;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15); /* Sombra a las imágenes */
+}
+
+/* FOOTER */
+.main-footer {
+  background: #1f2937; /* Color más oscuro para el footer */
+  color: white;
+  padding: 3rem 2rem; /* Más padding */
+  text-align: center;
+  margin-top: 3rem;
+  border-top: 5px solid var(--color-accent); /* Borde superior con color de acento */
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.social-links {
+  margin-top: 1.5rem;
+}
+
+.social-links a {
+  color: white;
+  margin: 0 15px; /* Más espacio entre iconos */
+  font-size: 1.5rem; /* Iconos más grandes */
+  transition: var(--transition);
+}
+
+.social-links a:hover {
+  color: var(--color-accent);
+  transform: translateY(-4px) scale(1.15); /* Efecto más pronunciado */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .container {
+    padding: 1rem;
+  }
+  
+  .navbar {
+    padding: 1rem;
+  }
+  
+  .navbar-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .navbar-links {
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .hero-section {
+    height: 60vh;
+  }
+  
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.2rem;
+  }
+  
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .slide img {
+    height: 300px;
+  }
+
+  .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+  }
+
+  .section-header h2 {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 1rem;
+  }
+
+  .table-responsive {
+    /* Mantener overflow-x: auto para tablas en móvil */
+    margin: 0.5rem 0;
+  }
+
+  /* Ajustes para botones en móvil */
+  .btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .btn-action {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Efectos adicionales para botones */
+.btn:hover::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(45deg);
+  transition: all 0.3s ease; /* Asegura una transición suave para este efecto */
+  opacity: 1;
+}
+
+/* Títulos con subrayado más modernos */
+/* .page-header h1 i, .section-header h2 i { */
+/*   No se necesita un ::after aquí si ya tienes el icono */
+/*   Si quisieras una línea debajo del texto sin el icono, usarías el ::after */
+/* } */
+
+/* Pasos numerados en listas (si los usas) */
+.steps-list li {
+  position: relative;
+  padding-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+.steps-list .step-number {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==================== ESTILOS PARA INDEX MEJORADO ==================== */
+
+/* Hero Section */
+.hero-section {
+  position: relative;
+  height: 70vh;
+  /* CAMBIO AQUI: Nueva URL de imagen de fondo más fiable */
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+              url('https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center/cover;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 3rem;
+  border-radius: var(--border-radius); /* Bordes redondeados */
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2); /* Sombra grande */
+}
+
+.hero-content {
+  max-width: 800px;
+  padding: 0 2rem;
+  z-index: 2;
+}
+
+.hero-section h1 {
+  font-size: 3.5rem; /* Más grande */
+  margin-bottom: 1rem;
+  text-shadow: 0 3px 6px rgba(0,0,0,0.4); /* Sombra de texto más pronunciada */
+  font-weight: 700;
+}
+
+.hero-subtitle {
+  font-size: 1.6rem; /* Más grande */
+  margin-bottom: 2.5rem; /* Más espacio */
+  font-weight: 300;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero-button {
+  display: inline-block;
+  background: var(--gradient-primary); /* Usando el degradado primario */
+  color: white;
+  padding: 1rem 2.5rem; /* Más padding */
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.4s ease; /* Transición más suave */
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2); /* Sombra para el botón */
+}
+
+.hero-button:hover {
+  transform: translateY(-5px); /* Mayor elevación */
+  box-shadow: 0 15px 30px rgba(0,0,0,0.3); /* Sombra más grande */
+}
+
+/* University Gallery */
+.university-gallery {
+  padding: 4rem 2rem;
+  background: #f9f9f9;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 3rem;
+  font-size: 2.5rem; /* Más grande */
+  color: var(--color-text);
+  position: relative;
+  font-weight: 700;
+}
+
+.section-title::after {
+  content: "";
+  display: block;
+  width: 100px; /* Más ancho */
+  height: 5px; /* Más grueso */
+  background: var(--color-accent);
+  margin: 1rem auto 0;
+  border-radius: 2px;
+}
+
+.glider-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.glider {
+  overflow: hidden;
+  padding: 1rem 0; /* Asegura espacio para las sombras de los slides */
+}
+
+.slide {
+  position: relative;
+  border-radius: 12px; /* Más redondeado */
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15); /* Sombra más pronunciada */
+  margin: 0 1rem;
+  transition: transform 0.4s ease, box-shadow 0.4s ease; /* Transiciones suaves */
+}
+
+.slide:hover {
+  transform: scale(1.03); /* Mayor zoom */
+  box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+}
+
+.slide img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  display: block;
+}
+
+.slide-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.2)); /* Degradado en la leyenda */
+  color: white;
+  padding: 1.2rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.glider-prev, .glider-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.85); /* Más opaco */
+  border: none;
+  width: 45px; /* Más grandes */
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  color: var(--color-accent); /* Color de icono */
+  font-size: 1.2rem;
+}
+
+.glider-prev:hover, .glider-next:hover {
+  background: rgba(255,255,255,1);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+}
+
+.glider-prev {
+  left: 20px;
+}
+
+.glider-next {
+  right: 20px;
+}
+
+/* Steps Section */
+.steps-section {
+  padding: 4rem 2rem;
+  background: var(--color-bg); /* Fondo de la sección de pasos */
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Tarjetas más anchas */
+  gap: 2.5rem; /* Más espacio */
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.step-card {
+  background: white;
+  border-radius: 10px; /* Bordes más redondeados */
+  padding: 2.5rem; /* Más padding */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08); /* Sombra mejorada */
+  transition: all 0.4s ease;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+  position: relative;
+  overflow: hidden; /* Para el efecto de brillo */
+}
+
+.step-card::before { /* Efecto de brillo sutil */
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: all 0.7s ease;
+}
+
+.step-card:hover::before {
+  left: 100%;
+}
+
+.step-card:hover {
+  transform: translateY(-12px); /* Mayor elevación */
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15); /* Sombra más grande */
+}
+
+.step-number {
+  width: 60px; /* Más grande */
+  height: 60px;
+  background: var(--gradient-primary); /* Degradado en el número */
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem; /* Número más grande */
+  font-weight: bold;
+  margin: 0 auto 1.5rem; /* Más espacio */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Sombra para el número */
+}
+
+.step-card h3 {
+  margin-bottom: 1rem;
+  color: var(--color-accent);
+  font-size: 1.6rem;
+}
+
+.step-link {
+  display: inline-block;
+  margin-top: 1.8rem; /* Más espacio */
+  color: var(--color-accent);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative; /* Para el subrayado animado */
+}
+
+.step-link::after { /* Subrayado animado */
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  display: block;
+  margin-top: 5px;
+  right: 0;
+  background: var(--color-accent-hover);
+  transition: width .3s ease;
+  -webkit-transition: width .3s ease;
+}
+
+.step-link:hover::after {
+  width: 100%;
+  left: 0;
+  background: var(--color-accent-hover);
+}
+
+/* Footer */
+.main-footer {
+  background: #1f2937; /* Color más oscuro para el footer */
+  color: white;
+  padding: 3rem 2rem; /* Más padding */
+  text-align: center;
+  margin-top: 3rem;
+  border-top: 5px solid var(--color-accent); /* Borde superior */
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.social-links {
+  margin-top: 1.5rem;
+}
+
+.social-links a {
+  color: white;
+  margin: 0 15px; /* Más espacio entre iconos */
+  font-size: 1.5rem; /* Iconos más grandes */
+  transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+  color: var(--color-accent);
+  transform: translateY(-4px) scale(1.15); /* Efecto más pronunciado */
+}
+
+/* SWEETALERT2 PERSONALIZADO */
+.swal2-popup {
+  font-family: 'Inter', sans-serif !important;
+  border-radius: var(--border-radius) !important;
+  background: var(--color-bg-light) !important;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important; /* Sombra para el modal */
+  padding: 2.5em !important;
+}
+
+.swal2-title {
+  color: var(--color-text) !important; /* Título SweetAlert con color de texto principal */
+  font-size: 1.7rem !important;
+}
+
+.swal2-html-container {
+    color: var(--color-text) !important;
+    font-size: 1.1rem !important;
+    padding: 1.5em !important; 
+}
+
+.swal2-input {
+    border: 1px solid #d1d5db !important;
+    border-radius: var(--border-radius) !important;
+    padding: 0.75rem !important;
+    font-size: 1rem !important;
+    width: calc(100% - 1.5rem) !important; /* Ajuste para padding */
+    transition: all 0.3s ease !important;
+}
+
+.swal2-input:focus {
+    border-color: var(--color-accent) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2) !important;
+    outline: none !important;
+}
+
+.swal2-confirm {
+  background: var(--gradient-primary) !important; /* Botón de confirmar con degradado */
+  color: white !important;
+  font-weight: 600 !important;
+  padding: 0.7rem 1.5rem !important;
+  border-radius: 50px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+}
+
+.swal2-confirm:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.25) !important;
+}
+
+.swal2-cancel {
+  background-color: #6b7280 !important;
+  color: white !important;
+  font-weight: 500 !important;
+  padding: 0.7rem 1.5rem !important;
+  border-radius: 50px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+}
+
+.swal2-cancel:hover {
+    background-color: #4b5563 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+}
+
+.swal2-styled.swal2-confirm:focus,
+.swal2-styled.swal2-cancel:focus {
+    box-shadow: none !important; /* Eliminar el box-shadow por defecto de SweetAlert2 en el focus */
+}
+
+.swal2-html-container .form-group { /* Usa una clase como 'form-group' en tus divs */
+    margin-bottom: 15px; /* Espacio entre los grupos de campos */
+    text-align: left; /* Asegura que el contenido dentro de cada grupo se alinee a la izquierda */
+}
+/* Fin de SweetAlert2 personalizado */
