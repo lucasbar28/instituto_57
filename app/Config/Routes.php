@@ -17,6 +17,7 @@ $routes->get('login', 'Login::index');
 $routes->post('auth', 'Login::auth');
 // Cierra la sesión
 $routes->get('logout', 'Login::logout');
+$routes->post('login/auth', 'Login::auth'); 
 
 
 // -----------------------------------------------------------
