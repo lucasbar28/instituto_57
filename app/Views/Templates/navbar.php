@@ -1,7 +1,7 @@
 <nav class="navbar">
     <div class="navbar-container">
         <a class="navbar-logo" href="<?= base_url() ?>">
-            <img src="<?= base_url('img/logo.png') ?>" alt="Logo del Instituto" class="logo-navbar" style="height: 40px;">
+            <img src="<?= base_url('img/logo.png') ?>" alt="Logo del Instituto" class="logo-navbar" style="height: 80px;">
         </a>
         
         <div class="navbar-links">

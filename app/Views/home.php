@@ -3,11 +3,11 @@
 <?= $this->section('content') ?>
 
 <header class="hero-section">
-    <div class="hero-content">
-        <h1><i class="fas fa-graduation-cap"></i> Bienvenido a StudentApp</h1>
-        <p class="hero-subtitle">La plataforma definitiva para la gestión académica universitaria</p>
-        <a href="<?= base_url('estudiantes') ?>" class="hero-button">Comenzar ahora <i class="fas fa-arrow-right"></i></a>
-    </div>
+  <div class="hero-content">
+    <h1><i class="fas fa-graduation-cap"></i> Instituto Superior de Formación Docente y Técnica N 57</h1>
+    <p class="hero-subtitle">El Instituto ofrece carreras docentes y técnicas del Nivel Superior.</p>
+    <a href="<= base_url('estudiantes')>" class="hero-button">Comenzar ahora <i class="fas fa-arrow-right"></i></a>
+  </div>
 </header>
 
 <section class="university-gallery">
@@ -37,29 +37,29 @@
 </section>
 
 <section class="steps-section">
-    <div class="container">
-        <h2 class="section-title"><i class="fas fa-magic"></i> Cómo usar la aplicación</h2>
-        <div class="steps-grid">
-            <div class="step-card">
-                <div class="step-number">1</div>
-                <h3>Gestiona Estudiantes</h3>
-                <p>Registra nuevos alumnos, actualiza sus datos y realiza seguimiento académico.</p>
-                <a href="<?= base_url('estudiantes') ?>" class="step-link">Ir a Estudiantes <i class="fas fa-arrow-right"></i></a>
-            </div>
-            <div class="step-card">
-                <div class="step-number">2</div>
-                <h3>Administra Carreras</h3>
-                <p>Crea y organiza las carreras académicas ofrecidas por tu institución.</p>
-                <a href="<?= base_url('carreras') ?>" class="step-link">Ir a Carreras <i class="fas fa-arrow-right"></i></a>
-            </div>
-            <div class="step-card">
-                <div class="step-number">3</div>
-                <h3>Organiza Categorías</h3>
-                <p>Clasifica las carreras por áreas de conocimiento para mejor gestión.</p>
-                <a href="<?= base_url('categorias') ?>" class="step-link">Ir a Categorías <i class="fas fa-arrow-right"></i></a>
-            </div>
-        </div>
+  <div class="container">
+    <h2 class="section-title"><i class="fas fa-magic"></i> Cómo usar la aplicación</h2>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3>Gestiona Estudiantes</h3>
+        <p>Registra nuevos alumnos, actualiza sus datos y realiza seguimiento académico.</p>
+        <a href="<?= base_url('estudiantes') ?>" class="step-link">Ir a Estudiantes <i class="fas fa-arrow-right"></i></a>
+      </div>
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3>Administra Carreras</h3>
+        <p>Crea y organiza las carreras académicas ofrecidas por tu institución.</p>
+        <a href="<?= base_url('carreras') ?>" class="step-link">Ir a Carreras <i class="fas fa-arrow-right"></i></a>
+      </div>
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3>Organiza Categorías</h3>
+        <p>Clasifica  las carreras por áreas de conocimiento para mejor gestión.</p>
+        <a href="<?= base_url('categorias') ?>" class="step-link">Ir a Categorías <i class="fas fa-arrow-right"></i></a>
+      </div>
     </div>
+  </div> 
 </section>
 
 <?= $this->endSection() ?> 
