@@ -5,14 +5,17 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
+$routes->get('/', 'Home::index'); 
 $routes->get('login', 'Login::index');
 $routes->post('auth', 'Login::auth'); 
 $routes->get('profesores', 'Profesores::index');
 $routes->get('carreras', 'Carreras::index'); 
-$routes->get('categorias', 'Categorias::index'); 
+$routes->get('categorias', 'Categorias::index');
+$routes->get('categorias/crear', 'Categorias::crear');
+$routes->post('categorias/guardar', 'Categorias::guardar'); 
 $routes->get('cursos', 'Cursos::index'); 
 $routes->post('inscripcion/guardar', 'Inscripcion::guardar');
+$routes->get('estudiantes', 'Estudiantes::index');
 $routes->get('estudiantes/crear', 'Estudiantes::crear');
 $routes->post('estudiantes/guardar', 'Estudiantes::guardar');
 $routes->get('profesores/crear', 'Profesores::crear');
