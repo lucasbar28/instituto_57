@@ -15,12 +15,13 @@ class Estudiantes extends BaseController
     {
         $estudianteModel = new EstudianteModel();
         
+        // NOTA: Para mostrar el nombre de la carrera, idealmente se usaría un JOIN aquí.
         $data = [
             'estudiantes' => $estudianteModel->findAll(),
             'title'       => 'Lista de Alumnos', // Título para el layout
         ];
         
-        // Carga la vista de lista (que ya corregiste y debes adaptar al layout)
+        // Carga la vista de lista
         return view('estudiantes', $data); 
     }
     
@@ -40,7 +41,6 @@ class Estudiantes extends BaseController
         ];
 
         // 3. Cargar el formulario
-        // Nota: La vista 'estudiantes_form' debe usar $this->extend('templates/layout')
         return view('estudiantes_form', $data);
     }
     
@@ -55,9 +55,18 @@ class Estudiantes extends BaseController
         // --- Reglas de Validación ---
         if (! $this->validate([
             'nombre_completo' => 'required|min_length[3]',
-            'dni_matricula'   => 'required|is_unique[alumnos.dni_matricula]', // Asumiendo que es único
-            'email'           => 'required|valid_email|is_unique[alumnos.email]',
+            'dni'             => 'required|is_unique[alumnos.dni]', // << CORREGIDO: Usando 'dni' en la validación
+            'email'           => 'required|valid_email|is_unique[alumnos.email]', // Válido y Único
             'id_carrera'      => 'required|integer',
+        ],
+        // Mensajes personalizados
+        [
+            'dni' => [ // << CORREGIDO: Usando 'dni' en el mensaje
+                'is_unique' => 'Ya existe un alumno con este DNI.'
+            ],
+            'email' => [
+                'is_unique' => 'Ya existe un alumno registrado con esta dirección de correo.'
+            ]
         ])) {
             // Si la validación falla, regresa al formulario con los errores y los datos ingresados
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
@@ -66,13 +75,14 @@ class Estudiantes extends BaseController
         // --- Inserción de Datos en la tabla 'alumnos' ---
         $estudianteModel->insert([
             'nombre_completo' => $datos['nombre_completo'],
-            'dni_matricula'   => $datos['dni_matricula'],
+            'dni'             => $datos['dni'], // << CORREGIDO: Usando 'dni' en la inserción
             'email'           => $datos['email'],
-            'telefono'        => $datos['telefono'],
+            'telefono'        => $datos['telefono'], 
             'id_carrera'      => $datos['id_carrera'],
         ]);
 
         // Redirección exitosa a la lista de alumnos
         return redirect()->to(base_url('estudiantes'))->with('mensaje', '✅ Alumno registrado con éxito!');
     }
-} 
+}
+ 

@@ -9,17 +9,20 @@ use App\Models\CategoriaModel;
 class Carreras extends BaseController
 {
     /**
-     * Muestra la lista de todas las carreras (placeholder por ahora).
+     * Muestra la lista de todas las carreras, posiblemente con sus categorías.
      */
     public function index()
     {
         $carreraModel = new CarreraModel();
+        
+        // NOTA: Si necesitas mostrar el nombre de la categoría, 
+        // deberías hacer un JOIN o usar un método personalizado en el Modelo.
+        // Por ahora, solo cargamos los datos básicos.
         $data = [
             'carreras' => $carreraModel->findAll(),
             'page_title' => 'Lista de Carreras'
         ];
         
-        // Simplemente muestra una página de 'éxito' para fines de prueba/redirección
         return view('carreras_list', $data); 
     }
     
@@ -37,7 +40,8 @@ class Carreras extends BaseController
         // 3. Preparar los datos para la vista
         $data = [
             'categorias' => $categorias,
-            'validation' => \Config\Services::validation(), // Para mensajes de validación
+            // Inyectar el servicio de validación para errores inline
+            'validation' => \Config\Services::validation(), 
             'page_title' => 'Crear Carrera'
         ];
 
@@ -54,12 +58,18 @@ class Carreras extends BaseController
         $datos = $this->request->getPost();
 
         // --- Reglas de Validación ---
-        // Estas reglas garantizan que los datos son obligatorios y tienen el formato correcto
         if (! $this->validate([
-            'nombre_carrera' => 'required|min_length[3]',
+            // Se agregó 'is_unique' para asegurar que el nombre de la carrera no se repita
+            'nombre_carrera' => 'required|min_length[3]|is_unique[carreras.nombre_carrera]', 
             'duracion'       => 'required|integer|greater_than[0]',
             'modalidad'      => 'required',
             'id_categoria'   => 'required|integer',
+        ], 
+        // Mensajes personalizados para el campo único
+        [
+            'nombre_carrera' => [
+                'is_unique' => 'Ya existe una carrera con este nombre. Por favor, ingrese un nombre diferente.'
+            ]
         ])) {
             // Si la validación falla, regresa al formulario con los errores
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
@@ -71,10 +81,11 @@ class Carreras extends BaseController
             'duracion'       => $datos['duracion'],
             'modalidad'      => $datos['modalidad'],
             'id_categoria'   => $datos['id_categoria'],
-            // 'estado' y 'fecha_creacion' deben ser manejados por el modelo o la DB
+            // Se asume que el estado se maneja por defecto en la base de datos o en el modelo
         ]);
 
         // Redirección con mensaje de éxito (flash data)
         return redirect()->to(base_url('carreras'))->with('mensaje', '✅ ¡Carrera registrada con éxito!');
     }
-} 
+}
+ 
