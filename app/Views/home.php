@@ -1,5 +1,6 @@
-<?= view('templates/head') ?>
-<?= view('templates/navbar') ?>
+<?= $this->extend('templates/layout') ?> 
+
+<?= $this->section('content') ?>
 
 <header class="hero-section">
   <div class="hero-content">
@@ -10,29 +11,29 @@
 </header>
 
 <section class="university-gallery">
-  <h2 class="section-title">Nuestro entorno académico</h2>
-  <div class="glider-container">
-    <div class="glider">
-      <div class="slide">
-        <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80" 
-              alt="Estudiantes en biblioteca">
-        <div class="slide-caption">Ambiente de estudio colaborativo</div>
-      </div>
-      <div class="slide">
-        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80" 
-              alt="Grupo de estudiantes">
-        <div class="slide-caption">Trabajo en equipo</div>
-      </div>
-      <div class="slide">
-        <img src="https://images.unsplash.com/photo-1541178735493-479c1a27ed24?auto=format&fit=crop&w=1200&q=80" 
-              alt="Aula universitaria">
-        <div class="slide-caption">Aulas modernas</div>
-      </div>
+    <h2 class="section-title">Nuestro entorno académico</h2>
+    <div class="glider-container">
+        <div class="glider">
+            <div class="slide">
+                <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80" 
+                    alt="Estudiantes en biblioteca">
+                <div class="slide-caption">Ambiente de estudio colaborativo</div>
+            </div>
+            <div class="slide">
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80" 
+                    alt="Grupo de estudiantes">
+                <div class="slide-caption">Trabajo en equipo</div>
+            </div>
+            <div class="slide">
+                <img src="https://images.unsplash.com/photo-1541178735493-479c1a27ed24?auto=format&fit=crop&w=1200&q=80" 
+                    alt="Aula universitaria">
+                <div class="slide-caption">Aulas modernas</div>
+            </div>
+        </div>
+        <button aria-label="Previous" class="glider-prev"><i class="fas fa-chevron-left"></i></button>
+        <button aria-label="Next" class="glider-next"><i class="fas fa-chevron-right"></i></button>
+        <div role="tablist" class="dots"></div>
     </div>
-    <button aria-label="Previous" class="glider-prev"><i class="fas fa-chevron-left"></i></button>
-    <button aria-label="Next" class="glider-next"><i class="fas fa-chevron-right"></i></button>
-    <div role="tablist" class="dots"></div>
-  </div>
 </section>
 
 <section class="steps-section">
@@ -61,4 +62,4 @@
   </div> 
 </section>
 
-<?= view('templates/footer') ?>
+<?= $this->endSection() ?> 

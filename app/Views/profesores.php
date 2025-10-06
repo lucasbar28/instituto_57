@@ -1,28 +1,49 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregar Profesor</title>
-</head>
-<body>
+<?= $this->extend('templates/layout') ?> 
 
-    <h1>Agregar Nuevo Profesor</h1>
+<?= $this->section('content') ?>
 
-    <form action="<?= base_url('profesores/guardar') ?>" method="post">
-        <label for="nombre_completo">Nombre Completo:</label>
-        <input type="text" name="nombre_completo" required><br><br>
+<div class="page-header">
+    <h1>Lista de Profesores</h1>
+    <p class="page-subtitle">Gestión de todos los docentes registrados en el instituto.</p>
+    <a href="<?= base_url('profesores/crear') ?>" class="btn btn-primary">Registrar Nuevo Profesor</a>
+</div>
 
-        <label for="especialidad">Especialidad:</label>
-        <input type="text" name="especialidad" required><br><br>
+<?php if (session()->getFlashdata('mensaje')): ?>
+    <div class="alert-success section-box">
+        <p><?= session()->getFlashdata('mensaje') ?></p>
+    </div>
+<?php endif; ?>
 
-        <label for="email">Email:</label>
-        <input type="email" name="email" required><br><br>
+<div class="section-box">
+    <?php if (!empty($profesores) && is_array($profesores)): ?>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Nombre Completo</th>
+                    <th>Especialidad</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($profesores as $profesor): ?>
+                <tr>
+                    <td><?= esc($profesor['nombre_completo']) ?></td>
+                    <td><?= esc($profesor['especialidad']) ?></td> 
+                    <td><?= esc($profesor['email']) ?></td>
+                    <td><?= esc($profesor['telefono']) ?></td>
+                    <td>
+                        <a href="<?= base_url('profesores/editar/' . $profesor['id_profesor']) ?>" class="btn btn-sm btn-info">Editar</a>
+                        <a href="<?= base_url('profesores/eliminar/' . $profesor['id_profesor']) ?>" class="btn btn-sm btn-danger">Eliminar</a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <p class="text-muted">No hay profesores registrados para mostrar.</p>
+    <?php endif; ?>
+</div>
 
-        <label for="telefono">Teléfono:</label>
-        <input type="text" name="telefono"><br><br>
-
-        <button type="submit">Guardar Profesor</button>
-    </form>
-</body>
-</html> 
+<?= $this->endSection() ?> 
