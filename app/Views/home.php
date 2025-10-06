@@ -3,9 +3,9 @@
 
 <header class="hero-section">
   <div class="hero-content">
-    <h1><i class="fas fa-graduation-cap"></i> Bienvenido a StudentApp</h1>
-    <p class="hero-subtitle">La plataforma definitiva para la gestión académica universitaria</p>
-    <a href="<?= base_url('estudiantes') ?>" class="hero-button">Comenzar ahora <i class="fas fa-arrow-right"></i></a>
+    <h1><i class="fas fa-graduation-cap"></i> Instituto Superior de Formación Docente y Técnica N 57</h1>
+    <p class="hero-subtitle">El Instituto ofrece carreras docentes y técnicas del Nivel Superior.</p>
+    <a href="<= base_url('estudiantes')>" class="hero-button">Comenzar ahora <i class="fas fa-arrow-right"></i></a>
   </div>
 </header>
 
