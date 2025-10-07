@@ -12,15 +12,14 @@ class CategoriaModel extends Model
     // Campos permitidos para la inserción/actualización
     protected $allowedFields = ['nombre', 'descripcion'];
 
-    // --- Configuración de CodeIgniter 4 ---
+    // --- TimeStamps ---
     // Si tu tabla 'categorias' tiene las columnas 'fecha_creacion' y 'fecha_actualizacion'
     protected $useTimestamps = true; 
     protected $createdField  = 'fecha_creacion'; 
     protected $updatedField  = 'fecha_actualizacion'; 
-    // ----------------------------------------
+    // ------------------
 
-    // --- Callback Personalizado (Tu Funcionalidad) ---
-    // Ejecuta la función 'guardarComoJSON' después de una inserción exitosa
+    // Callback: Ejecuta la función 'guardarComoJSON' después de una inserción exitosa
     protected $afterInsert = ['guardarComoJSON'];
 
     protected function guardarComoJSON(array $data)
@@ -46,7 +45,8 @@ class CategoriaModel extends Model
             // Guardar el contenido en el archivo
             file_put_contents($file_path, $json_data);
         }
-        // Nota: Se debe retornar $data al final de un callback
+        
+        // Es crucial retornar $data al final de un callback del modelo
         return $data;
     }
 } 

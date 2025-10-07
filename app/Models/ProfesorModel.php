@@ -6,9 +6,16 @@ use CodeIgniter\Model;
 
 class ProfesorModel extends Model
 {
-    protected $table = 'profesores';
+    protected $table      = 'profesores';
     protected $primaryKey = 'id_profesor';
     protected $allowedFields = ['nombre_completo', 'especialidad', 'email', 'telefono', 'id_usuario'];
+
+    // --- TimeStamps (Añadido para gestión automática de fechas) ---
+    protected $useTimestamps = true;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at'; 
+    // -----------------------------------------------------------------
 
     protected $afterInsert = ['guardarComoJSON'];
 
@@ -28,5 +35,8 @@ class ProfesorModel extends Model
 
             file_put_contents($file_path, $json_data);
         }
+        
+        // Es crucial retornar $data al final del callback
+        return $data;
     }
 } 
