@@ -14,7 +14,6 @@ $routes->get('logout', 'Login::logout');
 
 // --------------------------------------------------------------------------
 // RUTAS DE GESTIÓN (Acceso directo temporal)
-// NOTA: Hemos eliminado el filtro 'auth' que estaba causando problemas.
 // --------------------------------------------------------------------------
 
 // Rutas de Profesores
@@ -35,7 +34,8 @@ $routes->post('categorias/guardar', 'Categorias::guardar');
 // ...
 
 // Rutas de Cursos
-$routes->post('cursos', 'Cursos::index');
+// ¡CORRECCIÓN AQUÍ! Ahora es GET para poder ver la lista de cursos en el navegador
+$routes->get('cursos', 'Cursos::index');
 // ...
 
 // Rutas de Estudiantes
@@ -47,4 +47,3 @@ $routes->post('estudiantes/guardar', 'Estudiantes::guardar');
 // Rutas de Inscripción
 $routes->post('inscripcion/guardar', 'Inscripcion::guardar');
 // ...
- 
