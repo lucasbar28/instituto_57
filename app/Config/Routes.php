@@ -13,37 +13,70 @@ $routes->post('login/auth', 'Login::auth');
 $routes->get('logout', 'Login::logout');
 
 // --------------------------------------------------------------------------
-// RUTAS DE GESTIÓN (Acceso directo temporal)
+// RUTAS DE GESTIÓN (Acceso directo temporal) - CRUD COMPLETO
 // --------------------------------------------------------------------------
 
-// Rutas de Profesores
-$routes->get('profesores', 'Profesores::index');
-$routes->post('profesores/crear', 'Profesores::crear');
-$routes->post('profesores/guardar', 'Profesores::guardar');
-// ... (Añadir rutas de editar/eliminar si existen)
+// --- PROFESORES ---
+$routes->group('profesores', static function ($routes) {
+    // Listar todos
+    $routes->get('/', 'Profesores::index'); 
+    // Crear (Formulario GET y Guardar POST)
+    $routes->get('crear', 'Profesores::crear');
+    $routes->post('guardar', 'Profesores::guardar');
+    // Editar (Formulario GET con ID)
+    $routes->get('editar/(:num)', 'Profesores::editar/$1'); 
+    // Actualizar (Procesar formulario POST con ID)
+    $routes->post('actualizar', 'Profesores::actualizar');
+    // Eliminar (Procesar eliminación POST/GET con ID)
+    $routes->get('eliminar/(:num)', 'Profesores::eliminar/$1'); 
+});
 
-// Rutas de Carreras
-$routes->get('carreras', 'Carreras::index');
-$routes->post('carreras/crear', 'Carreras::crear');
-$routes->post('carreras/guardar', 'Carreras::guardar');
-// ...
 
-// Rutas de Categorías
-$routes->get('categorias/crear', 'Categorias::crear');
-$routes->post('categorias/guardar', 'Categorias::guardar');
-// ...
+// --- CARRERAS ---
+$routes->group('carreras', static function ($routes) {
+    $routes->get('/', 'Carreras::index');
+    $routes->get('crear', 'Carreras::crear');
+    $routes->post('guardar', 'Carreras::guardar');
+    $routes->get('editar/(:num)', 'Carreras::editar/$1');
+    $routes->post('actualizar', 'Carreras::actualizar');
+    $routes->get('eliminar/(:num)', 'Carreras::eliminar/$1');
+});
 
-// Rutas de Cursos
-// ¡CORRECCIÓN AQUÍ! Ahora es GET para poder ver la lista de cursos en el navegador
-$routes->get('cursos', 'Cursos::index');
-// ...
 
-// Rutas de Estudiantes
-$routes->get('estudiantes', 'Estudiantes::index');
-$routes->post('estudiantes/crear', 'Estudiantes::crear');
-$routes->post('estudiantes/guardar', 'Estudiantes::guardar');
-// ...
+// --- CATEGORÍAS ---
+$routes->group('categorias', static function ($routes) {
+    $routes->get('/', 'Categorias::index'); // Agregamos el index para listado
+    $routes->get('crear', 'Categorias::crear');
+    $routes->post('guardar', 'Categorias::guardar');
+    $routes->get('editar/(:num)', 'Categorias::editar/$1');
+    $routes->post('actualizar', 'Categorias::actualizar');
+    $routes->get('eliminar/(:num)', 'Categorias::eliminar/$1');
+});
 
-// Rutas de Inscripción
+
+// --- CURSOS ---
+$routes->group('cursos', static function ($routes) {
+    $routes->get('/', 'Cursos::index');
+    $routes->get('crear', 'Cursos::crear');
+    $routes->post('guardar', 'Cursos::guardar');
+    $routes->get('editar/(:num)', 'Cursos::editar/$1');
+    $routes->post('actualizar', 'Cursos::actualizar');
+    $routes->get('eliminar/(:num)', 'Cursos::eliminar/$1');
+});
+
+
+// --- ESTUDIANTES (Alumnos) ---
+$routes->group('estudiantes', static function ($routes) {
+    $routes->get('/', 'Estudiantes::index');
+    $routes->get('crear', 'Estudiantes::crear');
+    $routes->post('guardar', 'Estudiantes::guardar');
+    $routes->get('editar/(:num)', 'Estudiantes::editar/$1');
+    $routes->post('actualizar', 'Estudiantes::actualizar');
+    $routes->get('eliminar/(:num)', 'Estudiantes::eliminar/$1');
+});
+
+
+// --- INSCRIPCIÓN ---
+// Dejamos la inscripción fuera de un grupo por ahora, ya que solo tiene una ruta de acción
 $routes->post('inscripcion/guardar', 'Inscripcion::guardar');
-// ...
+ 
