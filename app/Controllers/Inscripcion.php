@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\InscripcionModel;
 use CodeIgniter\Controller;
+use CodeIgniter\Database\Exceptions\DatabaseException; 
 
 class Inscripcion extends BaseController
 {
@@ -20,14 +21,9 @@ class Inscripcion extends BaseController
         ];
 
         // 2. --- Reglas de Validación ---
-        // Se valida que ambos IDs existan y, más importante, que la combinación
-        // de id_alumno + id_curso no exista ya en la tabla 'inscripciones'.
         if (! $this->validate([
             'id_alumno' => 'required|integer',
             'id_curso'  => 'required|integer|is_unique[inscripciones.id_curso,id_alumno,{id_alumno}]', 
-            // La regla 'is_unique' compleja comprueba: 
-            // 1. Unicidad de 'id_curso'
-            // 2. Filtrando por 'id_alumno' (la variable {id_alumno} se toma del array $data)
         ],
         // Mensajes personalizados
         [
@@ -49,11 +45,38 @@ class Inscripcion extends BaseController
         $inscripcionModel = new InscripcionModel();
         
         // 4. Guarda el registro en la base de datos
+        // Usamos save() ya que el modelo maneja internamente la fecha_inscripcion
         $inscripcionModel->save($data);
 
         // 5. Redirecciona con mensaje de éxito (flash data)
         return redirect()->back()->with('mensaje', '✅ Inscripción registrada con éxito!');
-        // Se redirige hacia atrás (back) asumiendo que el formulario está en estudiantes/index o cursos/index
+    }
+
+    /**
+     * Elimina un registro de inscripción basado en el ID de inscripción.
+     * Esto desinscribe a un alumno de un curso.
+     * @param int $id ID de la inscripción a eliminar (id_inscripcion).
+     */
+    public function eliminar($id)
+    {
+        $inscripcionModel = new InscripcionModel();
+        
+        try {
+            // 1. Intentar eliminar el registro
+            $deleted = $inscripcionModel->delete($id);
+
+            if (!$deleted) {
+                // Si delete retorna falso, el ID no existía o hubo un error silencioso.
+                 return redirect()->back()->with('error', '❌ Error al desinscribir: No se encontró la inscripción o el ID es inválido.');
+            }
+
+            // 2. Redireccionar con mensaje de éxito
+            return redirect()->back()->with('mensaje', '🗑️ Desinscripción realizada con éxito. El alumno ya no está en el curso.');
+
+        } catch (DatabaseException $e) {
+            log_message('error', 'Error al eliminar inscripción: ' . $e->getMessage());
+            return redirect()->back()->with('error', '❌ Error de base de datos al desinscribir. Por favor, inténtelo de nuevo.');
+        }
     }
 }
  
