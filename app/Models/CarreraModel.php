@@ -11,8 +11,7 @@ class CarreraModel extends Model
     protected $useAutoIncrement   = true;
     protected $returnType         = 'array';
     
-    // Dejamos $useSoftDeletes en false porque estamos manejando
-    // la eliminación lógica manualmente con la columna 'estado'.
+    // Dejamos $useSoftDeletes en false.
     protected $useSoftDeletes     = false; 
     
     protected $protectFields      = true;
@@ -21,15 +20,18 @@ class CarreraModel extends Model
         'nombre_carrera', 
         'duracion', 
         'modalidad', 
-        'estado' // La columna de eliminación lógica
+        'estado' // Columna de eliminación lógica
     ];
 
     // Dates
-    protected $useTimestamps = true;
-    protected $dateFormat    = 'datetime';
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_at'; // No usado con $useSoftDeletes = false
+    // CORRECCIÓN: Se desactiva el uso de timestamps porque tu tabla no tiene
+    // las columnas 'created_at' ni 'updated_at' por defecto.
+    protected $useTimestamps = false; 
+    
+    protected $dateFormat     = 'datetime';
+    protected $createdField   = ''; // Se anulan ya que $useTimestamps es false
+    protected $updatedField   = ''; // Se anulan ya que $useTimestamps es false
+    protected $deletedField   = 'deleted_at'; // No aplica, pero se mantiene por convención si se desea usar soft delete en el futuro
 
     // Validation
     protected $validationRules    = [
@@ -37,7 +39,7 @@ class CarreraModel extends Model
         'duracion'       => 'required|integer|greater_than_equal_to[1]',
         'modalidad'      => 'required|in_list[Presencial,Virtual,Mixta]',
         'id_categoria'   => 'required|integer|is_not_unique[categorias.id_categoria]',
-        // Ajustamos la validación del estado para aceptar solo 0 o 1 (o nulo/vacío si lo manejas en otro lado)
+        // Ajustamos la validación del estado para aceptar solo 0 o 1
         'estado'         => 'permit_empty|integer|in_list[0,1]',
     ];
     protected $validationMessages = [];
@@ -51,7 +53,7 @@ class CarreraModel extends Model
     protected $beforeUpdate   = [];
     protected $afterUpdate    = [];
     protected $beforeFind     = [];
-    protected $afterFind      = []; // <--- CORREGIDO: Se eliminó el callback inválido aquí.
+    protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
@@ -90,4 +92,3 @@ class CarreraModel extends Model
         return $this->update($id, ['estado' => 0]);
     }
 }
- 
