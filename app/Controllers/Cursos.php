@@ -56,7 +56,7 @@ class Cursos extends BaseController // Extender de BaseController por consistenc
         // --- Reglas de Validación ---
         if (! $this->validate([
             // Nombre del curso debe ser obligatorio y único en la tabla 'cursos'
-            'nombre_curso' => 'required|min_length[3]|is_unique[cursos.nombre_curso]', 
+            'nombre' => 'required|min_length[3]|is_unique[cursos.nombre]', 
             'creditos'     => 'required|integer|greater_than[0]',
             'id_profesor'  => 'required|integer', // ID del profesor
             'id_carrera'   => 'required|integer', // ID de la carrera
@@ -64,7 +64,7 @@ class Cursos extends BaseController // Extender de BaseController por consistenc
         ], 
         // Mensajes personalizados
         [
-            'nombre_curso' => [
+            'nombre' => [
                 'is_unique' => 'Ya existe un curso con este nombre. Por favor, ingrese un nombre diferente.'
             ]
         ])) {
@@ -74,7 +74,7 @@ class Cursos extends BaseController // Extender de BaseController por consistenc
 
         // --- Inserción de Datos ---
         $cursoModel->insert([
-            'nombre_curso' => $datos['nombre_curso'],
+            'nombre' => $datos['nombre'],
             'creditos'     => $datos['creditos'],
             'id_profesor'  => $datos['id_profesor'],
             'id_carrera'   => $datos['id_carrera'],

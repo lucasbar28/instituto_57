@@ -31,6 +31,8 @@
     <?php endif; ?>
 
     <form action="<?= base_url('cursos/guardar') ?>" method="post">
+        <?= csrf_field() ?>
+
         
         <div class="form-grid">
             
@@ -44,16 +46,6 @@
                 <?php endif; ?>
             </div>
 
-            <!-- Código del Curso -->
-            <div class="form-group">
-                <label for="codigo_curso">Código del Curso (Ej: INF101):</label>
-                <input type="text" name="codigo_curso" id="codigo_curso" class="form-control <?= $validation->hasError('codigo_curso') ? 'is-invalid' : '' ?>" 
-                       value="<?= old('codigo_curso') ?>" required>
-                <?php if ($validation->hasError('codigo_curso')): ?>
-                    <div class="invalid-feedback"><?= $validation->getError('codigo_curso') ?></div>
-                <?php endif; ?>
-            </div>
-            
             <!-- Profesor Asignado (Dropdown) -->
             <div class="form-group">
                 <label for="id_profesor">Profesor Asignado:</label>

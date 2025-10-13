@@ -10,7 +10,7 @@ class CursoModel extends Model
     protected $primaryKey = 'id_curso';
     
     // CORREGIDO: Se añadió 'id_profesor' para que pueda ser guardado desde el formulario.
-    protected $allowedFields = ['nombre', 'codigo', 'creditos', 'descripcion', 'id_carrera', 'id_profesor'];
+    protected $allowedFields = ['nombre', 'creditos', 'descripcion', 'id_carrera', 'id_profesor'];
 
     // --- TimeStamps (Para gestión automática de fechas) ---
     protected $useTimestamps = true;
