@@ -1,0 +1,9 @@
+{
+    "id_alumno": "2",
+    "nombre_completo": "Javier Newton",
+    "dni_matricula": "42490755",
+    "email": "javier@gmail.com",
+    "telefono": null,
+    "id_usuario": null,
+    "id_carrera": "1"
+}

@@ -2,6 +2,7 @@
 /**
  * Vista: Formulario para la creación o edición de un Estudiante.
  * Extiende el layout principal 'templates/layout'.
+ * CORREGIDO: Cambiado 'dni' a 'dni_matricula' para coincidir con la BD, Modelo y Controlador.
  */
 ?>
 <?= $this->extend('templates/layout') ?> 
@@ -85,14 +86,14 @@ $has_error = function($field) use ($validation) {
                     <?php endif; ?>
                 </div>
 
-                <!-- DNI (o documento de identidad) -->
+                <!-- DNI / DOCUMENTO / MATRÍCULA (CAMBIADO name="dni_matricula") -->
                 <div class="form-group">
-                    <label for="dni">DNI / Documento:</label>
-                    <input type="text" name="dni" id="dni" 
-                            class="form-control <?= $has_error('dni') ?>" 
-                            value="<?= esc($get_value('dni')) ?>" required>
-                    <?php if ($validation->hasError('dni')): ?>
-                        <small class="invalid-feedback-text"><?= $validation->getError('dni') ?></small>
+                    <label for="dni_matricula">DNI / Documento / Matrícula:</label>
+                    <input type="text" name="dni_matricula" id="dni_matricula" 
+                            class="form-control <?= $has_error('dni_matricula') ?>" 
+                            value="<?= esc($get_value('dni_matricula')) ?>" required>
+                    <?php if ($validation->hasError('dni_matricula')): ?>
+                        <small class="invalid-feedback-text"><?= $validation->getError('dni_matricula') ?></small>
                     <?php endif; ?>
                 </div>
                 
@@ -123,7 +124,7 @@ $has_error = function($field) use ($validation) {
                     <label for="id_carrera">Carrera Asociada:</label>
                     <?php $selected_carrera = $get_value('id_carrera'); ?>
                     <select name="id_carrera" id="id_carrera" 
-                             class="form-control <?= $has_error('id_carrera') ?>" required>
+                                 class="form-control <?= $has_error('id_carrera') ?>" required>
                         <option value="">Seleccione una Carrera</option>
                         <?php if (!empty($carreras)): ?>
                             <?php foreach ($carreras as $carrera): ?>
@@ -163,4 +164,4 @@ $has_error = function($field) use ($validation) {
 }
 </style>
 
-<?= $this->endSection() ?>
+<?= $this->endSection() ?> 

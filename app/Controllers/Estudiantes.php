@@ -4,14 +4,13 @@ namespace App\Controllers;
 
 use App\Models\EstudianteModel;
 use App\Models\CarreraModel;
-use App\Models\CursoModel; // Nuevo: Para obtener la lista de cursos
-use App\Models\InscripcionModel; // Nuevo: Para obtener las inscripciones
+use App\Models\CursoModel;
+use App\Models\InscripcionModel;
 
 class Estudiantes extends BaseController
 {
     /**
      * Muestra la lista de todos los estudiantes.
-     * Ahora también obtiene la lista de cursos e inscripciones para la integración.
      */
     public function index()
     {
@@ -29,7 +28,6 @@ class Estudiantes extends BaseController
         $carreras_map = array_column($carreras, 'nombre_carrera', 'id_carrera');
 
         // Obtener la lista de inscripciones (ID de inscripción, ID de alumno, ID de curso)
-        // Usamos findAll() y luego mapeamos los nombres de los cursos.
         $inscripciones_raw = $inscripcionModel->findAll();
 
         // Mapear cursos por ID
@@ -80,6 +78,7 @@ class Estudiantes extends BaseController
 
     /**
      * Procesa los datos del formulario y guarda el nuevo estudiante.
+     * CORREGIDO: Se cambia 'dni' a 'dni_matricula' en la validación y al guardar.
      */
     public function guardar()
     {
@@ -87,14 +86,16 @@ class Estudiantes extends BaseController
         $datos = $this->request->getPost();
 
         if (!$this->validate([
-            'dni' => 'required|numeric|is_unique[estudiantes.dni]',
+            // CORRECCIÓN CLAVE: La validación debe apuntar a la columna real 'alumnos.dni_matricula'
+            'dni_matricula' => 'required|numeric|is_unique[alumnos.dni_matricula]',
             'nombre_completo' => 'required|min_length[3]|max_length[255]',
-            'email' => 'required|valid_email|is_unique[estudiantes.email]',
+            // CORRECCIÓN CLAVE: La validación debe apuntar a la tabla correcta 'alumnos.email'
+            'email' => 'required|valid_email|is_unique[alumnos.email]',
             'id_carrera' => 'required|integer',
         ],
         [
-            'dni' => [
-                'is_unique' => 'Ya existe un estudiante con este DNI.'
+            'dni_matricula' => [
+                'is_unique' => 'Ya existe un estudiante con este DNI/Matrícula.'
             ],
             'email' => [
                 'is_unique' => 'Ya existe un estudiante con este correo electrónico.'
@@ -104,7 +105,8 @@ class Estudiantes extends BaseController
         }
 
         $estudianteModel->insert([
-            'dni' => $datos['dni'],
+            // CORRECCIÓN CLAVE: El dato que se inserta debe coincidir con el campo de la BD
+            'dni_matricula' => $datos['dni_matricula'],
             'nombre_completo' => $datos['nombre_completo'],
             'email' => $datos['email'],
             'id_carrera' => $datos['id_carrera'],
@@ -139,23 +141,27 @@ class Estudiantes extends BaseController
 
     /**
      * Procesa el formulario de edición y actualiza el registro.
+     * CORREGIDO: Se cambia 'dni' a 'dni_matricula' en la validación y al guardar.
      */
     public function actualizar()
     {
         $estudianteModel = new EstudianteModel();
         $datos = $this->request->getPost();
-        $id_estudiante = $datos['id_estudiante'];
+        // Asumo que el ID en el formulario es 'id_alumno' (clave primaria de la tabla 'alumnos')
+        $id_estudiante = $datos['id_alumno']; 
 
         // Validar unicidad de DNI y Email, excluyendo el registro actual.
         if (!$this->validate([
-            'dni' => "required|numeric|is_unique[estudiantes.dni,id_estudiante,{$id_estudiante}]",
+            // CORRECCIÓN CLAVE: Usar dni_matricula y el nombre de la clave primaria 'id_alumno'
+            'dni_matricula' => "required|numeric|is_unique[alumnos.dni_matricula,id_alumno,{$id_estudiante}]",
             'nombre_completo' => 'required|min_length[3]|max_length[255]',
-            'email' => "required|valid_email|is_unique[estudiantes.email,id_estudiante,{$id_estudiante}]",
+            // CORRECCIÓN CLAVE: Usar el nombre de la clave primaria 'id_alumno'
+            'email' => "required|valid_email|is_unique[alumnos.email,id_alumno,{$id_estudiante}]",
             'id_carrera' => 'required|integer',
         ],
         [
-            'dni' => [
-                'is_unique' => 'Ya existe un estudiante con este DNI.'
+            'dni_matricula' => [
+                'is_unique' => 'Ya existe un estudiante con este DNI/Matrícula.'
             ],
             'email' => [
                 'is_unique' => 'Ya existe un estudiante con este correo electrónico.'
@@ -165,7 +171,8 @@ class Estudiantes extends BaseController
         }
 
         $estudianteModel->update($id_estudiante, [
-            'dni' => $datos['dni'],
+            // CORRECCIÓN CLAVE: El dato que se inserta debe coincidir con el campo de la BD
+            'dni_matricula' => $datos['dni_matricula'],
             'nombre_completo' => $datos['nombre_completo'],
             'email' => $datos['email'],
             'id_carrera' => $datos['id_carrera'],
@@ -192,5 +199,4 @@ class Estudiantes extends BaseController
             return redirect()->to(base_url('estudiantes'))->with('error', '❌ Error al eliminar el estudiante: ' . $e->getMessage());
         }
     }
-}
- 
+} 
