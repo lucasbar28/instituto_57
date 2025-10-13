@@ -2,72 +2,77 @@
 
 namespace App\Controllers;
 
-use CodeIgniter\Controller;
 use App\Models\UsuarioModel;
-use App\Controllers\BaseController; // Asegúrate de usar BaseController
+use CodeIgniter\Controller;
 
 class Login extends BaseController
 {
     /**
-     * Muestra la vista del formulario de login.
+     * Muestra el formulario de inicio de sesión.
      */
     public function index()
     {
-        // Si el usuario ya está autenticado, redirigir a la página principal
-        if (session()->get('isLoggedIn')) {
-            return redirect()->to(base_url('home'));
-        }
-        
-        // Muestra la vista del formulario de login
-        return view('login');
+        helper(['form']);
+        $data['title'] = 'Iniciar Sesión'; // Título para el head
+        echo view('login', $data);
     }
 
     /**
-     * Procesa la solicitud de inicio de sesión.
+     * Procesa la autenticación del usuario.
      */
     public function auth()
     {
         $session = session();
         $model = new UsuarioModel();
-        $username = $this->request->getPost('nombre_de_usuario');
-        $password = $this->request->getPost('contrasena');
+        
+        $email = $this->request->getVar('nombre_de_usuario');
+        $password = $this->request->getVar('contrasena');
+        
+        // 1. Buscar el usuario por email (nombre_de_usuario)
+        $usuario = $model->where('nombre_de_usuario', $email)->first();
+        
+        // --- DEPURACIÓN: Paso 1 ---
+        // Si no encuentra el usuario, muestra un mensaje y el dump.
+        if (is_null($usuario)) {
+            $session->setFlashdata('msg', 'Por favor, ingrese un nombre de usuario y contraseña válidos.');
+            
+            // Si $usuario es null, devolvemos un dump de error.
+            echo "<h2>--- ERROR DE DEPURACIÓN (USUARIO NO ENCONTRADO) ---</h2>";
+            echo "<p>El modelo no pudo encontrar un registro para el email: <strong>$email</strong></p>";
+            var_dump($usuario); 
+            echo "<p>Vuelve al formulario con el mensaje de error.</p>";
+            
+            return redirect()->to(base_url('/login'));
+        }
+        
+        // --- DEPURACIÓN: Paso 2 ---
+        // Si encuentra el usuario, verifica la contraseña.
+        $verificarContrasena = password_verify($password, $usuario['contrasena']);
+        
+        // Si la verificación de contraseña falla.
+        if (! $verificarContrasena) {
+            $session->setFlashdata('msg', 'Por favor, ingrese un nombre de usuario y contraseña válidos.');
 
-        // 1. Validar campos
-        if (!$this->validate([
-            'nombre_de_usuario' => 'required',
-            'contrasena' => 'required|min_length[4]' // Mínimo de 4 caracteres (ajusta si es necesario)
-        ])) {
-            return redirect()->back()->withInput()->with('error', 'Por favor, ingrese un nombre de usuario y contraseña válidos.');
+            echo "<h2>--- ERROR DE DEPURACIÓN (CONTRASEÑA NO VÁLIDA) ---</h2>";
+            echo "<p>Contraseña ingresada (texto plano): <strong>$password</strong></p>";
+            echo "<p>Contraseña hasheada en BD: <strong>{$usuario['contrasena']}</strong></p>";
+            echo "<p>Resultado de password_verify(): "; var_dump($verificarContrasena); echo "</p>";
+            echo "<p>Vuelve al formulario con el mensaje de error.</p>";
+            
+            return redirect()->to(base_url('/login'));
         }
 
-        // 2. Buscar usuario
-        $user = $model->where('nombre_de_usuario', $username)->first();
-
-        if ($user) {
-            // 3. Verificar contraseña (asumiendo que las contraseñas están hasheadas con password_hash)
-            if (password_verify($password, $user['contrasena'])) { 
-                
-                // 4. Establecer sesión exitosa
-                $ses_data = [
-                    'id_usuario'  => $user['id_usuario'],
-                    'nombre'      => $user['nombre_de_usuario'],
-                    'rol'         => $user['rol'], // Asumiendo que tienes un campo 'rol'
-                    'isLoggedIn'  => TRUE
-                ];
-                $session->set($ses_data);
-
-                // 5. Redireccionar al dashboard
-                return redirect()->to(base_url('/')); 
-            } else {
-                // Contraseña incorrecta
-                $session->setFlashdata('error', 'Contraseña incorrecta.');
-                return redirect()->to(base_url('login'))->withInput();
-            }
-        } else {
-            // Usuario no encontrado
-            $session->setFlashdata('error', 'Nombre de usuario no encontrado.');
-            return redirect()->to(base_url('login'))->withInput();
-        }
+        // --- AUTENTICACIÓN EXITOSA ---
+        // Si el usuario existe y la contraseña es correcta, crea la sesión
+        $sesionData = [
+            'id_usuario'  => $usuario['id_usuario'],
+            'username'    => $usuario['nombre_de_usuario'],
+            'rol'         => $usuario['rol'],
+            'isLoggedIn'  => TRUE
+        ];
+        
+        $session->set($sesionData);
+        return redirect()->to(base_url('/')); // Redirigir a la página de inicio
     }
 
     /**
@@ -75,8 +80,8 @@ class Login extends BaseController
      */
     public function logout()
     {
-        session()->destroy();
-        return redirect()->to(base_url('login'))->with('success', 'Has cerrado sesión exitosamente.');
+        $session = session();
+        $session->destroy();
+        return redirect()->to(base_url('/login'));
     }
-}
- 
+} 

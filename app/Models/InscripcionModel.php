@@ -6,9 +6,16 @@ use CodeIgniter\Model;
 
 class InscripcionModel extends Model
 {
-    protected $table = 'inscripciones';
+    protected $table      = 'inscripciones';
     protected $primaryKey = 'id_inscripcion';
     protected $allowedFields = ['id_alumno', 'id_curso'];
+
+    // --- TimeStamps (Añadido para gestión automática de fechas) ---
+    protected $useTimestamps = true;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at'; 
+    // -----------------------------------------------------------------
 
     // Define el evento que se activa después de una inserción
     protected $afterInsert = ['guardarComoJSON'];
@@ -35,5 +42,8 @@ class InscripcionModel extends Model
             // Guarda el archivo
             file_put_contents($file_path, $json_data);
         }
+        
+        // Es crucial retornar $data al final del callback
+        return $data;
     }
 } 

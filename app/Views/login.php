@@ -1,7 +1,7 @@
 <?php
 /**
  * Vista del Formulario de Inicio de Sesión (Login)
- * Utiliza el layout principal y garantiza la protección CSRF.
+ * Se asegura de usar los nombres de campo correctos para el controlador (nombre_de_usuario y contrasena)
  */
 ?>
 <?= $this->extend('templates/layout') ?> 
@@ -12,9 +12,12 @@
     <div class="login-card">
         <h1 class="text-center mb-4">Iniciar Sesión</h1>
         
-        <?php if (session()->getFlashdata('error')): ?>
+        <?php 
+        // Mostrar mensaje de error (usando 'msg' ya que es lo que el controlador envía)
+        if (session()->getFlashdata('msg')): 
+        ?>
             <div class="alert-danger text-center mb-4">
-                <?= session()->getFlashdata('error') ?>
+                <?= session()->getFlashdata('msg') ?>
             </div>
         <?php endif; ?>
 
@@ -25,17 +28,19 @@
         <?php endif; ?>
 
         <form action="<?= base_url('login/auth') ?>" method="post">
-            <!-- CAMPO CSRF ESENCIAL PARA PREVENIR EL ERROR 403 -->
+            <!-- CAMPO CSRF ESENCIAL para evitar el error 403 de seguridad -->
             <?= csrf_field() ?> 
 
             <div class="form-group">
-                <label for="username">Usuario (Email):</label>
-                <input type="email" name="username" class="form-control" required value="<?= old('username') ?>" placeholder="admin@instituto.com">
+                <label for="nombre_de_usuario">Usuario (Email):</label>
+                <!-- CAMPO CORREGIDO: ahora usa name="nombre_de_usuario" -->
+                <input type="email" name="nombre_de_usuario" class="form-control" required value="<?= old('nombre_de_usuario') ?>" placeholder="jefe@instituto.com">
             </div>
 
             <div class="form-group">
-                <label for="password">Contraseña:</label>
-                <input type="password" name="password" class="form-control" required placeholder="Contraseña">
+                <label for="contrasena">Contraseña:</label>
+                <!-- CAMPO CORREGIDO: ahora usa name="contrasena" -->
+                <input type="password" name="contrasena" class="form-control" required placeholder="Contraseña">
             </div>
 
             <button type="submit" class="btn btn-primary btn-block mt-4">Entrar</button>
@@ -79,4 +84,5 @@
 }
 </style>
 
-<?= $this->endSection() ?> 
+<?= $this->endSection() ?>
+ 
