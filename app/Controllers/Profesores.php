@@ -40,6 +40,7 @@ class Profesores extends BaseController
 
     /**
      * Procesa el formulario, guarda el nuevo usuario (credenciales) y el profesor (datos personales).
+     * NOTA: La contraseña inicial se genera de forma segura y aleatoria.
      */
     public function guardar()
     {
@@ -49,12 +50,12 @@ class Profesores extends BaseController
         
         $datos = $this->request->getPost();
 
-        // --- 1. REGLAS DE VALIDACIÓN ---
+        // --- 1. REGLAS DE VALIDACIÓN (DNI_O_SIMILAR ELIMINADO) ---
+        // Se valida contra ambas tablas para asegurar la unicidad del email.
         if (!$this->validate([
             'nombre_completo' => 'required|min_length[3]|max_length[255]',
             'especialidad'    => 'required|min_length[3]|max_length[150]',
             'email'           => 'required|valid_email|is_unique[profesores.email]|is_unique[usuarios.nombre_de_usuario]',
-            'dni_o_similar'   => 'required|min_length[4]', // Contraseña inicial
             'telefono'        => 'permit_empty|max_length[20]',
         ],
         [
@@ -66,9 +67,13 @@ class Profesores extends BaseController
         }
 
         // --- 2. PREPARAR DATOS Y USAR TRANSACCIÓN ---
+        
+        // **IMPORTANTE:** Generamos una contraseña temporal segura y aleatoria.
+        $contrasena_inicial = bin2hex(random_bytes(8)); 
+        
         $usuarioData = [
             'nombre_de_usuario' => $datos['email'],
-            'contrasena'        => password_hash($datos['dni_o_similar'], PASSWORD_DEFAULT),
+            'contrasena'        => password_hash($contrasena_inicial, PASSWORD_DEFAULT),
             'rol'               => 'profesor',
             'estado'            => 'activo'
         ];
@@ -86,26 +91,37 @@ class Profesores extends BaseController
             // A. Guardar el usuario y obtener el ID
             $id_usuario = $usuarioModel->insert($usuarioData);
             
+            // Si el modelo de usuario falló (ej: error en la BD o validación final)
             if (!$id_usuario) {
-                 throw new DatabaseException("No se pudo insertar el registro del usuario.");
+                // Si el modelo retorna errores de validación, usarlos, sino usar un error genérico
+                $error_detalle = $usuarioModel->errors() ? implode(', ', $usuarioModel->errors()) : "Error desconocido al insertar usuario.";
+                throw new DatabaseException("No se pudo insertar el registro del usuario: " . $error_detalle);
             }
 
             // B. Asignar el ID de usuario al profesor
             $profesorData['id_usuario'] = $id_usuario;
             
             // C. Guardar el registro del profesor
-            $profesorModel->insert($profesorData);
+            if (!$profesorModel->insert($profesorData)) {
+                $error_detalle = $profesorModel->errors() ? implode(', ', $profesorModel->errors()) : "Error desconocido al insertar profesor.";
+                throw new DatabaseException("No se pudo insertar el registro del profesor: " . $error_detalle);
+            }
             
             $db->transComplete();
             
             if ($db->transStatus() === FALSE) {
-                 throw new DatabaseException("La transacción de guardado falló.");
+                // Esto maneja errores de la BD que no fueron capturados por el 'insert()'
+                throw new DatabaseException("La transacción de guardado falló. Estado de la BD: FALSE.");
             }
             
-            return redirect()->to(base_url('profesores'))->with('mensaje', '✅ Profesor y usuario creados con éxito. Credencial: ' . $datos['email']);
+            // Mensaje de éxito con la contraseña inicial generada
+            return redirect()->to(base_url('profesores'))->with('mensaje', '✅ Profesor y usuario creados con éxito. Credencial: ' . $datos['email'] . ' | Contraseña Temporal: ' . $contrasena_inicial);
 
-        } catch (DatabaseException $e) {
-            $db->transRollback();
+        } catch (\Exception $e) {
+            // Se revierte si el 'insert' falló o si el 'transStatus' es FALSE
+            if ($db->transStatus() === TRUE) {
+                $db->transRollback();
+            }
             log_message('error', 'Error al guardar profesor: ' . $e->getMessage());
             return redirect()->back()->withInput()->with('error', '❌ Error al registrar el profesor o el usuario: ' . $e->getMessage());
         }
@@ -142,6 +158,9 @@ class Profesores extends BaseController
     public function actualizar()
     {
         $profesorModel = new ProfesorModel();
+        $usuarioModel = new UsuarioModel();
+        $db = \Config\Database::connect();
+        
         $datos = $this->request->getPost();
         
         $id_profesor = $datos['id_profesor'];
@@ -149,7 +168,7 @@ class Profesores extends BaseController
         // Obtiene el registro actual para chequear el ID de usuario
         $profesor_actual = $profesorModel->find($id_profesor);
         if (!$profesor_actual) {
-             return redirect()->to(base_url('profesores'))->with('error', '❌ Error al actualizar: Profesor no encontrado.');
+            return redirect()->to(base_url('profesores'))->with('error', '❌ Error al actualizar: Profesor no encontrado.');
         }
         $id_usuario = $profesor_actual['id_usuario'];
 
@@ -159,7 +178,7 @@ class Profesores extends BaseController
         if (!$this->validate([
             'nombre_completo' => 'required|min_length[3]|max_length[255]',
             'especialidad'    => 'required|min_length[3]|max_length[150]',
-            'email'           => "required|valid_email|is_unique[profesores.email,id_profesor,{$id_profesor}]|is_unique[usuarios.nombre_de_usuario,id_usuario,{$id_usuario}]",
+            'email'           => "required|valid_email|is_unique[profesores.email,id,{$id_profesor}]|is_unique[usuarios.nombre_de_usuario,id,{$id_usuario}]",
             'telefono'        => 'permit_empty|max_length[20]',
         ],
         [
@@ -178,13 +197,11 @@ class Profesores extends BaseController
             'telefono'        => $datos['telefono'],
         ];
 
-        // Solo se actualiza el email/nombre_de_usuario en la tabla 'usuarios' si el email cambió
+        // Solo se actualiza el email/nombre_de_usuario en la tabla 'usuarios'
         $usuarioData = [
             'nombre_de_usuario' => $datos['email'], 
         ];
 
-        $usuarioModel = new UsuarioModel();
-        $db = \Config\Database::connect();
         
         $db->transStart();
         
@@ -198,12 +215,12 @@ class Profesores extends BaseController
             $db->transComplete();
             
             if ($db->transStatus() === FALSE) {
-                 throw new DatabaseException("La transacción de actualización falló.");
+                throw new DatabaseException("La transacción de actualización falló.");
             }
             
             return redirect()->to(base_url('profesores'))->with('mensaje', '✅ Profesor actualizado con éxito!');
 
-        } catch (DatabaseException $e) {
+        } catch (\Exception $e) {
             $db->transRollback();
             log_message('error', 'Error al actualizar profesor: ' . $e->getMessage());
             return redirect()->back()->withInput()->with('error', '❌ Error al actualizar el profesor y su credencial: ' . $e->getMessage());
@@ -242,12 +259,12 @@ class Profesores extends BaseController
             $db->transComplete(); // Finaliza la transacción
 
             if ($db->transStatus() === FALSE) {
-                 throw new DatabaseException("La transacción de eliminación falló.");
+                throw new DatabaseException("La transacción de eliminación falló.");
             }
             
             return redirect()->to(base_url('profesores'))->with('mensaje', '🗑️ Profesor y usuario eliminados con éxito!');
 
-        } catch (DatabaseException $e) {
+        } catch (\Exception $e) {
             $db->transRollback();
             log_message('error', 'Error al eliminar profesor: ' . $e->getMessage());
             // Mensaje específico si hay cursos asociados (dependencia)
@@ -258,4 +275,3 @@ class Profesores extends BaseController
         }
     }
 }
- 

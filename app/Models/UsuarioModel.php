@@ -7,66 +7,29 @@ use CodeIgniter\Model;
 class UsuarioModel extends Model
 {
     protected $table      = 'usuarios';
-    protected $primaryKey = 'id_usuario';
-    
-    // El campo 'contrasena' ya no se necesita en allowedFields si usamos beforeInsert/Update
-    // Pero lo mantendremos ya que se usa para la lógica de hashing.
+    protected $primaryKey = 'id'; 
+
     protected $allowedFields = ['nombre_de_usuario', 'contrasena', 'rol', 'estado'];
 
-    // --- Callbacks de Seguridad (Hashing) ---
-    protected $beforeInsert = ['hashPassword'];
-    protected $beforeUpdate = ['hashPassword'];
-    // ----------------------------------------
+    // Se mantiene en false para evitar el error de created_at/updated_at
+    protected $useTimestamps = false; 
     
-    // --- TimeStamps (Añadido para gestión automática de fechas) ---
-    protected $useTimestamps = true;
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_at'; 
-    // -----------------------------------------------------------------
-
-    // Función que hashea la contraseña antes de guardarla/actualizarla
-    protected function hashPassword(array $data)
-    {
-        if (! isset($data['data']['contrasena'])) {
-            return $data;
-        }
-
-        // Hashing de la contraseña
-        $data['data']['contrasena'] = password_hash($data['data']['contrasena'], PASSWORD_DEFAULT);
+    protected $validationRules = [
+        // Aceptamos cualquier largo, ya que es el hash que se va a guardar
+        'contrasena'        => 'required', 
         
-        // Eliminamos el campo 'contrasena' del array $data['data'] si está vacío
-        // Esto previene que se guarde un hash vacío si el usuario no ingresó nada al actualizar.
-        unset($data['data']['password']); 
-
-        return $data;
-    }
-
-    // Define el evento que se activa después de una inserción
-    protected $afterInsert = ['guardarComoJSON'];
-
-    // Esta función se ejecuta automáticamente después de insertar un usuario
-    protected function guardarComoJSON(array $data)
-    {
-        if (isset($data['id']) && $data['id'] > 0) {
-            $registro = $this->find($data['id']);
-
-            // PRÁCTICA DE SEGURIDAD: Excluir la contraseña (aunque esté hasheada) del archivo JSON
-            unset($registro['contrasena']); 
-
-            $json_data = json_encode($registro, JSON_PRETTY_PRINT);
-            
-            $file_name = 'export_usuario_' . date('YmdHis') . '.json';
-            $file_path = WRITEPATH . 'exports/' . $file_name;
-
-            if (!is_dir(WRITEPATH . 'exports')) {
-                mkdir(WRITEPATH . 'exports', 0777, true);
-            }
-
-            file_put_contents($file_path, $json_data);
-        }
+        // El email es el nombre de usuario y debe ser único.
+        'nombre_de_usuario' => 'required|valid_email|is_unique[usuarios.nombre_de_usuario]',
         
-        // Es crucial retornar $data al final del callback
-        return $data;
-    }
-} 
+        'rol'               => 'required|in_list[admin,profesor,alumno]',
+        'estado'            => 'required|in_list[activo,inactivo]',
+    ];
+    
+    protected $validationMessages = [
+        'nombre_de_usuario' => [
+            'is_unique' => 'Este nombre de usuario (email) ya está registrado.',
+            'valid_email' => 'El campo Email debe ser una dirección de correo válida.'
+        ]
+    ];
+}
+ 
