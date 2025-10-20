@@ -28,7 +28,7 @@
             <tbody>
                 <?php foreach ($cursos as $curso): ?>
                 <tr>
-                    <td><?= esc($curso['nombre_curso']) ?></td>
+                    <td><?= esc($curso['nombre']) ?></td>
                     <td><?= esc($curso['nombre_profesor'] ?? 'N/A') ?></td> 
                     <td><?= esc($curso['nombre_carrera'] ?? 'N/A') ?></td>
                     <td><?= esc($curso['cupo_maximo']) ?></td>
