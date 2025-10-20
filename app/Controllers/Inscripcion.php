@@ -7,21 +7,18 @@ use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\InscripcionModel; 
 use CodeIgniter\I18n\Time; 
 
-// CORRECCIÓN CRÍTICA: La clase debe coincidir con el nombre del archivo (Inscripcion.php)
-// y con el nombre en la ruta (Inscripcion::inscribir)
 class Inscripcion extends BaseController
 {
     protected $inscripcionModel;
     protected $session;
+    protected $db; // Añadimos la propiedad de base de datos para consultas específicas si se necesitan
 
     public function __construct()
     {
-        // Se llama al constructor del padre si es necesario, aunque en BaseController no hace nada especial.
-        // parent::__construct(); 
-        
         $this->inscripcionModel = new InscripcionModel();
-        // Cargar el servicio de sesión directamente
         $this->session = \Config\Services::session(); 
+        // Inicializa la conexión a la base de datos
+        $this->db = \Config\Database::connect();
     }
 
     /**
@@ -33,16 +30,11 @@ class Inscripcion extends BaseController
         // 1. Recibir los datos del formulario (deben tener estos nombres en el formulario HTML)
         $data = $this->request->getPost(['id_alumno', 'id_curso']);
         
-        // Verificar si la solicitud es AJAX para devolver una respuesta JSON limpia (opcional, pero útil)
-        // if (!$this->request->isAJAX()) {
-        //     //return $this->response->setStatusCode(405)->setBody('Method Not Allowed');
-        // }
-
         // 2. Preparar el array de datos para el modelo, incluyendo campos no automáticos
         $dataToSave = [
             'id_alumno'         => $data['id_alumno'] ?? null,
             'id_curso'          => $data['id_curso'] ?? null,
-            // Asumo que tu tabla tiene 'fecha_inscripcion' como DATE o DATETIME
+            // Usamos Time::now() para asegurar consistencia
             'fecha_inscripcion' => Time::now()->toDateString(), 
             'estado'            => 'Activo', // Estado por defecto para nuevas inscripciones
         ];
@@ -70,6 +62,43 @@ class Inscripcion extends BaseController
         return redirect()->to(base_url('estudiantes')); 
     }
     
-    // Aquí puedes añadir otros métodos como index() para listar inscripciones, etc.
+    /**
+     * Realiza la desinscripción (Soft Delete) de la última inscripción activa de un alumno.
+     * RUTA: GET /inscripciones/desinscribir/(:num)
+     * @param int $id_alumno ID del alumno a desinscribir.
+     */
+    public function desinscribir(int $id_alumno)
+    {
+        // 1. Buscar la última inscripción activa del alumno (la más reciente)
+        // Buscamos la inscripción con 'deleted_at IS NULL' (activa)
+        $ultimaInscripcion = $this->inscripcionModel
+            ->where('id_alumno', $id_alumno)
+            ->where('deleted_at IS NULL') 
+            ->orderBy('fecha_inscripcion', 'DESC')
+            ->first();
+
+        if (empty($ultimaInscripcion)) {
+            // Si no encuentra una inscripción activa, redirige con un mensaje
+            $this->session->setFlashdata('error', 'El alumno no tiene inscripciones activas para desinscribir.');
+            return redirect()->to(base_url('estudiantes'));
+        }
+
+        // 2. Realizar el Soft Delete usando el ID de la inscripción
+        // CodeIgniter, gracias a $useSoftDeletes = true en el modelo, marcará 'deleted_at' con la fecha actual.
+        // Además, actualizamos el campo 'estado' a 'Inactivo' para claridad, aunque SoftDelete ya lo "oculta".
+        
+        $idInscripcion = $ultimaInscripcion['id_inscripcion'];
+        
+        // Hacemos un update explícito del estado antes del delete (opcional, pero ayuda a la lógica)
+        $this->inscripcionModel->update($idInscripcion, ['estado' => 'Inactivo']);
+
+        // Ejecutamos el soft delete (coloca la fecha en deleted_at)
+        if ($this->inscripcionModel->delete($idInscripcion)) {
+            $this->session->setFlashdata('mensaje', '✅ Desinscripción realizada con éxito. El registro se ha movido al historial.');
+            return redirect()->to(base_url('estudiantes'));
+        } else {
+            $this->session->setFlashdata('error', '❌ Error al procesar la desinscripción. Intente de nuevo.');
+            return redirect()->to(base_url('estudiantes'));
+        }
+    }
 }
- 

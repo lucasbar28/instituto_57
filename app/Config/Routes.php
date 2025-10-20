@@ -77,8 +77,12 @@ $routes->group('estudiantes', static function ($routes) {
 
 
 // --- INSCRIPCIONES ---
-// CORRECCIÓN FINAL: Cambiamos el nombre del grupo de 'inscripcion' a 'inscripciones' (Plural)
-// para que coincida con la URL utilizada en el formulario (base_url('inscripciones/inscribir')).
 $routes->group('inscripciones', static function ($routes) {
+    // Procesar la inscripción de un alumno a un curso (POST)
     $routes->post('inscribir', 'Inscripcion::inscribir');
+    
+    // Nueva ruta: Desinscribir un alumno (Eliminación lógica/Soft Delete) (GET)
+    // Espera el ID del alumno en la URL. El controlador se encargará de buscar
+    // la última inscripción activa de ese alumno y hacer el Soft Delete.
+    $routes->get('desinscribir/(:num)', 'Inscripcion::desinscribir/$1');
 });
