@@ -9,7 +9,10 @@
   --border-radius: 0.75rem;
   --box-shadow: 0 4px 14px rgba(0,0,0,0.08);
   --transition: all 0.3s ease;
-} 
+
+  /* AGREGAR: degradado primario usado en botones y elementos */
+  --gradient-primary: linear-gradient(90deg, #0ea5a4 0%, #0369a1 100%);
+}
 
 /* Estilos base */
 body {

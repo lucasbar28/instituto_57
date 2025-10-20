@@ -18,3 +18,6 @@
     // El contenido de footer.php debe cerrar </body> y </html>.
     echo view('templates/footer'); 
 ?> 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+
+<script src="<?= base_url('js/app.js') ?>"></script>
