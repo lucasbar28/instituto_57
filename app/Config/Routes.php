@@ -7,14 +7,14 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
-// Rutas de Login (DEBEN seguir activas)
+// Rutas de Login y Autenticación
 $routes->get('login', 'Login::index');
 $routes->post('login/auth', 'Login::auth');
 $routes->get('logout', 'Login::logout');
 
-// --------------------------------------------------------------------------
-// RUTAS DE GESTIÓN (Acceso directo temporal) - CRUD COMPLETO
-// --------------------------------------------------------------------------
+// ==========================================================================
+// RUTAS DE GESTIÓN (CRUD COMPLETO)
+// ==========================================================================
 
 // --- PROFESORES ---
 $routes->group('profesores', static function ($routes) {
@@ -23,11 +23,11 @@ $routes->group('profesores', static function ($routes) {
     // Crear (Formulario GET y Guardar POST)
     $routes->get('crear', 'Profesores::crear');
     $routes->post('guardar', 'Profesores::guardar');
-    // Editar (Formulario GET con ID)
+    // Editar (Formulario GET)
     $routes->get('editar/(:num)', 'Profesores::editar/$1'); 
-    // Actualizar (Procesar formulario POST con ID)
+    // Actualizar (Procesar formulario POST)
     $routes->post('actualizar', 'Profesores::actualizar');
-    // Eliminar (Procesar eliminación POST/GET con ID)
+    // Eliminar (Eliminación lógica/física)
     $routes->get('eliminar/(:num)', 'Profesores::eliminar/$1'); 
 });
 
@@ -45,7 +45,7 @@ $routes->group('carreras', static function ($routes) {
 
 // --- CATEGORÍAS ---
 $routes->group('categorias', static function ($routes) {
-    $routes->get('/', 'Categorias::index'); // Agregamos el index para listado
+    $routes->get('/', 'Categorias::index'); 
     $routes->get('crear', 'Categorias::crear');
     $routes->post('guardar', 'Categorias::guardar');
     $routes->get('editar/(:num)', 'Categorias::editar/$1');
@@ -76,7 +76,12 @@ $routes->group('estudiantes', static function ($routes) {
 });
 
 
-// --- INSCRIPCIÓN ---
-// Dejamos la inscripción fuera de un grupo por ahora, ya que solo tiene una ruta de acción
-$routes->post('inscripcion/guardar', 'Inscripcion::guardar');
- 
+// --- INSCRIPCIONES ---
+// Solución al error 404: 'POST: inscripciones/inscribir'
+$routes->group('inscripciones', static function ($routes) {
+    // RUTA DE INSCRIPCIÓN RÁPIDA
+    $routes->post('inscribir', 'Inscripciones::inscribir');
+});
+
+// Nota: La ruta original 'inscripcion/guardar' (singular) fue eliminada para evitar duplicidad 
+// y seguir la convención de 'inscripciones' (plural) que usamos ahora.

@@ -2,81 +2,67 @@
 
 namespace App\Controllers;
 
-use App\Models\InscripcionModel;
-use CodeIgniter\Controller;
-use CodeIgniter\Database\Exceptions\DatabaseException; 
+use App\Controllers\BaseController;
+use CodeIgniter\HTTP\ResponseInterface;
+use App\Models\InscripcionModel; // Asegúrate de que el path sea correcto
+use CodeIgniter\I18n\Time; // Para manejar la fecha de forma limpia
 
-class Inscripcion extends BaseController
+class Inscripciones extends BaseController
 {
-    /**
-     * Procesa los datos del formulario de inscripción y guarda el registro.
-     * La inscripción se espera que provenga de la vista 'estudiantes' (que muestra un formulario de inscripción rápida).
-     */
-    public function guardar()
+    protected $inscripcionModel;
+    protected $session;
+
+    public function __construct()
     {
-        // 1. Obtiene los datos enviados por el formulario
-        $data = [
-            'id_alumno' => $this->request->getPost('id_alumno'),
-            'id_curso'  => $this->request->getPost('id_curso')
-        ];
-
-        // 2. --- Reglas de Validación ---
-        if (! $this->validate([
-            'id_alumno' => 'required|integer',
-            'id_curso'  => 'required|integer|is_unique[inscripciones.id_curso,id_alumno,{id_alumno}]', 
-        ],
-        // Mensajes personalizados
-        [
-            'id_curso' => [
-                'is_unique' => '❌ Este alumno ya se encuentra inscrito en el curso seleccionado.'
-            ],
-            'id_alumno' => [
-                'required' => 'Debe seleccionar un alumno.',
-            ],
-            'id_curso' => [
-                'required' => 'Debe seleccionar un curso.',
-            ]
-        ])) {
-            // Si la validación falla (ej. duplicado o campo vacío), regresa a la página anterior
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
-
-        // 3. Obtiene la instancia del modelo de inscripción
-        $inscripcionModel = new InscripcionModel();
-        
-        // 4. Guarda el registro en la base de datos
-        // Usamos save() ya que el modelo maneja internamente la fecha_inscripcion
-        $inscripcionModel->save($data);
-
-        // 5. Redirecciona con mensaje de éxito (flash data)
-        return redirect()->back()->with('mensaje', '✅ Inscripción registrada con éxito!');
+        // Instancia del modelo de Inscripciones
+        $this->inscripcionModel = new InscripcionModel();
+        // Inicialización del servicio de sesión para mensajes flash
+        $this->session = \Config\Services::session(); 
     }
 
     /**
-     * Elimina un registro de inscripción basado en el ID de inscripción.
-     * Esto desinscribe a un alumno de un curso.
-     * @param int $id ID de la inscripción a eliminar (id_inscripcion).
+     * Procesa la solicitud POST para inscribir a un alumno en un curso.
+     * RUTA: POST /inscripciones/inscribir
      */
-    public function eliminar($id)
+    public function inscribir()
     {
-        $inscripcionModel = new InscripcionModel();
+        // 1. Recibir los datos del formulario (deben tener estos nombres en el formulario HTML)
+        $data = $this->request->getPost(['id_alumno', 'id_curso']);
         
+        // 2. Preparar el array de datos para el modelo, incluyendo campos no automáticos
+        $dataToSave = [
+            'id_alumno'         => $data['id_alumno'] ?? null,
+            'id_curso'          => $data['id_curso'] ?? null,
+            // Usamos Time::now()->toDateString() para obtener la fecha en formato 'YYYY-MM-DD' 
+            // que coincide con la columna 'fecha_inscripcion' de tu tabla
+            'fecha_inscripcion' => Time::now()->toDateString(), 
+            'estado'            => 'Activo', // Estado por defecto para nuevas inscripciones
+        ];
+
+        // 3. Validar los datos antes de intentar la inserción
+        if (!$this->inscripcionModel->validate($dataToSave)) {
+            // Si la validación falla (ej. faltan id_alumno o id_curso)
+            $this->session->setFlashdata('errors', $this->inscripcionModel->errors());
+            $this->session->setFlashdata('error', 'No se pudo completar la inscripción. Verifique los datos de alumno y curso.');
+            return redirect()->back()->withInput();
+        }
+
+        // 4. Intentar guardar la inscripción
         try {
-            // 1. Intentar eliminar el registro
-            $deleted = $inscripcionModel->delete($id);
-
-            if (!$deleted) {
-                // Si delete retorna falso, el ID no existía o hubo un error silencioso.
-                 return redirect()->back()->with('error', '❌ Error al desinscribir: No se encontró la inscripción o el ID es inválido.');
+            if ($this->inscripcionModel->insert($dataToSave)) {
+                $this->session->setFlashdata('success', '✅ Alumno inscrito correctamente.');
+                // Redirigir a la vista de estudiantes
+                return redirect()->to(base_url('estudiantes')); 
+            } else {
+                // Esto podría ocurrir por un error de base de datos no capturado por try/catch
+                $this->session->setFlashdata('error', '❌ Error de base de datos al guardar la inscripción.');
+                return redirect()->back()->withInput();
             }
-
-            // 2. Redireccionar con mensaje de éxito
-            return redirect()->back()->with('mensaje', '🗑️ Desinscripción realizada con éxito. El alumno ya no está en el curso.');
-
-        } catch (DatabaseException $e) {
-            log_message('error', 'Error al eliminar inscripción: ' . $e->getMessage());
-            return redirect()->back()->with('error', '❌ Error de base de datos al desinscribir. Por favor, inténtelo de nuevo.');
+        } catch (\Exception $e) {
+            // Capturar cualquier excepción de base de datos (ej. clave foránea inexistente)
+            // En un entorno de producción, podrías registrar $e->getMessage()
+            $this->session->setFlashdata('error', '❌ Error al procesar la inscripción: ' . $e->getMessage());
+            return redirect()->back()->withInput();
         }
     }
 }
- 
