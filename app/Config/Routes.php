@@ -77,11 +77,8 @@ $routes->group('estudiantes', static function ($routes) {
 
 
 // --- INSCRIPCIONES ---
-// Solución al error 404: 'POST: inscripciones/inscribir'
+// CORRECCIÓN FINAL: Cambiamos el nombre del grupo de 'inscripcion' a 'inscripciones' (Plural)
+// para que coincida con la URL utilizada en el formulario (base_url('inscripciones/inscribir')).
 $routes->group('inscripciones', static function ($routes) {
-    // RUTA DE INSCRIPCIÓN RÁPIDA
-    $routes->post('inscribir', 'Inscripciones::inscribir');
+    $routes->post('inscribir', 'Inscripcion::inscribir');
 });
-
-// Nota: La ruta original 'inscripcion/guardar' (singular) fue eliminada para evitar duplicidad 
-// y seguir la convención de 'inscripciones' (plural) que usamos ahora.
