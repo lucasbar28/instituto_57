@@ -13,10 +13,12 @@ class CategoriaModel extends Model
     protected $allowedFields = ['nombre', 'descripcion'];
 
     // --- TimeStamps ---
-    // Si tu tabla 'categorias' tiene las columnas 'fecha_creacion' y 'fecha_actualizacion'
     protected $useTimestamps = true; 
     protected $createdField  = 'fecha_creacion'; 
     protected $updatedField  = 'fecha_actualizacion'; 
+    
+    // NUEVA LÍNEA: Asegura que el modelo use el formato de fecha adecuado para MySQL.
+    protected $dateFormat    = 'datetime'; 
     // ------------------
 
     // Callback: Ejecuta la función 'guardarComoJSON' después de una inserción exitosa
@@ -25,10 +27,12 @@ class CategoriaModel extends Model
     protected function guardarComoJSON(array $data)
     {
         // El ID del registro insertado se encuentra en $data['id']
-        if (isset($data['id']) && $data['id'] > 0) {
+        $id_insertado = $data['id'] ?? null; 
+
+        if ($id_insertado) {
             
             // Obtener el registro completo de la base de datos
-            $registro = $this->find($data['id']);
+            $registro = $this->find($id_insertado);
 
             // Codificar a formato JSON con formato legible
             $json_data = json_encode($registro, JSON_PRETTY_PRINT);
@@ -49,4 +53,5 @@ class CategoriaModel extends Model
         // Es crucial retornar $data al final de un callback del modelo
         return $data;
     }
-} 
+}
+ 
