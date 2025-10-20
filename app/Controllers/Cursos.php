@@ -19,30 +19,35 @@ class Cursos extends BaseController
     
     /**
      * Extiende el modelo de Curso para incluir los nombres de la Carrera y el Profesor.
+     * Si el CursoModel usa Soft Deletes, automáticamente filtrará por deleted_at IS NULL.
      */
     protected function findAllWithRelations()
     {
         // Se realiza un JOIN para obtener los nombres de las entidades relacionadas (Profesor y Carrera)
+        // El findAll() del cursoModel automáticamente aplica el filtro de Soft Delete si está activo allí.
         return $this->cursoModel
             ->select('cursos.*, p.nombre_completo as nombre_profesor, c.nombre_carrera')
             ->join('profesores p', 'p.id_profesor = cursos.id_profesor', 'left')
             ->join('carreras c', 'c.id_carrera = cursos.id_carrera', 'left')
-            ->where('cursos.deleted_at IS NULL') // Asegura que solo se muestren los cursos activos
-            ->findAll();
+            ->findAll(); // Aquí, el modelo de cursos se encarga de filtrar por deleted_at si lo tiene activo
     }
 
     /**
      * Carga las listas de profesores y carreras para los dropdowns.
+     * Se eliminan los filtros WHERE deleted_at IS NULL, ya que esa columna no existe en estas tablas.
      */
     protected function loadDropdownData()
     {
         $profesorModel = new ProfesorModel();
         $carreraModel = new CarreraModel();
         
-        // Asumo que quieres solo profesores y carreras activas (sin deleted_at)
         return [
-            'profesores' => $profesorModel->where('deleted_at IS NULL')->findAll(),
-            'carreras'   => $carreraModel->where('deleted_at IS NULL')->findAll(),
+            // El modelo de Profesor no tiene eliminación lógica, usamos findAll()
+            'profesores' => $profesorModel->findAll(), 
+            
+            // El modelo de Carrera tiene su propia función de eliminación lógica por 'estado=0'
+            // Usamos findAllActive() que ya filtra por 'estado=1'
+            'carreras'   => $carreraModel->findAllActive(), 
         ];
     }
     // ------------------------------------------
@@ -179,4 +184,3 @@ class Cursos extends BaseController
         return redirect()->to(base_url('cursos'))->with('mensaje', '🗑️ Curso "' . $curso['nombre'] . '" eliminado lógicamente.');
     }
 }
- 
