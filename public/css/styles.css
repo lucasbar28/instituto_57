@@ -1,16 +1,14 @@
-/* Variables CSS */
 :root {
-  --color-bg: #f5f7fa;
+  --color-bg: #f9fafb;
   --color-bg-light: #ffffff;
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
-  --color-text: #1f2937;
+  --color-accent: #0e7490; /* azul petróleo */
+  --color-accent-hover: #155e75; /* más oscuro */
+  --color-text: #111827;
   --color-muted: #6b7280;
-  --border-radius: 0.5rem;
-  --box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  --box-shadow-hover: 0 4px 6px rgba(0,0,0,0.1);
-  --transition: all 0.2s ease;
-  --gradient-primary: linear-gradient(to right, #2563eb, #3b82f6); /* Nuevo degradado */
+  --color-highlight: #fbbf24; /* un dorado sutil tipo carpincho */
+  --border-radius: 0.75rem;
+  --box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  --transition: all 0.3s ease;
 }
 
 /* Estilos base */
@@ -27,7 +25,7 @@ body {
 /* NAVEGACIÓN */
 .navbar {
   background-color: var(--color-bg-light);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px #1f2937;
   padding: 1rem 2rem;
   position: sticky;
   top: 0;
@@ -489,7 +487,7 @@ body {
   height: 70vh;
   /* CAMBIO AQUI: Nueva URL de imagen de fondo más fiable */
   background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-              url('https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center/cover;
+              url('img/nueva_img.jpg') no-repeat center center/cover;
   color: white;
   display: flex;
   align-items: center;
@@ -536,6 +534,62 @@ body {
   transform: translateY(-5px); /* Mayor elevación */
   box-shadow: 0 15px 30px rgba(0,0,0,0.3); /* Sombra más grande */
 }
+
+/* AJUSTES CLAVE DE CSS para que el video local sea grande y responsivo */
+
+/* El contenedor mantiene las sombras y los bordes */
+.video-container {
+    /* Quitamos 'position: relative', 'padding-bottom: 56.25%', y 'height: 0' que eran para iframes */
+    position: relative; 
+    height: auto; 
+    overflow: hidden;
+    border-radius: 8px; 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+    
+    /* Asegura el centrado y el ancho máximo */
+    margin: 0 auto; 
+    max-width: 100%; /* El video no excederá el ancho de su columna en el grid */
+}
+.local-video {
+    width: 100%;
+    max-width: 800px; /* Tamaño grande */
+    height: auto;
+    margin: 0 auto; /* Centrado horizontal */
+    display: block; /* Necesario para que el centrado funcione */
+    /* ... sombra y bordes ... */
+}
+
+/* El elemento de video en sí */
+.video-container .local-video {
+    width: 100%; /* MUY IMPORTANTE: Hace que el video llene todo el ancho del contenedor */
+    height: auto; /* Mantiene la proporción del video */
+    display: block;
+}
+
+/* Resto de los estilos de la sección (Aseguran el centrado de la sección) */
+
+.about-us-section {
+    padding: 60px 20px;
+    background-color: #f8f9fa;
+    text-align: center;
+}
+
+.about-content-grid {
+    display: grid;
+    gap: 40px;
+    align-items: center;
+    margin: 0 auto;
+    max-width: 1200px; 
+    text-align: left; 
+}
+
+@media (min-width: 900px) {
+    .about-content-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* ... otros estilos para el texto que ya tenías ... */
 
 /* University Gallery */
 .university-gallery {

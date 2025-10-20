@@ -2,6 +2,7 @@
     <div class="footer-content">
         <p>&copy; <?= date('Y') ?> Instituto 57. Todos los derechos reservados.</p>
         <div class="social-links">
+            <a href="tel:+542241422051" aria-label="Llamar al Instituto 57"><i class="fas fa-phone-alt"></i></a>
             <a href="#"><i class="fab fa-twitter"></i></a>
             <a href="https://www.facebook.com/instituto57chascomus/" target="_blank"><i class="fab fa-facebook"></i></a>
             <a href="https://www.instagram.com/instituto57chascomus/" target="_blank"><i class="fab fa-instagram"></i></a>

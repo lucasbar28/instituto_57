@@ -14,21 +14,39 @@
     <h2 class="section-title">Nuestro entorno académico</h2>
     <div class="glider-container">
         <div class="glider">
-            <div class="slide">
-                <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80" 
-                    alt="Estudiantes en biblioteca">
-                <div class="slide-caption">Ambiente de estudio colaborativo</div>
-            </div>
-            <div class="slide">
-                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80" 
-                    alt="Grupo de estudiantes">
-                <div class="slide-caption">Trabajo en equipo</div>
-            </div>
-            <div class="slide">
-                <img src="https://images.unsplash.com/photo-1541178735493-479c1a27ed24?auto=format&fit=crop&w=1200&q=80" 
-                    alt="Aula universitaria">
-                <div class="slide-caption">Aulas modernas</div>
-            </div>
+          <div class="slide">
+            <img src="img/img_001.png" alt="Grupo de estudiantes en clase presencial">
+            <div class="slide-caption">Reflexión y debate en el aula</div>
+          </div>
+       <div class="slide">
+            <img src="img/img_002.jpg" alt="Maniquí de bebé para práctica de RCP o primeros auxilios">
+            <div class="slide-caption">Prácticas de Salud y RCP</div>
+          </div>
+       <div class="slide">
+         <img src="img/img_003.jpg" alt="Estudiantes conversando en un patio exterior en blanco y negro con árbol amarillo">
+         <div class="slide-caption">Encuentros en el campus</div>
+         </div>
+       <div class="slide">
+          <img src="img/img_004.jpg" alt="Estudiantes en reunión de trabajo colaborativo o tutoría">
+          <div class="slide-caption">Tutorías y trabajo colaborativo</div>
+        </div>
+       <div class="slide">
+         <img src="img/img_005.jpg" alt="Docente leyendo un libro a grupo de estudiantes en un espacio de primera infancia">
+         <div class="slide-caption">Seminarios y talleres de lectura</div>
+       </div>
+       <div class="slide">
+         <img src="img/img_006.jpg" alt="Reunión de profesores en aula con proyector encendido">
+         <div class="slide-caption">Formación docente continua</div>
+        </div>
+       <div class="slide">
+         <img src="img/img_007.jpg" alt="Tres mujeres sosteniendo el logo del ISFDyT 57 Juana Paula Manso">
+         <div class="slide-caption">Identidad Institucional</div>
+        </div>
+       <div class="slide">
+        <img src="img/img_008.jpg" alt="Material didáctico para enseñar vocales y palabras a niños pequeños">
+        <div class="slide-caption">Recursos de Pedagogía y Didáctica</div>
+    </div>
+</div>
         </div>
         <button aria-label="Previous" class="glider-prev"><i class="fas fa-chevron-left"></i></button>
         <button aria-label="Next" class="glider-next"><i class="fas fa-chevron-right"></i></button>
