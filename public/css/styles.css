@@ -21,7 +21,27 @@ body {
   padding: 0;
   overflow-x: hidden; /* Evita el desplazamiento horizontal */
 }
+/* Animaciones de aparición */
+.fade-up {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s ease;
+}
 
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Hover cards */
+.step-card, .slide {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.step-card:hover, .slide:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
 /* NAVEGACIÓN */
 .navbar {
   background-color: var(--color-bg-light);

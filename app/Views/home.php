@@ -10,6 +10,25 @@
   </div>
 </header>
 
+<section class="about-us-section">
+    <div class="container about-content-grid">
+        <div class="text-content">
+            <h2 class="section-title">Un compromiso con la formación y el crecimiento profesional</h2>
+            <p>Trabajamos de la mano con el sector empresarial para ofrecerte las herramientas que necesitás para crecer personal y profesionalmente.</p>
+        </div>
+        
+        <div class="video-container">
+            <video controls class="local-video">
+                
+        <source src="<?= base_url('videos/practicas.mp4') ?>" type="video/mp4">
+        
+        <source src="<?= base_url('videos/practicas.webm') ?>" type="video/webm">
+                Tu navegador no soporta la etiqueta de video.
+            </video>
+            <p class="video-caption">Video: Prácticas Profesionalizantes - TNSHyS</p>
+        </div>
+</section>
+
 <section class="university-gallery">
     <h2 class="section-title">Nuestro entorno académico</h2>
     <div class="glider-container">
