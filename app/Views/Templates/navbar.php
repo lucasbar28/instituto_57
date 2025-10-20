@@ -9,6 +9,8 @@
             <a href="<?= base_url('profesores') ?>">Profesores</a>
             <a href="<?= base_url('carreras') ?>">Carreras</a>
             <a href="<?= base_url('cursos') ?>">Cursos</a>
+            <a target="_blank" href="https://abc.gob.ar/calendario_escolar">Calendario</a>
+            <a target="_blank" href="https://isfdyt57-bue.infd.edu.ar/aula/acceso.cgi">CAMPUS</a>
         </div>
     </div>
 </nav>
