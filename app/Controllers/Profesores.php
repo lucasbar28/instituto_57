@@ -112,6 +112,8 @@ class Profesores extends BaseController
     }
     
 
+    
+
     public function editar($id)
     {
         $profesorModel = new ProfesorModel();

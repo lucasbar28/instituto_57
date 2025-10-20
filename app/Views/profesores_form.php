@@ -40,6 +40,12 @@ $get_value = function($field) use ($data_profesor) {
             </ul>
         </div>
     <?php endif; ?>
+    <?php if (isset($error)): ?>
+    <div class="alert-danger section-box">
+        <p><strong>❌ Error interno:</strong> <?= esc($error) ?></p>
+    </div>
+<?php endif; ?>
+
 
     <form action="<?= $action_url ?>" method="post">
         <?= csrf_field() ?>

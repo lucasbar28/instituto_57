@@ -1,0 +1,11 @@
+{
+    "id_profesor": "1",
+    "nombre_completo": "santiago ",
+    "especialidad": "no se",
+    "email": "nose@gmail.com",
+    "telefono": "2241588888",
+    "id_usuario": "1",
+    "created_at": "2025-10-15 00:16:08",
+    "updated_at": "2025-10-15 00:16:08",
+    "deleted_at": null
+}
