@@ -9,7 +9,7 @@
   --border-radius: 0.75rem;
   --box-shadow: 0 4px 14px rgba(0,0,0,0.08);
   --transition: all 0.3s ease;
-}
+} 
 
 /* Estilos base */
 body {
@@ -505,17 +505,16 @@ body {
 .hero-section {
   position: relative;
   height: 70vh;
-  /* CAMBIO AQUI: Nueva URL de imagen de fondo más fiable */
   background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-              url('img/nueva_img.jpg') no-repeat center center/cover;
+              url('../img/nueva_img.jpg') no-repeat center center/cover;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   margin-bottom: 3rem;
-  border-radius: var(--border-radius); /* Bordes redondeados */
-  box-shadow: 0 10px 20px rgba(0,0,0,0.2); /* Sombra grande */
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
 .hero-content {
