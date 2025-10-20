@@ -127,7 +127,7 @@
                                         <option value="">Seleccione Curso</option>
                                         <?php foreach ($cursos as $curso): ?>
                                             <option value="<?= esc($curso['id_curso']) ?>">
-                                                <?= esc($curso['nombre_curso']) ?>
+                                                <?= esc($curso['nombre']) ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
