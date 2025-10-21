@@ -30,17 +30,7 @@
 
 <section class="university-gallery">
   <h2 class="section-title">Nuestro entorno académico</h2>
-  <div class="glider-container">
-    <div class="glider">
-      <div class="slide">
-        <img src="<?= base_url('img/img_001.png') ?>" alt="Grupo de estudiantes en clase presencial">
-        <div class="slide-caption">Reflexión y debate en el aula</div>
-      </div>
-
-      <div class="slide">
-        <img src="<?= base_url('img/img_002.png') ?>" alt="Maniquí de bebé para práctica de RCP o primeros auxilios">
-        <div class="slide-caption">Prácticas de Salud y RCP</div>
-      </div>
+ div>
 
       <div class="slide">
         <img src="<?= base_url('img/img_003.png') ?>" alt="Estudiantes conversando en un patio exterior">
@@ -77,7 +67,17 @@
     <button aria-label="Next" class="glider-next"><i class="fas fa-chevron-right"></i></button>
     <div role="tablist" class="dots"></div>
   </div> <!-- .glider-container -->
-</section>
+</section> <div class="glider-container">
+    <div class="glider">
+      <div class="slide">
+        <img src="<?= base_url('img/img_001.png') ?>" alt="Grupo de estudiantes en clase presencial">
+        <div class="slide-caption">Reflexión y debate en el aula</div>
+      </div>
+
+      <div class="slide">
+        <img src="<?= base_url('img/img_002.png') ?>" alt="Maniquí de bebé para práctica de RCP o primeros auxilios">
+        <div class="slide-caption">Prácticas de Salud y RCP</div>
+      </
 
 <section class="steps-section">
   <div class="container">
