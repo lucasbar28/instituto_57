@@ -559,26 +559,16 @@ body {
 
 /* AJUSTES CLAVE DE CSS para que el video local sea grande y responsivo */
 
-/* El contenedor mantiene las sombras y los bordes */
 .video-container {
-    /* Quitamos 'position: relative', 'padding-bottom: 56.25%', y 'height: 0' que eran para iframes */
-    position: relative; 
-    height: auto; 
-    overflow: hidden;
-    border-radius: 8px; 
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
-    
-    /* Asegura el centrado y el ancho máximo */
-    margin: 0 auto; 
-    max-width: 100%; /* El video no excederá el ancho de su columna en el grid */
+    width: 100%; 
+    height: auto;
+    max-width: 100%; 
 }
+
 .local-video {
     width: 100%;
-    max-width: 800px; /* Tamaño grande */
-    height: auto;
-    margin: 0 auto; /* Centrado horizontal */
-    display: block; /* Necesario para que el centrado funcione */
-    /* ... sombra y bordes ... */
+    height: auto; 
+    display: block; 
 }
 
 /* El elemento de video en sí */
@@ -598,7 +588,8 @@ body {
 
 .about-content-grid {
     display: grid;
-    gap: 40px;
+    gap: 30px;
+    grid-template-columns: 1fr 1fr;
     align-items: center;
     margin: 0 auto;
     max-width: 1200px; 

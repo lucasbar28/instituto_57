@@ -58,13 +58,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Pantallas mayores a 768px
                     breakpoint: 768,
                     settings: {
-                        slidesToShow: 'auto',
+                        slidesToShow: 1,
                         itemWidth: 300,
                         slidesToScroll: 1,
                     }
                 }
             ]
-        });
+        });
     }
 });
 
