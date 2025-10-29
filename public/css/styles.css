@@ -925,3 +925,11 @@ body {
     text-align: left; /* Asegura que el contenido dentro de cada grupo se alinee a la izquierda */
 }
 /* Fin de SweetAlert2 personalizado */
+
+.text-center {
+  text-align: center;       /* centra el texto horizontalmente */
+  margin-left: auto;        /* opcional: centra el bloque si tiene ancho */
+  margin-right: auto;
+  max-width: 900px;         /* opcional: limita el ancho para mejor lectura */
+  line-height: 1.6;         /* opcional: mejora legibilidad */
+}

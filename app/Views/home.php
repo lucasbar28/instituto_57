@@ -4,7 +4,7 @@
 
 <header class="hero-section">
   <div class="hero-content">
-    <h1><i class="fas fa-graduation-cap"></i> Instituto Superior de Formación Docente y Técnica N 57</h1>
+    <h1><i class="fas fa-graduation-cap"></i> Instituto Superior de Formación Docente y Técnica N° 57</h1>
     <p class="hero-subtitle">El Instituto ofrece carreras docentes y técnicas del Nivel Superior.</p>
     <a href="<?= base_url('estudiantes') ?>" class="hero-button">Comenzar ahora <i class="fas fa-arrow-right"></i></a>
   </div>
@@ -116,6 +116,23 @@
 
     <p >El Instituto Superior de Formación Docente y Técnica N.º 57 "Juana Paula Manso" es una institución pública y gratuita ubicada en Chascomús, Buenos Aires. Forma parte de la Región Educativa XVII y depende de la Dirección General de Cultura y Educación de la Provincia. Ofrece una amplia gama de carreras docentes y técnicas de nivel superior, brindando títulos oficiales y de calidad.</p> 
     <p >Su historia se remonta a 1972, y desde entonces ha evolucionado para responder a las necesidades educativas de la comunidad, incluyendo extensiones en Ranchos y Lezama. Comprometido con la formación integral, el instituto promueve la innovación pedagógica y la inclusión social, consolidándose como un referente en la región.</p>
+  </div>
+</section>
+<section class="steps-section">
+  <div class="container">
+    <h2 class="section-title">Carreras</h2>
+    <p class="text-center">PROFESORADO DE EDUCACIÓN INICIAL (4 AÑOS) RES. N° 4154/07.</p> 
+    <p class="text-center">PROFESORADO DE INGLÉS (4 AÑOS) RES: 1860/17 </p> 
+    <p class="text-center">TECNICATURA SUPERIOR EN ENFERMERÍA (3 AÑOS) RES: 854/16.</p> 
+    <p class="text-center">TECNICATURA SUPERIOR EN CIENCIA DE DATOS E INTELIGENCIA ARTIFICIAL (3 AÑOS) RES:2730/22</p> 
+    <p class="text-center">CERTIFICACIÓN SUPERIOR: ESPECIALIZACIÓN DE ENFERMERÍA EN SALUD MENTAL RES. 43/17</p> 
+  </div>
+</section>
+<section class="steps-section">
+  <div class="container">
+    <h2 class="section-title">Horarios de Cursada</h2>
+    <p class="text-center" >Lunes a viernes</p> 
+    <p class="text-center" >17:30 hs. a 21:30 hs.</p> 
   </div>
 </section>
 
