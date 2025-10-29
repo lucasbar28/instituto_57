@@ -6,34 +6,30 @@ use CodeIgniter\Model;
 
 class UsuarioModel extends Model
 {
-    protected $table = 'usuarios';
-    protected $primaryKey = 'id_usuario';
+    protected $table      = 'usuarios';
+    protected $primaryKey = 'id'; 
+
     protected $allowedFields = ['nombre_de_usuario', 'contrasena', 'rol', 'estado'];
 
-    // Define el evento que se activa después de una inserción
-    protected $afterInsert = ['guardarComoJSON'];
-
-    // Esta función se ejecuta automáticamente después de insertar un usuario
-    protected function guardarComoJSON(array $data)
-    {
-        if (isset($data['id']) && $data['id'] > 0) {
-            // Busca el registro completo usando el ID que se acaba de insertar
-            $registro = $this->find($data['id']);
-
-            // Convierte el array de PHP a una cadena JSON con formato legible
-            $json_data = json_encode($registro, JSON_PRETTY_PRINT);
-            
-            // Define la ruta y el nombre del archivo
-            $file_name = 'export_usuario_' . date('YmdHis') . '.json';
-            $file_path = WRITEPATH . 'exports/' . $file_name;
-
-            // Asegúrate de que el directorio de exportación exista
-            if (!is_dir(WRITEPATH . 'exports')) {
-                mkdir(WRITEPATH . 'exports', 0777, true);
-            }
-
-            // Guarda el archivo
-            file_put_contents($file_path, $json_data);
-        }
-    }
-} 
+    // Se mantiene en false para evitar el error de created_at/updated_at
+    protected $useTimestamps = false; 
+    
+    protected $validationRules = [
+        // Aceptamos cualquier largo, ya que es el hash que se va a guardar
+        'contrasena'        => 'required', 
+        
+        // El email es el nombre de usuario y debe ser único.
+        'nombre_de_usuario' => 'required|valid_email|is_unique[usuarios.nombre_de_usuario]',
+        
+        'rol'               => 'required|in_list[admin,profesor,alumno]',
+        'estado'            => 'required|in_list[activo,inactivo]',
+    ];
+    
+    protected $validationMessages = [
+        'nombre_de_usuario' => [
+            'is_unique' => 'Este nombre de usuario (email) ya está registrado.',
+            'valid_email' => 'El campo Email debe ser una dirección de correo válida.'
+        ]
+    ];
+}
+ 
