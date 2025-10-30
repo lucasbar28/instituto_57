@@ -5,7 +5,6 @@
 <div class="container mt-5">
     
     <!-- 1. ALERTAS (Mensajes de éxito/error) -->
-    <!-- Replicamos la inclusión de _alerts, pero manejamos la lógica de mensajes directamente si es necesario. -->
     <?php if (session()->getFlashdata('mensaje')): ?>
         <div class="alert alert-success mt-3" role="alert">
             <?= session()->getFlashdata('mensaje') ?>
@@ -18,7 +17,6 @@
     <?php endif; ?>
 
     <!-- 2. TÍTULO Y BOTÓN DE CREACIÓN -->
-    <!-- Usamos la misma estructura de centrado que carreras.php: d-flex flex-column align-items-center justify-content-center -->
     <div class="d-flex flex-column align-items-center justify-content-center mb-5">
         <!-- Título principal -->
         <h1 class="display-5 fw-bold text-primary mb-3">Lista de Profesores</h1>
@@ -30,13 +28,11 @@
     </div>
 
     <!-- 3. CONTENEDOR DE LA TABLA -->
-    <!-- Usamos 'table-responsive' y tu clase 'data-table' -->
     <div class="table-responsive">
         <table class="data-table"> 
             
             <!-- ENCABEZADO -->
             <thead> 
-                <!-- Las columnas son diferentes a las de carreras, usamos las columnas de profesor -->
                 <tr>
                     <th class="col-1">ID</th>
                     <th class="col-3">Nombre Completo</th>
@@ -73,13 +69,16 @@
                             <!-- Botón Editar: Usando la clase personalizada btn-edit y fa-edit (asumimos Font Awesome) -->
                             <a href="<?= base_url("profesores/editar/{$profesor['id_profesor']}") ?>" 
                                class="btn-action btn-edit" title="Editar Profesor">
-                                <i class="fas fa-edit"></i> Editar
+                                 <i class="fas fa-edit"></i> Editar
                             </a>
                             
-                            <!-- Botón Eliminar: Usando la clase personalizada btn-delete. Mantenemos el formulario DELETE. -->
+                            <!-- Botón Eliminar: CORREGIDO para incluir el campo CSRF. -->
                             <form action="<?= base_url('profesores/eliminar/' . $profesor['id_profesor']) ?>" 
-                                  method="post" style="display:inline;"
-                                  onsubmit="return confirm('⚠️ ADVERTENCIA: Esta acción es PERMANENTE. ¿Está seguro de que desea BORRAR DEFINITIVAMENTE al profesor <?= esc($profesor['nombre_completo']) ?>?');">
+                                    method="post" style="display:inline;"
+                                    onsubmit="return confirm('⚠️ ADVERTENCIA: Esta acción es PERMANENTE. ¿Está seguro de que desea BORRAR DEFINITIVAMENTE al profesor <?= esc($profesor['nombre_completo']) ?>?');">
+                                
+                                <!-- CORRECCIÓN CLAVE: Token CSRF para validar la solicitud (Soluciona error 403) -->
+                                <?= csrf_field() ?> 
                                 
                                 <input type="hidden" name="_method" value="DELETE"> 
                                 <button type="submit" class="btn-action btn-delete" title="Borrar Permanentemente">

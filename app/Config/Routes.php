@@ -7,7 +7,7 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
-// Rutas de Login y Autenticación
+// Rutas de Login y Autenticación (Dejadas como login manual por ahora)
 $routes->get('login', 'Login::index');
 $routes->post('login/auth', 'Login::auth');
 $routes->get('logout', 'Login::logout');
@@ -27,8 +27,10 @@ $routes->group('profesores', static function ($routes) {
     $routes->get('editar/(:num)', 'Profesores::editar/$1'); 
     // Actualizar (Procesar formulario POST)
     $routes->post('actualizar', 'Profesores::actualizar');
+    
+    // ** CORRECCIÓN AQUÍ: CAMBIAR de GET a DELETE **
     // Eliminar (Eliminación lógica/física)
-    $routes->get('eliminar/(:num)', 'Profesores::eliminar/$1'); 
+    $routes->delete('eliminar/(:num)', 'Profesores::eliminar/$1'); 
 });
 
 
@@ -82,7 +84,6 @@ $routes->group('inscripciones', static function ($routes) {
     $routes->post('inscribir', 'Inscripcion::inscribir');
     
     // Nueva ruta: Desinscribir un alumno (Eliminación lógica/Soft Delete) (GET)
-    // Espera el ID del alumno en la URL. El controlador se encargará de buscar
-    // la última inscripción activa de ese alumno y hacer el Soft Delete.
     $routes->get('desinscribir/(:num)', 'Inscripcion::desinscribir/$1');
 });
+ 
