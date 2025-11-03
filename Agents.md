@@ -1,4 +1,4 @@
-markdown
+
 # 🏫 Sistema Académico - Documentación Completa MVC
 
 ## 📚 MODELOS (Capa de Datos)

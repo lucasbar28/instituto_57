@@ -1,118 +1,89 @@
-📚 MODELOS - Sistema Académico 
-🗃️ MODELOS DISPONIBLES
-Modelo	Tabla	Característica Principal
-CarreraModel	carreras	Eliminación lógica con campo estado
-CategoriaModel	categorias	Exportación automática a JSON
-CursoModel	cursos	Soft Deletes completo
-EstudianteModel	alumnos	Validación de DNI/email únicos
-InscripcionModel	inscripciones	Gestión de relaciones alumno-curso
-ProfesorModel	profesores	Exportación automática a JSON
-UsuarioModel	usuarios	Sistema de roles y autenticación
-🔧 CONFIGURACIONES PRINCIPALES
-⏰ Timestamps
-Con Timestamps:
+# 📚 MODELOS - Sistema Académico
 
-CategoriaModel - Campos personalizados: fecha_creacion, fecha_actualizacion
+## 🗃️ MODELOS DISPONIBLES (CodeIgniter 4)
 
-CursoModel - Campos estándar: created_at, updated_at
+| Modelo | Tabla | Clave Primaria | Característica Principal |
+| :--- | :--- | :--- | :--- |
+| **UsuarioModel** | `usuarios` | `id` | Gestión de credenciales, roles y autenticación. |
+| **ProfesorModel** | `profesores` | `id_profesor` | Exportación automática a JSON después de la inserción. |
+| **EstudianteModel** | `alumnos` | `id_alumno` | Validaciones de unicidad en DNI/Matrícula y Email. |
+| **CategoriaModel** | `categorias` | `id_categoria` | Uso de TimeStamps personalizados. Exportación a JSON. |
+| **CarreraModel** | `carreras` | `id_carrera` | Eliminación lógica mediante el campo `estado`. |
+| **CursoModel** | `cursos` | `id_curso` | Uso de **Soft Deletes** completo (`deleted_at`). |
+| **InscripcionModel** | `inscripciones` | `id_inscripcion` | Registra el estado (`estado`) y fecha de inscripción. |
 
-InscripcionModel - Campos estándar
+---
 
-Sin Timestamps:
+## 🔧 CONFIGURACIONES PRINCIPALES
 
-CarreraModel, EstudianteModel, ProfesorModel, UsuarioModel
+### ⏰ TimeStamps (Fechas de Creación/Actualización)
 
-🗑️ Gestión de Borrados
-Soft Deletes:
+| Modelo | `useTimestamps` | Campos Usados |
+| :--- | :--- | :--- |
+| **CategoriaModel** | `true` | `fecha_creacion`, `fecha_actualizacion` (Personalizados) |
+| **CursoModel** | `true` | `created_at`, `updated_at` (Estándar) |
+| **InscripcionModel** | `true` | `created_at`, `updated_at` (Estándar) |
+| **CarreraModel** | `false` | *No usados* |
+| **EstudianteModel** | `false` | *No usados* |
+| **ProfesorModel** | `false` | *No usados* |
+| **UsuarioModel** | `false` | *No usados* |
 
-CursoModel - Usa deleted_at
+### 🗑️ Gestión de Borrados (Delete Handling)
 
-Eliminación Lógica:
+| Modelo | Mecanismo | Campo / Característica |
+| :--- | :--- | :--- |
+| **CursoModel** | **Soft Delete** | `deleted_at` (El registro se marca como borrado, pero no se elimina de la DB) |
+| **CarreraModel** | **Eliminación Lógica** | Campo `estado` (`1`=activo, `0`=inactivo). Posee método `findAllActive()` |
+| **InscripcionModel** | Borrado Físico | Se gestiona el estado ('Activo'/'Inactivo') en el controlador. |
+| **UsuarioModel** | Borrado Físico | Estándar. |
+| **ProfesorModel** | Borrado Físico | Estándar. |
+| **EstudianteModel** | Borrado Físico | Estándar. |
+| **CategoriaModel** | Borrado Físico | Estándar. |
 
-CarreraModel - Campo estado (1=activo, 0=inactivo)
+---
 
-Borrado Físico:
+## 📋 VALIDACIONES DESTACADAS
 
-Resto de modelos
+### 🔒 Unicidad (`is_unique`) y Restricciones
 
-📋 VALIDACIONES DESTACADAS
-🔒 Unicidad
-php
-// EstudianteModel
-'dni_matricula' => 'is_unique[alumnos.dni_matricula]'
-'email' => 'is_unique[alumnos.email]'
+| Modelo | Campo Validado | Regla de Unicidad / Restricción |
+| :--- | :--- | :--- |
+| **EstudianteModel** | `dni_matricula` | `required|is_unique[alumnos.dni_matricula,id_alumno,{id_alumno}]` |
+| **EstudianteModel** | `email` | `required|valid_email|is_unique[alumnos.email,id_alumno,{id_alumno}]` |
+| **UsuarioModel** | `nombre_de_usuario` | `required|valid_email|is_unique[usuarios.nombre_de_usuario]` |
+| **CarreraModel** | `modalidad` | `in_list[Presencial,Virtual,Mixta]` |
+| **UsuarioModel** | `rol` | `required|in_list[admin,profesor,alumno]` |
+| **UsuarioModel** | `estado` | `required|in_list[activo,inactivo]` |
 
-// UsuarioModel  
-'nombre_de_usuario' => 'is_unique[usuarios.nombre_de_usuario]'
-📝 Listas Controladas
-php
-// CarreraModel
-'modalidad' => 'in_list[Presencial,Virtual,Mixta]'
+---
 
-// UsuarioModel
-'rol' => 'in_list[admin,profesor,alumno]'
-'estado' => 'in_list[activo,inactivo]'
-🔄 CALLBACKS AUTOMÁTICOS
-📤 Exportación JSON
-Modelos con exportación:
+## ⚙️ CARACTERÍSTICAS AVANZADAS Y CALLBACKS
 
-CategoriaModel - Después de insertar
+### 🔄 Callbacks de Eventos
 
-EstudianteModel - Después de insertar
+| Modelo | Evento | Callback / Función | Lógica |
+| :--- | :--- | :--- | :--- |
+| **CarreraModel** | `beforeInsert` | `setDefaultEstado` | Asigna `estado = 1` (Activo) si no se proporciona al insertar. |
+| **ProfesorModel** | `afterInsert` | `guardarComoJSON` | Exporta el registro completo a un archivo JSON en `writable/exports/`. |
+| **EstudianteModel** | `afterInsert` | `guardarComoJSON` | Exporta el registro completo a un archivo JSON en `writable/exports/`. |
+| **CategoriaModel** | `afterInsert` | `guardarComoJSON` | Exporta el registro completo a un archivo JSON en `writable/exports/`. |
 
-ProfesorModel - Después de insertar
+### 🎯 Métodos Personalizados
 
-Ubicación archivos:
+| Modelo | Método | Propósito |
+| :--- | :--- | :--- |
+| **CarreraModel** | `findAllActive()` | Recupera solo las carreras cuyo campo `estado` es `1` (Activo). |
+| **CarreraModel** | `logicalDelete($id)` | Realiza la eliminación lógica actualizando `estado` a `0`. |
 
-text
-writable/exports/
-├── export_categoria_20231120143045.json
-├── export_alumno_20231120143122.json
-└── export_profesor_20231120143215.json
-⚙️ Configuraciones Automáticas
-php
-// CarreraModel - Estado por defecto
-protected function setDefaultEstado($data)
-{
-    if (!isset($data['data']['estado'])) {
-        $data['data']['estado'] = 1; // Activo
-    }
-    return $data;
-}
-🔗 RELACIONES IMPLÍCITAS
-text
-Usuarios → Estudiantes/Profesores (id_usuario)
-Categorías → Carreras (id_categoria) 
-Carreras → Cursos (id_carrera)
-Estudiantes → Inscripciones (id_alumno)
-Cursos → Inscripciones (id_curso)
-Profesores → Cursos (id_profesor)
-🎯 MÉTODOS ESPECIALES
-CarreraModel
-php
-findAllActive() - Solo carreras con estado=1
-softDelete($id) - Eliminación lógica (estado=0)
-💾 ESTRUCTURA DE DATOS
-Tablas con estado:
+---
 
-carreras - estado (1/0)
+## 🔗 RELACIONES IMPLÍCITAS (Claves Foráneas)
 
-alumnos - estado
-
-usuarios - estado
-
-Tablas con relaciones:
-
-inscripciones - id_alumno, id_curso
-
-cursos - id_profesor, id_carrera
-
-carreras - id_categoria
-
-Campos únicos críticos:
-
-alumnos.dni_matricula
-
-alumnos.email
-
-usuarios.nombre_de_usuario
+| Relación | Modelos Involucrados | Campo de Unión (FK) |
+| :--- | :--- | :--- |
+| **Autenticación** | Usuario → Profesor/Estudiante | `id_usuario` |
+| **Académica** | Categoría → Carrera | `id_categoria` |
+| **Académica** | Carrera → Curso | `id_carrera` |
+| **Recursos Humanos** | Profesor → Curso | `id_profesor` |
+| **Registro** | Estudiante → Inscripción | `id_alumno` |
+| **Registro** | Curso → Inscripción | `id_curso` |
