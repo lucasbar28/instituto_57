@@ -3,6 +3,7 @@
  * Vista: Lista de Estudiantes con opciones de CRUD y Gestión de Inscripciones separadas.
  * Extiende el layout principal 'templates/layout'.
  */
+$rol = session()->get('rol'); // Obtenemos el rol del usuario para restringir la vista
 ?>
 <?= $this->extend('templates/layout') ?> 
 
@@ -16,46 +17,62 @@
     <!-- 2. SECCIÓN PRINCIPAL: LISTA DE ESTUDIANTES (CRUD) -->
     <h1 class="text-center mb-4">Gestión de Estudiantes</h1>
     
-    <div class="section-header mb-4">
+    <div class="section-header mb-4 d-flex justify-content-between align-items-center">
         <h2><i class="fas fa-graduation-cap"></i> Listado de Alumnos</h2>
-        <!-- Botón de Registro con el estilo consistente -->
-        <a href="<?= base_url('estudiantes/crear') ?>" class="btn btn-primary">
+        
+        <?php if ($rol === 'administrador'): // Solo Administrador puede Crear ?>
+        <a href="<?= base_url('estudiantes/crear') ?>" class="btn btn-primary btn-sm">
             <i class="fas fa-user-plus"></i> Crear Nuevo Estudiante
         </a>
+        <?php endif; ?>
     </div>
 
-    <!-- Tabla de Estudiantes (AHORA USANDO CLASES CSS PERSONALIZADAS: data-table) -->
+    <!-- Tabla de Estudiantes -->
     <div class="table-responsive">
-        <!-- Reemplazamos 'table table-hover' por la clase personalizada 'data-table' -->
         <table class="data-table">
-            <!-- El encabezado se estiliza automáticamente con .data-table thead th -->
             <thead> 
                 <tr>
                     <th>ID</th>
+                    <!-- DNI y Email solo visibles para Admin y Profesor por privacidad -->
+                    <?php if ($rol === 'administrador' || $rol === 'profesor'): ?>
                     <th>DNI</th>
+                    <?php endif; ?>
                     <th>Nombre Completo</th>
+                    <?php if ($rol === 'administrador' || $rol === 'profesor'): ?>
                     <th>Email</th>
+                    <?php endif; ?>
                     <th>Carrera</th>
+                    
+                    <?php if ($rol === 'administrador'): // Solo Administrador tiene acciones CRUD ?>
                     <th>Acciones</th>
+                    <?php endif; ?>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($estudiantes)): ?>
                     <tr>
-                        <td colspan="6" class="text-center py-4">No hay estudiantes registrados.</td>
+                        <td colspan="<?= ($rol === 'administrador' || $rol === 'profesor') ? 6 : 4 ?>" class="text-center py-4">No hay estudiantes registrados.</td>
                     </tr>
                 <?php else: ?>
                     <?php foreach ($estudiantes as $estudiante): ?>
                     <tr>
                         <td class="align-middle"><?= esc($estudiante['id_alumno']) ?></td>
+                        
+                        <?php if ($rol === 'administrador' || $rol === 'profesor'): ?>
                         <td class="align-middle"><?= esc($estudiante['dni_matricula'] ?? 'N/A') ?></td> 
+                        <?php endif; ?>
+                        
                         <td class="align-middle"><?= esc($estudiante['nombre_completo']) ?></td>
+                        
+                        <?php if ($rol === 'administrador' || $rol === 'profesor'): ?>
                         <td class="align-middle"><?= esc($estudiante['email'] ?? 'N/A') ?></td>
+                        <?php endif; ?>
+                        
                         <td class="align-middle"><?= esc($carreras_map[$estudiante['id_carrera']] ?? 'N/A') ?></td>
                         
-                        <!-- Columna de Acciones (Editar/Eliminar) -->
+                        <!-- Columna de Acciones (Editar/Eliminar) - SOLO ADMINISTRADOR -->
+                        <?php if ($rol === 'administrador'): ?>
                         <td class="align-middle action-buttons">
-                            <!-- Usando clases btn-action y btn-edit/btn-delete del styles.css -->
                             <a href="<?= base_url("estudiantes/editar/{$estudiante['id_alumno']}") ?>" class="btn-action btn-edit" title="Editar Alumno">
                                 <i class="fas fa-edit"></i> Editar
                             </a>
@@ -63,6 +80,7 @@
                                 <i class="fas fa-trash"></i> Eliminar
                             </a>
                         </td>
+                        <?php endif; ?>
                     </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -73,16 +91,16 @@
     <!-- Separador visual -->
     <hr class="my-5"> 
 
-    <!-- 3. SECCIÓN SECUNDARIA: GESTIÓN DE INSCRIPCIONES (para el rol específico) -->
+    <!-- 3. SECCIÓN SECUNDARIA: GESTIÓN DE INSCRIPCIONES (Solo para Administrador y Profesor) -->
+    <?php if ($rol === 'administrador' || $rol === 'profesor'): ?>
+    
     <div class="section-header mt-5 mb-4">
         <h2><i class="fas fa-list-alt"></i> Gestión de Inscripciones Rápidas</h2>
     </div>
     
     <!-- Tabla de Inscripciones Rápidas -->
     <div class="table-responsive">
-        <!-- Se mantiene .data-table pero podemos usar un estilo inline en thead para diferenciar -->
         <table class="data-table">
-            <!-- Usamos un estilo inline para forzar el color gris oscuro en este encabezado, si es necesario -->
             <thead style="background-color: #6b7280; color: white;"> 
                 <tr>
                     <th>Estudiante</th>
@@ -122,7 +140,6 @@
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="id_alumno" value="<?= esc($estudiante['id_alumno']) ?>">
                                     
-                                    <!-- Usando la clase form-control de tu CSS -->
                                     <select name="id_curso" class="form-control" style="width: 100%; max-width: 200px;" required>
                                         <option value="">Seleccione Curso</option>
                                         <?php foreach ($cursos as $curso): ?>
@@ -132,20 +149,18 @@
                                         <?php endforeach; ?>
                                     </select>
                                     
-                                    <!-- Usando un botón de acción success/info -->
                                     <button type="submit" class="btn-action btn-edit" title="Inscribir">
                                         <i class="fas fa-check"></i>
                                     </button>
                                 </form>
                             </td>
 
-                            <!-- Botón de Desinscripción (solo si está inscrito en algo) -->
+                            <!-- Botón de Desinscripción -->
                             <td class="align-middle">
                                 <?php if (!empty($inscripciones_por_alumno[$estudiante['id_alumno']])): ?>
-                                    <!-- Botón de acción danger/delete -->
                                     <a href="<?= base_url('inscripciones/desinscribir/' . esc($estudiante['id_alumno'])) ?>" 
                                        class="btn-action btn-delete" 
-                                       title="Desinscribir de todos los cursos"
+                                       title="Desinscribir de su último curso"
                                        onclick="return confirm('¿Desea desinscribir a <?= esc($estudiante['nombre_completo']) ?> de su último curso?')">
                                         <i class="fas fa-minus-circle"></i>
                                     </a>
@@ -159,6 +174,8 @@
             </tbody>
         </table>
     </div>
+
+    <?php endif; ?>
 
 </div>
 

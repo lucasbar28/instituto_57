@@ -1,99 +1,91 @@
-<?= $this->extend('templates/layout') ?> 
-
+<?= $this->extend('templates/layout') ?>
 <?= $this->section('content') ?>
 
 <div class="container mt-5">
-    
-    <!-- 1. ALERTAS (Mensajes de éxito/error) -->
+    <!-- Mensajes de Sesión (Éxito o Error) -->
     <?php if (session()->getFlashdata('mensaje')): ?>
-        <div class="alert alert-success mt-3" role="alert">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
             <?= session()->getFlashdata('mensaje') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
     <?php if (session()->getFlashdata('error')): ?>
-        <div class="alert alert-danger mt-3" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <?= session()->getFlashdata('error') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
 
-    <!-- 2. TÍTULO Y BOTÓN DE CREACIÓN -->
-    <div class="d-flex flex-column align-items-center justify-content-center mb-5">
-        <!-- Título principal -->
-        <h1 class="display-5 fw-bold text-primary mb-3">Lista de Profesores</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 text-primary"><i class="bi bi-people-fill me-2"></i><?= esc($title) ?></h1>
         
-        <!-- Botón de Creación -->
-        <a href="<?= base_url('profesores/crear') ?>" class="btn btn-primary btn-lg shadow-sm">
-            <i class="fas fa-plus-circle"></i> Registrar Nuevo Profesor
-        </a>
+        <?php if (session()->get('rol') === 'administrador'): ?>
+            <a href="<?= base_url('profesores/crear') ?>" class="btn btn-success">
+                <i class="fas fa-user-plus me-1"></i> Nuevo Profesor
+            </a>
+        <?php endif; ?>
     </div>
 
-    <!-- 3. CONTENEDOR DE LA TABLA -->
-    <div class="table-responsive">
-        <table class="data-table"> 
-            
-            <!-- ENCABEZADO -->
-            <thead> 
-                <tr>
-                    <th class="col-1">ID</th>
-                    <th class="col-3">Nombre Completo</th>
-                    <th class="col-2 text-center">Especialidad</th>
-                    <th class="col-3">Email</th>
-                    <th class="col-2 text-center">Teléfono</th>
-                    <th class="col-1 text-center">Acciones</th>
-                </tr>
-            </thead>
-            
-            <!-- CUERPO DE LA TABLA -->
-            <tbody>
-                <?php 
-                // Usamos $profesores que viene del controlador
-                $data_profesores = $profesores ?? [];
-                ?>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <?php if (empty($profesores)): ?>
+                <div class="alert alert-info text-center">
+                    No hay profesores registrados en el sistema.
+                </div>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre Completo</th>
+                                <th>Especialidad</th>
+                                <th>Teléfono</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($profesores as $profesor): ?>
+                                <tr>
+                                    <td><?= esc($profesor['id_profesor']) ?></td>
+                                    <td class="fw-bold"><?= esc($profesor['nombre_completo']) ?></td>
+                                    <td><?= esc($profesor['especialidad']) ?></td>
+                                    <td><?= esc($profesor['telefono'] ?? 'N/A') ?></td>
+                                    <td>
+                                        <!-- Botón de Ver (Visible para Administrador y Profesor, si el filtro lo permite) -->
+                                        <a href="<?= base_url('profesores/ver/' . $profesor['id_profesor']) ?>" class="btn btn-sm btn-info" title="Ver Detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
 
-                <?php if (empty($data_profesores)): ?>
-                    <tr>
-                        <td colspan="6" class="text-center py-4">No hay profesores registrados.</td>
-                    </tr>
-                <?php else: ?>
-                    <?php foreach ($data_profesores as $profesor): ?>
-                    <tr>
-                        <!-- DATOS DEL PROFESOR -->
-                        <td class="align-middle"><?= esc($profesor['id_profesor']) ?></td>
-                        <td class="align-middle"><?= esc($profesor['nombre_completo']) ?></td>
-                        <td class="align-middle text-center"><?= esc($profesor['especialidad']) ?></td>
-                        <td class="align-middle"><?= esc($profesor['email']) ?></td>
-                        <td class="align-middle text-center"><?= esc($profesor['telefono'] ?? 'N/A') ?></td>
-                        
-                        <!-- ACCIONES -->
-                        <td class="align-middle action-buttons text-center"> 
-                            <!-- Botón Editar: Usando la clase personalizada btn-edit y fa-edit (asumimos Font Awesome) -->
-                            <a href="<?= base_url("profesores/editar/{$profesor['id_profesor']}") ?>" 
-                               class="btn-action btn-edit" title="Editar Profesor">
-                                 <i class="fas fa-edit"></i> Editar
-                            </a>
-                            
-                            <!-- Botón Eliminar: CORREGIDO para incluir el campo CSRF. -->
-                            <form action="<?= base_url('profesores/eliminar/' . $profesor['id_profesor']) ?>" 
-                                    method="post" style="display:inline;"
-                                    onsubmit="return confirm('⚠️ ADVERTENCIA: Esta acción es PERMANENTE. ¿Está seguro de que desea BORRAR DEFINITIVAMENTE al profesor <?= esc($profesor['nombre_completo']) ?>?');">
-                                
-                                <!-- CORRECCIÓN CLAVE: Token CSRF para validar la solicitud (Soluciona error 403) -->
-                                <?= csrf_field() ?> 
-                                
-                                <input type="hidden" name="_method" value="DELETE"> 
-                                <button type="submit" class="btn-action btn-delete" title="Borrar Permanentemente">
-                                    <i class="fas fa-trash"></i> Eliminar
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                                        <?php if (session()->get('rol') === 'administrador'): ?>
+                                            <!-- Botones de Edición y Eliminación (SOLO ADMINISTRADOR) -->
+                                            <a href="<?= base_url('profesores/editar/' . $profesor['id_profesor']) ?>" class="btn btn-sm btn-warning" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <!-- Botón de Eliminar (Requiere JS para confirmación) -->
+                                            <button class="btn btn-sm btn-danger" onclick="confirmDelete(<?= $profesor['id_profesor'] ?>, '<?= esc($profesor['nombre_completo']) ?>')" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </div>
     </div>
-
 </div>
+
+<!-- Script simple para confirmación de eliminación -->
+<script>
+    function confirmDelete(id, nombre) {
+        if (confirm('¿Está seguro de que desea eliminar al profesor ' + nombre + '? Esta acción es irreversible.')) {
+            window.location.href = '<?= base_url('profesores/eliminar') ?>/' + id;
+        }
+    }
+</script>
 
 <?= $this->endSection() ?>
  

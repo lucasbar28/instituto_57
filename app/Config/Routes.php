@@ -7,9 +7,9 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
-// Rutas de Login y Autenticación (Dejadas como login manual por ahora)
+// Rutas de Login y Autenticación
 $routes->get('login', 'Login::index');
-$routes->post('login/auth', 'Login::auth');
+$routes->post('login', 'Login::auth'); 
 $routes->get('logout', 'Login::logout');
 
 // ==========================================================================
@@ -20,17 +20,25 @@ $routes->get('logout', 'Login::logout');
 $routes->group('profesores', static function ($routes) {
     // Listar todos
     $routes->get('/', 'Profesores::index'); 
-    // Crear (Formulario GET y Guardar POST)
-    $routes->get('crear', 'Profesores::crear');
+    
+    // Crear (Formulario GET)
+    $routes->get('create', 'Profesores::crear'); 
+    // Guardar (Procesar formulario POST)
     $routes->post('guardar', 'Profesores::guardar');
-    // Editar (Formulario GET)
+    
+    // CORRECCIÓN DE RUTA: Mostrar/Ver detalle de un registro (GET: /profesores/ver/4)
+    // Cambiado de 'show' a 'ver' para coincidir con la URL de la vista.
+    $routes->get('ver/(:num)', 'Profesores::ver/$1'); 
+    
+    // Editar (Formulario GET para editar)
     $routes->get('editar/(:num)', 'Profesores::editar/$1'); 
     // Actualizar (Procesar formulario POST)
     $routes->post('actualizar', 'Profesores::actualizar');
     
-    // ** CORRECCIÓN AQUÍ: CAMBIAR de GET a DELETE **
     // Eliminar (Eliminación lógica/física)
-    $routes->delete('eliminar/(:num)', 'Profesores::eliminar/$1'); 
+    // Nota: Es más seguro usar GET para eliminación simple sin formularios de confirmación
+    // Aunque CodeIgniter recomienda POST/DELETE, el método GET es común para acciones de URL directas.
+    $routes->get('eliminar/(:num)', 'Profesores::eliminar/$1'); 
 });
 
 
@@ -85,5 +93,18 @@ $routes->group('inscripciones', static function ($routes) {
     
     // Nueva ruta: Desinscribir un alumno (Eliminación lógica/Soft Delete) (GET)
     $routes->get('desinscribir/(:num)', 'Inscripcion::desinscribir/$1');
+});
+
+// Rutas de Autenticación y Registro
+$routes->get('registro', 'Registro::index');
+$routes->post('registro/alumno', 'Registro::registroAlumno'); 
+// ==========================================================================
+// RUTAS DE ADMINISTRACIÓN (Dashboard)
+// ==========================================================================
+
+$routes->group('admin', ['filter' => 'auth:administrador'], static function ($routes) {
+    // Ruta principal del Dashboard
+    // Llama al método index() del controlador Admin/Dashboard
+    $routes->get('dashboard', 'Admin\Dashboard::index'); 
 });
  

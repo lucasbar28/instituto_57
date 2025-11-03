@@ -22,6 +22,7 @@ class Profesores extends BaseController
             'title'      => 'Lista de Profesores',
         ];
 
+        // CAMBIO: Ahora carga la vista 'profesores' (que está en app/Views/profesores.php)
         return view('profesores', $data);
     }
 
@@ -48,8 +49,7 @@ class Profesores extends BaseController
         
         $datos = $this->request->getPost();
 
-        // --- 1. REGLAS DE VALIDACIÓN (CORREGIDAS) ---
-        // Se elimina 'dni_o_similar'
+        // --- 1. REGLAS DE VALIDACIÓN ---
         if (!$this->validate([
             'nombre_completo' => 'required|min_length[3]|max_length[255]',
             'especialidad'    => 'required|min_length[3]|max_length[150]',
@@ -71,7 +71,6 @@ class Profesores extends BaseController
         
         $usuarioData = [
             'nombre_de_usuario' => $datos['email'],
-            // CORRECCIÓN: Se usa la contraseña generada
             'contrasena'        => password_hash($contrasena_inicial, PASSWORD_DEFAULT),
             'rol'               => 'profesor',
             'estado'            => 'activo'
@@ -118,6 +117,46 @@ class Profesores extends BaseController
             return redirect()->back()->withInput()->with('error', '❌ Error al registrar el profesor o el usuario: ' . $e->getMessage());
         }
     }
+    
+    /**
+     * Muestra los detalles de un profesor específico. (Ruta: GET /profesores/show/ID)
+     */
+    public function ver($id = null)
+    {
+        $profesorModel = new ProfesorModel();
+
+        if ($id === null) {
+            return redirect()->to(base_url('profesores'))->with('error', 'ID de profesor no especificado.');
+        }
+
+        // Obtener el profesor
+        $profesor = $profesorModel->find($id);
+
+        if (empty($profesor)) {
+            // Lanza una excepción 404 si el profesor no existe
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('No se encontró el profesor con ID: ' . $id);
+        }
+
+        // Además, deberíamos obtener el email de la tabla 'usuarios' usando el 'id_usuario'
+        $usuarioModel = new UsuarioModel();
+        $usuario = $usuarioModel->find($profesor['id_usuario']);
+
+        // Agregar el email del usuario para la vista de detalle
+        if ($usuario) {
+             $profesor['email'] = $usuario['nombre_de_usuario'];
+        } else {
+             $profesor['email'] = 'Usuario no encontrado';
+        }
+
+
+        $data = [
+            'profesor' => $profesor,
+            'title'    => 'Detalle del Profesor: ' . $profesor['nombre_completo']
+        ];
+
+        // Esta vista DEBE estar en app/Views/profesores/ver.php
+        return view('profesores/ver', $data); 
+    }
 
     /**
      * Muestra el formulario para editar un profesor existente.
@@ -160,7 +199,7 @@ class Profesores extends BaseController
         }
         $id_usuario = $profesor_actual['id_usuario'];
 
-        // --- REGLAS DE VALIDACIÓN (CORREGIDAS) ---
+        // --- REGLAS DE VALIDACIÓN ---
         if (!$this->validate([
             'nombre_completo' => 'required|min_length[3]|max_length[255]',
             'especialidad'    => 'required|min_length[3]|max_length[150]',
@@ -217,7 +256,6 @@ class Profesores extends BaseController
     {
         $profesorModel = new ProfesorModel();
         $usuarioModel = new UsuarioModel();
-        // ELIMINADO: $cursoModel (Ya no es necesario, la BD lo maneja)
         $db = \Config\Database::connect();
         
         $profesor = $profesorModel->find($id);
@@ -231,16 +269,12 @@ class Profesores extends BaseController
         $db->transStart(); 
 
         try {
-            // CORRECCIÓN: La BD (`instituto_57 (5).sql`) tiene ON DELETE SET NULL
-            // para 'cursos.id_profesor', por lo que la BD desasigna los cursos automáticamente.
-            
-            // A. Eliminar el profesor (Registro hijo)
+            // Eliminar el profesor (esto debería, a su vez, eliminar el usuario
+            // si tienes configurado ON DELETE CASCADE en la FK de profesores.id_usuario)
             $profesorModel->delete($id);
 
-            // B. Eliminar el usuario (Registro padre / credencial)
-            // Tu BD (`instituto_57 (5).sql`) tiene ON DELETE CASCADE en 'profesores_ibfk_1'.
-            // Esto significa que $usuarioModel->delete($id_usuario) es REDUNDANTE.
-            // La BD ya eliminó al usuario.
+            // Nota: Si la FK tiene ON DELETE CASCADE, la siguiente línea es redundante
+            // $usuarioModel->delete($id_usuario); 
             
             $db->transComplete(); 
 
@@ -254,9 +288,8 @@ class Profesores extends BaseController
             $db->transRollback();
             log_message('error', 'Error al eliminar profesor: ' . $e->getMessage());
             
-            // ELIMINADO: Chequeo 1451 (Si la BD está bien configurada, no debería pasar)
-            
             return redirect()->to(base_url('profesores'))->with('error', '❌ Error al eliminar el profesor y su credencial: ' . $e->getMessage());
         }
     }
-} 
+}
+ 
