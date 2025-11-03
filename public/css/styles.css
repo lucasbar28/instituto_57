@@ -16,7 +16,7 @@
 
 /* Estilos base */
 body {
-  font-family: 'Inter', Arial, sans-serif;
+  font-family: 'Encode Sans', Inter, Arial, sans-serif;
   line-height: 1.6;
   color: var(--color-text);
   background-color: var(--color-bg);
@@ -66,7 +66,7 @@ body {
 
 .navbar-logo {
   color: var(--color-accent);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 1.5rem;
   text-decoration: none;
 }
@@ -89,10 +89,22 @@ body {
 }
 
 .navbar-links a.active {
-  color: var(--color-accent);
+  text-decoration: none;
   font-weight: 600;
-  border-bottom: 2px solid var(--color-accent); /* Indicador de página activa */
-  padding-bottom: 3px;
+  color: var(--color-accent-hover);
+  position: relative; /* necesario para ::after posicionado */
+}
+
+.navbar-links a.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;       /* separacion debajo del texto */
+  height: 3px;
+  background: var(--gradient-primary);
+  border-radius: 2px;
+  width: 100%;
 }
 
 /* ENCABEZADOS DE PÁGINA */
@@ -559,26 +571,16 @@ body {
 
 /* AJUSTES CLAVE DE CSS para que el video local sea grande y responsivo */
 
-/* El contenedor mantiene las sombras y los bordes */
 .video-container {
-    /* Quitamos 'position: relative', 'padding-bottom: 56.25%', y 'height: 0' que eran para iframes */
-    position: relative; 
-    height: auto; 
-    overflow: hidden;
-    border-radius: 8px; 
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
-    
-    /* Asegura el centrado y el ancho máximo */
-    margin: 0 auto; 
-    max-width: 100%; /* El video no excederá el ancho de su columna en el grid */
+    width: 100%; 
+    height: auto;
+    max-width: 100%; 
 }
+
 .local-video {
     width: 100%;
-    max-width: 800px; /* Tamaño grande */
-    height: auto;
-    margin: 0 auto; /* Centrado horizontal */
-    display: block; /* Necesario para que el centrado funcione */
-    /* ... sombra y bordes ... */
+    height: auto; 
+    display: block; 
 }
 
 /* El elemento de video en sí */
@@ -598,7 +600,8 @@ body {
 
 .about-content-grid {
     display: grid;
-    gap: 40px;
+    gap: 30px;
+    grid-template-columns: 1fr 1fr;
     align-items: center;
     margin: 0 auto;
     max-width: 1200px; 
@@ -922,3 +925,11 @@ body {
     text-align: left; /* Asegura que el contenido dentro de cada grupo se alinee a la izquierda */
 }
 /* Fin de SweetAlert2 personalizado */
+
+.text-center {
+  text-align: center;       /* centra el texto horizontalmente */
+  margin-left: auto;        /* opcional: centra el bloque si tiene ancho */
+  margin-right: auto;
+  max-width: 900px;         /* opcional: limita el ancho para mejor lectura */
+  line-height: 1.6;         /* opcional: mejora legibilidad */
+}

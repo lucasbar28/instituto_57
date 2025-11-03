@@ -35,36 +35,66 @@ window.confirmDelete = async function(deleteUrl) {
     }
 };
 
-// ==================== INICIALIZACIÓN ====================
 // Espera a que el DOM esté completamente cargado antes de ejecutar el código
 document.addEventListener('DOMContentLoaded', () => {
-    // Esto elimina todo el código de formularios, carga de tablas y AJAX que ya no necesitamos.
-    // Solo dejamos la inicialización de Glider.js si existe en la página.
-    
-    // Inicialización de Glider.js (para la página de inicio)
-    const gliderElement = document.querySelector('.glider');
-    if (gliderElement) {
-        // Nota: Asume que la librería Glider.js está cargada en tu layout.
-        // Si no está cargada, esta línea causará un error "Glider is not defined".
-        new Glider(gliderElement, {
-            slidesToShow: 1,
-            dots: '.dots',
-            arrows: {
-                prev: '.glider-prev',
-                next: '.glider-next'
-            },
+    
+    const gliderElement = document.querySelector('.glider');
+    
+    if (gliderElement) {
+        // Almacenamos la instancia de Glider en la variable 'gliderInstance'
+        const gliderInstance = new Glider(gliderElement, {
+            // ... (Tus opciones de configuración actuales) ...
+            slidesToShow: 1,
+            dots: '.dots',
+            arrows: {
+                prev: '.glider-prev',
+                next: '.glider-next'
+            },
             responsive: [
                 {
                     // Pantallas mayores a 768px
                     breakpoint: 768,
                     settings: {
-                        slidesToShow: 'auto',
+                        slidesToShow: 1,
                         itemWidth: 300,
                         slidesToScroll: 1,
                     }
                 }
             ]
-        });
-    }
-});
+        });
 
+        // ----------------------------------------------------
+        // LÓGICA DE MOVIMIENTO AUTOMÁTICO (Cada 3 segundos) ⏱️
+        // ----------------------------------------------------
+        
+        const autoSlideInterval = 3000; // 3000 milisegundos = 3 segundos
+        let timeout = null;
+
+        // Función que avanza al siguiente slide y reinicia el temporizador
+        function nextSlideAndLoop() {
+            // Usa el método .scrollItem() para ir al siguiente elemento
+            gliderInstance.scrollItem('next');
+            
+            // Llama a 'resume' para reiniciar el temporizador y crear el loop
+            resumeAutoSlide(); 
+        }
+
+        // Función para detener el movimiento automático
+        function pauseAutoSlide() {
+            clearTimeout(timeout);
+        }
+
+        // Función para iniciar o reanudar el movimiento automático
+        function resumeAutoSlide() {
+            pauseAutoSlide(); // Asegura que no haya temporizadores duplicados
+            timeout = setTimeout(nextSlideAndLoop, autoSlideInterval);
+        }
+
+        // 1. Inicia el movimiento automático al cargar la página
+        resumeAutoSlide(); 
+
+        // 2. Opcional: Pausa el auto-avance al pasar el mouse (mejor UX)
+        gliderElement.addEventListener('mouseover', pauseAutoSlide);
+        gliderElement.addEventListener('mouseout', resumeAutoSlide);
+    }
+});

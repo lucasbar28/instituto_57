@@ -1,6 +1,7 @@
 <footer class="main-footer">
     <div class="footer-content">
         <p>&copy; <?= date('Y') ?> Instituto 57. Todos los derechos reservados.</p>
+        <p> Grupo 4: Barreu - Bertoglio - González - Newton - Sarmiento - Vázquez</p>
         <div class="social-links">
             <a href="tel:+542241422051" aria-label="Llamar al Instituto 57"><i class="fas fa-phone-alt"></i></a>
             <a href="#"><i class="fab fa-twitter"></i></a>
