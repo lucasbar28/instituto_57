@@ -9,45 +9,25 @@ use App\Models\CarreraModel;
 class Cursos extends BaseController
 {
     protected $cursoModel;
+    protected $profesorModel; // Añadido
+    protected $carreraModel; // Añadido
 
     public function __construct()
     {
         $this->cursoModel = new CursoModel();
-    }
-
-    // --- Métodos de Ayuda para el Controlador ---
-    
-    /**
-     * Extiende el modelo de Curso para incluir los nombres de la Carrera y el Profesor.
-     * Si el CursoModel usa Soft Deletes, automáticamente filtrará por deleted_at IS NULL.
-     */
-    protected function findAllWithRelations()
-    {
-        // Se realiza un JOIN para obtener los nombres de las entidades relacionadas (Profesor y Carrera)
-        // El findAll() del cursoModel automáticamente aplica el filtro de Soft Delete si está activo allí.
-        return $this->cursoModel
-            ->select('cursos.*, p.nombre_completo as nombre_profesor, c.nombre_carrera')
-            ->join('profesores p', 'p.id_profesor = cursos.id_profesor', 'left')
-            ->join('carreras c', 'c.id_carrera = cursos.id_carrera', 'left')
-            ->findAll(); // Aquí, el modelo de cursos se encarga de filtrar por deleted_at si lo tiene activo
+        // CORRECCIÓN: Instanciar todos los modelos necesarios
+        $this->profesorModel = new ProfesorModel();
+        $this->carreraModel = new CarreraModel();
     }
 
     /**
      * Carga las listas de profesores y carreras para los dropdowns.
-     * Se eliminan los filtros WHERE deleted_at IS NULL, ya que esa columna no existe en estas tablas.
      */
     protected function loadDropdownData()
     {
-        $profesorModel = new ProfesorModel();
-        $carreraModel = new CarreraModel();
-        
         return [
-            // El modelo de Profesor no tiene eliminación lógica, usamos findAll()
-            'profesores' => $profesorModel->findAll(), 
-            
-            // El modelo de Carrera tiene su propia función de eliminación lógica por 'estado=0'
-            // Usamos findAllActive() que ya filtra por 'estado=1'
-            'carreras'   => $carreraModel->findAllActive(), 
+            'profesores' => $this->profesorModel->findAll(), 
+            'carreras'   => $this->carreraModel->findAllActive(), 
         ];
     }
     // ------------------------------------------
@@ -58,11 +38,12 @@ class Cursos extends BaseController
     public function index()
     {
         $data = [
-            'cursos' => $this->findAllWithRelations(),
+            // CORRECCIÓN: Llamar a la función que SÍ existe en el Modelo
+            'cursos' => $this->cursoModel->findAllWithRelations(),
             'page_title' => 'Lista de Cursos'
         ];
 
-        return view('cursos', $data);
+        return view('cursos', $data); // Asumiendo 'cursos.php'
     }
     
     /**
@@ -73,7 +54,7 @@ class Cursos extends BaseController
         $data = $this->loadDropdownData();
         $data['validation'] = \Config\Services::validation(); 
         $data['page_title'] = 'Crear Curso';
-        $data['curso'] = null; // Usado para que la vista de formulario sepa que es una creación
+        $data['curso'] = null; 
 
         return view('cursos_form', $data);
     }
@@ -85,25 +66,32 @@ class Cursos extends BaseController
     {
         $datos = $this->request->getPost();
 
-        // Reglas de Validación: El nombre y el código deben ser únicos
+        // --- CORRECCIÓN DE VALIDACIÓN ---
+        // Se elimina 'id_profesor' (no existe en la BD)
         if (! $this->validate([
             'nombre'        => 'required|min_length[3]|is_unique[cursos.nombre]', 
-            'codigo'        => 'required|max_length[10]|is_unique[cursos.codigo]', // Validación de código
+            'codigo'        => 'required|max_length[10]|is_unique[cursos.codigo]',
             'creditos'      => 'required|integer|greater_than[0]',
-            'cupo_maximo'   => 'required|integer|greater_than[0]', // Validación de cupo
-            'id_profesor'   => 'required|integer', 
+            'cupo_maximo'   => 'required|integer|greater_than[0]',
             'id_carrera'    => 'required|integer',
             'descripcion'   => 'max_length[500]',
         ])) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+            // CORRECCIÓN: Si la validación falla, debemos recargar los dropdowns
+            $data = $this->loadDropdownData();
+            $data['validation'] = $this->validator;
+            $data['page_title'] = 'Crear Curso';
+            $data['curso'] = null; // Modo creación
+            return view('cursos_form', $data); // No usamos redirect()->back()
         }
 
+        // --- CORRECCIÓN DE INSERCIÓN ---
+        // Se elimina 'id_profesor'
         $this->cursoModel->insert([
             'nombre'        => $datos['nombre'],
             'codigo'        => $datos['codigo'],
             'creditos'      => $datos['creditos'],
             'cupo_maximo'   => $datos['cupo_maximo'],
-            'id_profesor'   => $datos['id_profesor'],
+            // 'id_profesor'   => $datos['id_profesor'], // ELIMINADO
             'id_carrera'    => $datos['id_carrera'],
             'descripcion'   => $datos['descripcion'] ?? null,
         ]);
@@ -113,7 +101,6 @@ class Cursos extends BaseController
 
     /**
      * Muestra el formulario con los datos de un curso para editar.
-     * @param int $id ID del curso a editar.
      */
     public function editar($id)
     {
@@ -137,28 +124,35 @@ class Cursos extends BaseController
     public function actualizar()
     {
         $datos = $this->request->getPost();
-        $id = $datos['id_curso']; // El ID del curso viene en un campo oculto del formulario
+        $id = $datos['id_curso']; 
 
-        // Regla de Validación de Nombre y Código: Ignorar el valor actual para la regla is_unique
+        // --- CORRECCIÓN DE VALIDACIÓN ---
+        // Se elimina 'id_profesor'
         if (! $this->validate([
             'nombre'        => "required|min_length[3]|is_unique[cursos.nombre,id_curso,{$id}]", 
             'codigo'        => "required|max_length[10]|is_unique[cursos.codigo,id_curso,{$id}]",
             'creditos'      => 'required|integer|greater_than[0]',
             'cupo_maximo'   => 'required|integer|greater_than[0]',
-            'id_profesor'   => 'required|integer', 
+            // 'id_profesor'   => 'required|integer', // ELIMINADO
             'id_carrera'    => 'required|integer',
             'descripcion'   => 'max_length[500]',
         ])) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+            // CORRECCIÓN: Si la validación falla, debemos recargar los dropdowns
+            $data = $this->loadDropdownData();
+            $data['validation'] = $this->validator;
+            $data['page_title'] = 'Editar Curso';
+            $data['curso'] = $this->cursoModel->find($id); // Recargar datos originales
+            return view('cursos_form', $data);
         }
 
-        // Actualización de Datos
+        // --- CORRECCIÓN DE ACTUALIZACIÓN ---
+        // Se elimina 'id_profesor'
         $this->cursoModel->update($id, [
             'nombre'        => $datos['nombre'],
             'codigo'        => $datos['codigo'],
             'creditos'      => $datos['creditos'],
             'cupo_maximo'   => $datos['cupo_maximo'],
-            'id_profesor'   => $datos['id_profesor'],
+            // 'id_profesor'   => $datos['id_profesor'], // ELIMINADO
             'id_carrera'    => $datos['id_carrera'],
             'descripcion'   => $datos['descripcion'] ?? null,
         ]);
@@ -168,7 +162,6 @@ class Cursos extends BaseController
 
     /**
      * Ejecuta la eliminación lógica (Soft Delete) de un curso.
-     * @param int $id ID del curso a eliminar.
      */
     public function eliminar($id)
     {
@@ -178,9 +171,9 @@ class Cursos extends BaseController
             return redirect()->to(base_url('cursos'))->with('error', '❌ Curso no encontrado.');
         }
 
-        // Ejecuta el Soft Delete (actualiza deleted_at)
+        // CORRECTO: El modelo de Cursos SÍ usa Soft Delete
         $this->cursoModel->delete($id);
 
-        return redirect()->to(base_url('cursos'))->with('mensaje', '🗑️ Curso "' . $curso['nombre'] . '" eliminado lógicamente.');
+        return redirect()->to(base_url('cursos'))->with('mensaje', '🗑️ Curso "' . $curso['nombre'] . '" enviado a la papelera.');
     }
-}
+} 

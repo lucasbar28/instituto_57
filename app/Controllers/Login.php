@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\UsuarioModel;
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 
 class Login extends BaseController
 {
@@ -12,9 +12,10 @@ class Login extends BaseController
      */
     public function index()
     {
-        helper(['form']);
-        $data['title'] = 'Iniciar Sesión'; // Título para el head
-        echo view('login', $data);
+        helper(['form']); 
+        $data['title'] = 'Iniciar Sesión'; 
+        
+        return view('login', $data);
     }
 
     /**
@@ -25,54 +26,46 @@ class Login extends BaseController
         $session = session();
         $model = new UsuarioModel();
         
-        $email = $this->request->getVar('nombre_de_usuario');
+        $email = $this->request->getVar('nombre_de_usuario', FILTER_SANITIZE_EMAIL);
         $password = $this->request->getVar('contrasena');
         
-        // 1. Buscar el usuario por email (nombre_de_usuario)
+        if (empty($email) || empty($password)) {
+            $session->setFlashdata('error', 'Por favor, ingrese su nombre de usuario (email) y contraseña.');
+            return redirect()->to(base_url('/login'));
+        }
+
         $usuario = $model->where('nombre_de_usuario', $email)->first();
         
-        // --- DEPURACIÓN: Paso 1 ---
-        // Si no encuentra el usuario, muestra un mensaje y el dump.
         if (is_null($usuario)) {
-            $session->setFlashdata('msg', 'Por favor, ingrese un nombre de usuario y contraseña válidos.');
-            
-            // Si $usuario es null, devolvemos un dump de error.
-            echo "<h2>--- ERROR DE DEPURACIÓN (USUARIO NO ENCONTRADO) ---</h2>";
-            echo "<p>El modelo no pudo encontrar un registro para el email: <strong>$email</strong></p>";
-            var_dump($usuario); 
-            echo "<p>Vuelve al formulario con el mensaje de error.</p>";
-            
+            $session->setFlashdata('error', 'Credenciales no válidas. Por favor, intente de nuevo.');
             return redirect()->to(base_url('/login'));
         }
         
-        // --- DEPURACIÓN: Paso 2 ---
-        // Si encuentra el usuario, verifica la contraseña.
         $verificarContrasena = password_verify($password, $usuario['contrasena']);
         
-        // Si la verificación de contraseña falla.
         if (! $verificarContrasena) {
-            $session->setFlashdata('msg', 'Por favor, ingrese un nombre de usuario y contraseña válidos.');
-
-            echo "<h2>--- ERROR DE DEPURACIÓN (CONTRASEÑA NO VÁLIDA) ---</h2>";
-            echo "<p>Contraseña ingresada (texto plano): <strong>$password</strong></p>";
-            echo "<p>Contraseña hasheada en BD: <strong>{$usuario['contrasena']}</strong></p>";
-            echo "<p>Resultado de password_verify(): "; var_dump($verificarContrasena); echo "</p>";
-            echo "<p>Vuelve al formulario con el mensaje de error.</p>";
-            
+            $session->setFlashdata('error', 'Credenciales no válidas. Por favor, intente de nuevo.');
+            log_message('warning', 'Intento de login fallido para usuario: ' . $email);
             return redirect()->to(base_url('/login'));
+        }
+        
+        // --- CORRECCIÓN DE SEGURIDAD: VERIFICAR ESTADO ---
+        if ($usuario['estado'] !== 'activo') {
+             $session->setFlashdata('error', 'Su cuenta está inactiva. Contacte al administrador.');
+             return redirect()->to(base_url('/login'));
         }
 
         // --- AUTENTICACIÓN EXITOSA ---
-        // Si el usuario existe y la contraseña es correcta, crea la sesión
         $sesionData = [
-            'id_usuario'  => $usuario['id_usuario'],
+            'id_usuario'  => $usuario['id_usuario'], 
             'username'    => $usuario['nombre_de_usuario'],
             'rol'         => $usuario['rol'],
             'isLoggedIn'  => TRUE
         ];
         
         $session->set($sesionData);
-        return redirect()->to(base_url('/')); // Redirigir a la página de inicio
+        
+        return redirect()->to(base_url('/')); 
     }
 
     /**
@@ -82,6 +75,6 @@ class Login extends BaseController
     {
         $session = session();
         $session->destroy();
-        return redirect()->to(base_url('/login'));
+        return redirect()->to(base_url('/login'))->with('mensaje', '🚪 Sesión cerrada con éxito.');
     }
-} 
+}

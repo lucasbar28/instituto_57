@@ -19,26 +19,23 @@ class Estudiantes extends BaseController
         $cursoModel = new CursoModel();
         $inscripcionModel = new InscripcionModel();
         
-        // Obtener los datos necesarios
         $estudiantes = $estudianteModel->findAll();
-        $carreras = $carreraModel->findAll();
+        // Usamos el método del modelo que filtra por estado=1
+        $carreras = $carreraModel->findAllActive(); 
         $cursos = $cursoModel->findAll();
 
-        // Mapear carreras por ID para fácil acceso en la vista
         $carreras_map = array_column($carreras, 'nombre_carrera', 'id_carrera');
 
-        // Obtener la lista de inscripciones (ID de inscripción, ID de alumno, ID de curso)
-        $inscripciones_raw = $inscripcionModel->findAll();
+        // CORRECCIÓN: El modelo de Cursos usa 'nombre'
+        $cursos_map = array_column($cursos, 'nombre', 'id_curso');
 
-        // Mapear cursos por ID
-        $cursos_map = array_column($cursos, 'nombre_curso', 'id_curso');
+        $inscripciones_raw = $inscripcionModel->findAll(); // Model auto-filtra soft deletes
 
-        // Estructurar las inscripciones por ID de alumno
         $inscripciones_por_alumno = [];
         foreach ($inscripciones_raw as $inscripcion) {
-            $curso_nombre = $cursos_map[$inscripcion['id_curso']] ?? 'Curso Desconocido';
+            // CORRECCIÓN: Usar 'nombre' (el alias 'nombre_curso' ya no se usa en el Modelo simple)
+            $curso_nombre = $cursos_map[$inscripcion['id_curso']] ?? 'Curso Desconocido'; 
             
-            // Si el ID de alumno es válido, añadir la inscripción
             if (isset($inscripcion['id_alumno'])) {
                 $inscripciones_por_alumno[$inscripcion['id_alumno']][] = [
                     'id_inscripcion' => $inscripcion['id_inscripcion'],
@@ -52,7 +49,7 @@ class Estudiantes extends BaseController
         $data = [
             'estudiantes' => $estudiantes,
             'carreras_map' => $carreras_map,
-            'cursos' => $cursos, // Lista completa de cursos para el dropdown
+            'cursos' => $cursos, 
             'inscripciones_por_alumno' => $inscripciones_por_alumno,
             'page_title' => 'Lista de Estudiantes'
         ];
@@ -68,7 +65,7 @@ class Estudiantes extends BaseController
         $carreraModel = new CarreraModel();
 
         $data = [
-            'carreras' => $carreraModel->findAll(),
+            'carreras' => $carreraModel->findAllActive(), // Solo mostrar carreras activas
             'validation' => \Config\Services::validation(), 
             'page_title' => 'Registrar Nuevo Estudiante'
         ];
@@ -78,18 +75,16 @@ class Estudiantes extends BaseController
 
     /**
      * Procesa los datos del formulario y guarda el nuevo estudiante.
-     * CORREGIDO: Se cambia 'dni' a 'dni_matricula' en la validación y al guardar.
      */
     public function guardar()
     {
         $estudianteModel = new EstudianteModel();
         $datos = $this->request->getPost();
 
+        // VALIDACIÓN (Usa 'dni_matricula' y 'alumnos')
         if (!$this->validate([
-            // CORRECCIÓN CLAVE: La validación debe apuntar a la columna real 'alumnos.dni_matricula'
             'dni_matricula' => 'required|numeric|is_unique[alumnos.dni_matricula]',
             'nombre_completo' => 'required|min_length[3]|max_length[255]',
-            // CORRECCIÓN CLAVE: La validación debe apuntar a la tabla correcta 'alumnos.email'
             'email' => 'required|valid_email|is_unique[alumnos.email]',
             'id_carrera' => 'required|integer',
         ],
@@ -104,9 +99,9 @@ class Estudiantes extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
+        // INSERCIÓN (Usa 'dni_matricula')
         $estudianteModel->insert([
-            // CORRECCIÓN CLAVE: El dato que se inserta debe coincidir con el campo de la BD
-            'dni_matricula' => $datos['dni_matricula'],
+            'dni_matricula' => $datos['dni_matricula'], 
             'nombre_completo' => $datos['nombre_completo'],
             'email' => $datos['email'],
             'id_carrera' => $datos['id_carrera'],
@@ -131,7 +126,7 @@ class Estudiantes extends BaseController
 
         $data = [
             'estudiante' => $estudiante,
-            'carreras' => $carreraModel->findAll(),
+            'carreras' => $carreraModel->findAllActive(), // Solo carreras activas
             'validation' => \Config\Services::validation(),
             'page_title' => 'Editar Estudiante'
         ];
@@ -141,21 +136,19 @@ class Estudiantes extends BaseController
 
     /**
      * Procesa el formulario de edición y actualiza el registro.
-     * CORREGIDO: Se cambia 'dni' a 'dni_matricula' en la validación y al guardar.
      */
     public function actualizar()
     {
         $estudianteModel = new EstudianteModel();
         $datos = $this->request->getPost();
-        // Asumo que el ID en el formulario es 'id_alumno' (clave primaria de la tabla 'alumnos')
+        
+        // CORRECCIÓN: El ID se llama 'id_alumno' en el modelo
         $id_estudiante = $datos['id_alumno']; 
 
-        // Validar unicidad de DNI y Email, excluyendo el registro actual.
+        // VALIDACIÓN (Usa 'dni_matricula' y 'id_alumno')
         if (!$this->validate([
-            // CORRECCIÓN CLAVE: Usar dni_matricula y el nombre de la clave primaria 'id_alumno'
             'dni_matricula' => "required|numeric|is_unique[alumnos.dni_matricula,id_alumno,{$id_estudiante}]",
             'nombre_completo' => 'required|min_length[3]|max_length[255]',
-            // CORRECCIÓN CLAVE: Usar el nombre de la clave primaria 'id_alumno'
             'email' => "required|valid_email|is_unique[alumnos.email,id_alumno,{$id_estudiante}]",
             'id_carrera' => 'required|integer',
         ],
@@ -170,9 +163,9 @@ class Estudiantes extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
+        // ACTUALIZACIÓN (Usa 'dni_matricula')
         $estudianteModel->update($id_estudiante, [
-            // CORRECCIÓN CLAVE: El dato que se inserta debe coincidir con el campo de la BD
-            'dni_matricula' => $datos['dni_matricula'],
+            'dni_matricula' => $datos['dni_matricula'], 
             'nombre_completo' => $datos['nombre_completo'],
             'email' => $datos['email'],
             'id_carrera' => $datos['id_carrera'],
@@ -189,12 +182,12 @@ class Estudiantes extends BaseController
         $estudianteModel = new EstudianteModel();
 
         try {
+            // Eliminación Física (Hard Delete)
             $estudianteModel->delete($id);
             return redirect()->to(base_url('estudiantes'))->with('mensaje', '🗑️ Estudiante eliminado con éxito!');
         } catch (\Exception $e) {
-            // Error de llave foránea (Foreign Key Constraint)
             if (strpos($e->getMessage(), '1451') !== false) {
-                 return redirect()->to(base_url('estudiantes'))->with('error', '❌ Error: No se puede eliminar el estudiante porque tiene registros asociados (inscripciones). Desinscriba al estudiante de todos los cursos primero.');
+                 return redirect()->to(base_url('estudiantes'))->with('error', '❌ Error: No se puede eliminar el estudiante porque tiene inscripciones asociadas (FK constraint). Desinscriba al estudiante de todos los cursos primero.');
             }
             return redirect()->to(base_url('estudiantes'))->with('error', '❌ Error al eliminar el estudiante: ' . $e->getMessage());
         }

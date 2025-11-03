@@ -7,21 +7,20 @@ use CodeIgniter\Model;
 class UsuarioModel extends Model
 {
     protected $table      = 'usuarios';
-    protected $primaryKey = 'id'; 
+    // CORRECCIÓN: Tu BD usa 'id_usuario'
+    protected $primaryKey = 'id_usuario'; 
 
     protected $allowedFields = ['nombre_de_usuario', 'contrasena', 'rol', 'estado'];
 
-    // Se mantiene en false para evitar el error de created_at/updated_at
+    // CORRECCIÓN: Tu tabla 'usuarios' no tiene timestamps
     protected $useTimestamps = false; 
     
     protected $validationRules = [
-        // Aceptamos cualquier largo, ya que es el hash que se va a guardar
         'contrasena'        => 'required', 
+        'nombre_de_usuario' => 'required|valid_email|is_unique[usuarios.nombre_de_usuario,id_usuario,{id_usuario}]',
         
-        // El email es el nombre de usuario y debe ser único.
-        'nombre_de_usuario' => 'required|valid_email|is_unique[usuarios.nombre_de_usuario]',
-        
-        'rol'               => 'required|in_list[admin,profesor,alumno]',
+        // CORRECCIÓN: Tu ENUM de la BD usa 'administrador', no 'admin'
+        'rol'               => 'required|in_list[administrador,profesor,alumno]',
         'estado'            => 'required|in_list[activo,inactivo]',
     ];
     
@@ -31,5 +30,4 @@ class UsuarioModel extends Model
             'valid_email' => 'El campo Email debe ser una dirección de correo válida.'
         ]
     ];
-}
- 
+} 

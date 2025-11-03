@@ -48,7 +48,7 @@
                     <?php foreach ($estudiantes as $estudiante): ?>
                     <tr>
                         <td class="align-middle"><?= esc($estudiante['id_alumno']) ?></td>
-                        <td class="align-middle"><?= esc($estudiante['dni'] ?? 'N/A') ?></td> 
+                        <td class="align-middle"><?= esc($estudiante['dni_matricula'] ?? 'N/A') ?></td> 
                         <td class="align-middle"><?= esc($estudiante['nombre_completo']) ?></td>
                         <td class="align-middle"><?= esc($estudiante['email'] ?? 'N/A') ?></td>
                         <td class="align-middle"><?= esc($carreras_map[$estudiante['id_carrera']] ?? 'N/A') ?></td>

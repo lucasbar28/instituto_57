@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\ProfesorModel;
 use App\Models\UsuarioModel;
+use App\Models\CursoModel; 
 use App\Controllers\BaseController; 
 use CodeIgniter\Database\Exceptions\DatabaseException; 
 
@@ -21,7 +22,6 @@ class Profesores extends BaseController
             'title'      => 'Lista de Profesores',
         ];
 
-        // Muestra la vista 'profesores' (lista)
         return view('profesores', $data);
     }
 
@@ -31,27 +31,25 @@ class Profesores extends BaseController
     public function crear()
     {
         $data = [
-            'validation' => \Config\Services::validation(), // Para mostrar errores
+            'validation' => \Config\Services::validation(), 
             'title'      => 'Registrar Nuevo Profesor',
         ];
-        // Muestra la vista del formulario
         return view('profesores_form', $data);
     }
 
     /**
      * Procesa el formulario, guarda el nuevo usuario (credenciales) y el profesor (datos personales).
-     * NOTA: La contraseña inicial se genera de forma segura y aleatoria.
      */
     public function guardar()
     {
         $profesorModel = new ProfesorModel();
         $usuarioModel = new UsuarioModel();
-        $db = \Config\Database::connect(); // Conexión para transacciones
+        $db = \Config\Database::connect(); 
         
         $datos = $this->request->getPost();
 
-        // --- 1. REGLAS DE VALIDACIÓN (DNI_O_SIMILAR ELIMINADO) ---
-        // Se valida contra ambas tablas para asegurar la unicidad del email.
+        // --- 1. REGLAS DE VALIDACIÓN (CORREGIDAS) ---
+        // Se elimina 'dni_o_similar'
         if (!$this->validate([
             'nombre_completo' => 'required|min_length[3]|max_length[255]',
             'especialidad'    => 'required|min_length[3]|max_length[150]',
@@ -68,11 +66,12 @@ class Profesores extends BaseController
 
         // --- 2. PREPARAR DATOS Y USAR TRANSACCIÓN ---
         
-        // **IMPORTANTE:** Generamos una contraseña temporal segura y aleatoria.
+        // Generamos una contraseña temporal segura
         $contrasena_inicial = bin2hex(random_bytes(8)); 
         
         $usuarioData = [
             'nombre_de_usuario' => $datos['email'],
+            // CORRECCIÓN: Se usa la contraseña generada
             'contrasena'        => password_hash($contrasena_inicial, PASSWORD_DEFAULT),
             'rol'               => 'profesor',
             'estado'            => 'activo'
@@ -88,20 +87,15 @@ class Profesores extends BaseController
         $db->transStart();
 
         try {
-            // A. Guardar el usuario y obtener el ID
             $id_usuario = $usuarioModel->insert($usuarioData);
             
-            // Si el modelo de usuario falló (ej: error en la BD o validación final)
             if (!$id_usuario) {
-                // Si el modelo retorna errores de validación, usarlos, sino usar un error genérico
                 $error_detalle = $usuarioModel->errors() ? implode(', ', $usuarioModel->errors()) : "Error desconocido al insertar usuario.";
                 throw new DatabaseException("No se pudo insertar el registro del usuario: " . $error_detalle);
             }
 
-            // B. Asignar el ID de usuario al profesor
             $profesorData['id_usuario'] = $id_usuario;
             
-            // C. Guardar el registro del profesor
             if (!$profesorModel->insert($profesorData)) {
                 $error_detalle = $profesorModel->errors() ? implode(', ', $profesorModel->errors()) : "Error desconocido al insertar profesor.";
                 throw new DatabaseException("No se pudo insertar el registro del profesor: " . $error_detalle);
@@ -110,15 +104,13 @@ class Profesores extends BaseController
             $db->transComplete();
             
             if ($db->transStatus() === FALSE) {
-                // Esto maneja errores de la BD que no fueron capturados por el 'insert()'
                 throw new DatabaseException("La transacción de guardado falló. Estado de la BD: FALSE.");
             }
             
-            // Mensaje de éxito con la contraseña inicial generada
-            return redirect()->to(base_url('profesores'))->with('mensaje', '✅ Profesor y usuario creados con éxito. Credencial: ' . $datos['email'] . ' | Contraseña Temporal: ' . $contrasena_inicial);
+            // Informamos al admin la contraseña temporal generada
+            return redirect()->to(base_url('profesores'))->with('mensaje', '✅ Profesor y usuario creados con éxito. Contraseña Temporal: ' . $contrasena_inicial);
 
         } catch (\Exception $e) {
-            // Se revierte si el 'insert' falló o si el 'transStatus' es FALSE
             if ($db->transStatus() === TRUE) {
                 $db->transRollback();
             }
@@ -129,7 +121,6 @@ class Profesores extends BaseController
 
     /**
      * Muestra el formulario para editar un profesor existente.
-     * @param int $id ID del profesor a editar.
      */
     public function editar($id)
     {
@@ -142,7 +133,7 @@ class Profesores extends BaseController
         }
 
         $data = [
-            'profesor'   => $profesor, // Pasa el objeto profesor a la vista
+            'profesor'   => $profesor, 
             'validation' => \Config\Services::validation(),
             'title'      => 'Editar Profesor',
         ];
@@ -152,8 +143,6 @@ class Profesores extends BaseController
     
     /**
      * Procesa el formulario de edición y actualiza el registro del profesor.
-     * La actualización de credenciales (usuario) queda fuera de este flujo por seguridad,
-     * se asume que se gestiona en un módulo de usuarios separado.
      */
     public function actualizar()
     {
@@ -165,20 +154,18 @@ class Profesores extends BaseController
         
         $id_profesor = $datos['id_profesor'];
 
-        // Obtiene el registro actual para chequear el ID de usuario
         $profesor_actual = $profesorModel->find($id_profesor);
         if (!$profesor_actual) {
             return redirect()->to(base_url('profesores'))->with('error', '❌ Error al actualizar: Profesor no encontrado.');
         }
         $id_usuario = $profesor_actual['id_usuario'];
 
-        // --- REGLAS DE VALIDACIÓN para Actualizar ---
-        // 1. Validar unicidad del email, EXCLUYENDO el registro actual del profesor
-        // 2. Validar unicidad del email, EXCLUYENDO el registro actual del usuario
+        // --- REGLAS DE VALIDACIÓN (CORREGIDAS) ---
         if (!$this->validate([
             'nombre_completo' => 'required|min_length[3]|max_length[255]',
             'especialidad'    => 'required|min_length[3]|max_length[150]',
-            'email'           => "required|valid_email|is_unique[profesores.email,id,{$id_profesor}]|is_unique[usuarios.nombre_de_usuario,id,{$id_usuario}]",
+            // CORRECCIÓN: Usa las PK correctas ('id_profesor' y 'id_usuario')
+            'email'           => "required|valid_email|is_unique[profesores.email,id_profesor,{$id_profesor}]|is_unique[usuarios.nombre_de_usuario,id_usuario,{$id_usuario}]",
             'telefono'        => 'permit_empty|max_length[20]',
         ],
         [
@@ -197,7 +184,6 @@ class Profesores extends BaseController
             'telefono'        => $datos['telefono'],
         ];
 
-        // Solo se actualiza el email/nombre_de_usuario en la tabla 'usuarios'
         $usuarioData = [
             'nombre_de_usuario' => $datos['email'], 
         ];
@@ -206,10 +192,7 @@ class Profesores extends BaseController
         $db->transStart();
         
         try {
-            // A. Actualizar el registro del profesor
             $profesorModel->update($id_profesor, $profesorData);
-
-            // B. Actualizar el nombre de usuario (email) en la tabla 'usuarios'
             $usuarioModel->update($id_usuario, $usuarioData);
 
             $db->transComplete();
@@ -229,16 +212,14 @@ class Profesores extends BaseController
 
     /**
      * Elimina el registro del profesor y su usuario asociado.
-     * Esta operación DEBE ser transaccional.
-     * @param int $id ID del profesor a eliminar.
      */
     public function eliminar($id)
     {
         $profesorModel = new ProfesorModel();
         $usuarioModel = new UsuarioModel();
+        // ELIMINADO: $cursoModel (Ya no es necesario, la BD lo maneja)
         $db = \Config\Database::connect();
         
-        // 1. Obtener el registro para conseguir el id_usuario
         $profesor = $profesorModel->find($id);
 
         if (!$profesor) {
@@ -247,16 +228,21 @@ class Profesores extends BaseController
         
         $id_usuario = $profesor['id_usuario'];
 
-        $db->transStart(); // Inicia la transacción
+        $db->transStart(); 
 
         try {
+            // CORRECCIÓN: La BD (`instituto_57 (5).sql`) tiene ON DELETE SET NULL
+            // para 'cursos.id_profesor', por lo que la BD desasigna los cursos automáticamente.
+            
             // A. Eliminar el profesor (Registro hijo)
             $profesorModel->delete($id);
 
             // B. Eliminar el usuario (Registro padre / credencial)
-            $usuarioModel->delete($id_usuario);
+            // Tu BD (`instituto_57 (5).sql`) tiene ON DELETE CASCADE en 'profesores_ibfk_1'.
+            // Esto significa que $usuarioModel->delete($id_usuario) es REDUNDANTE.
+            // La BD ya eliminó al usuario.
             
-            $db->transComplete(); // Finaliza la transacción
+            $db->transComplete(); 
 
             if ($db->transStatus() === FALSE) {
                 throw new DatabaseException("La transacción de eliminación falló.");
@@ -267,11 +253,10 @@ class Profesores extends BaseController
         } catch (\Exception $e) {
             $db->transRollback();
             log_message('error', 'Error al eliminar profesor: ' . $e->getMessage());
-            // Mensaje específico si hay cursos asociados (dependencia)
-            if (strpos($e->getMessage(), '1451') !== false) { // 1451 es el error de llave foránea en MySQL
-                return redirect()->to(base_url('profesores'))->with('error', '❌ Error: No se puede eliminar el profesor porque tiene cursos asignados. Desasigne los cursos primero.');
-            }
+            
+            // ELIMINADO: Chequeo 1451 (Si la BD está bien configurada, no debería pasar)
+            
             return redirect()->to(base_url('profesores'))->with('error', '❌ Error al eliminar el profesor y su credencial: ' . $e->getMessage());
         }
     }
-}
+} 

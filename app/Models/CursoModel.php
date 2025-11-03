@@ -6,40 +6,53 @@ use CodeIgniter\Model;
 
 class CursoModel extends Model
 {
-    // Nombre de la tabla en la base de datos
-    protected $table = 'cursos'; 
-    // Nombre de la columna que es la clave principal
-    protected $primaryKey = 'id_curso'; 
+    protected $table      = 'cursos';
+    protected $primaryKey = 'id_curso';
     
-    // Tipo de retorno
-    protected $returnType = 'array';
-    
-    // Uso de Soft Deletes (OBLIGATORIO para usar 'deleted_at')
+    // CORRECCIÓN: Añadidos todos los campos de tu BD
+    protected $allowedFields = ['nombre', 'codigo', 'creditos', 'descripcion', 'id_carrera', 'id_profesor', 'cupo_maximo', 'anio'];
+
+    // --- TimeStamps (CORRECTO, tu BD los tiene) ---
+    protected $useTimestamps = true;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at'; 
     protected $useSoftDeletes = true;
-    
-    // Nombres de las columnas de fecha/hora (opcional, pero buena práctica)
-    protected $createdField = 'created_at';
-    protected $updatedField = 'updated_at';
-    protected $deletedField = 'deleted_at'; // ¡Debe coincidir con la columna de la DB!
+    // --------------------------------
 
-    // Campos que están permitidos para la inserción y actualización
-    protected $allowedFields = [
-        'nombre', 
-        'codigo', 
-        'creditos', 
-        'cupo_maximo', 
-        'id_profesor', 
-        'id_carrera', 
-        'descripcion',
-        // No es necesario incluir los campos de fecha aquí si useTimestamps es verdadero,
-        // pero como los manejas manualmente, deben estar aquí.
-        // Si no se usan timestamps automáticos, estos campos de fecha deben ser nullables en la DB.
-    ];
+    protected $afterInsert = ['guardarComoJSON'];
 
-    // Uso de TimeStamps (Debe ser true si las columnas created_at y updated_at existen y quieres que se llenen automáticamente)
-    protected $useTimestamps = true; 
+    protected function guardarComoJSON(array $data)
+    {
+        if (isset($data['id']) && $data['id'] > 0) {
+            $registro = $this->find($data['id']);
+
+            $json_data = json_encode($registro, JSON_PRETTY_PRINT);
+            
+            $file_name = 'export_curso_' . date('YmdHis') . '.json';
+            $file_path = WRITEPATH . 'exports/' . $file_name;
+
+            if (!is_dir(WRITEPATH . 'exports')) {
+                mkdir(WRITEPATH . 'exports', 0777, true);
+            }
+
+            file_put_contents($file_path, $json_data);
+        }
+        
+        // CORRECCIÓN: Faltaba el return
+        return $data;
+    }
     
-    // Si useTimestamps es true, CodeIgniter intentará llenar estos campos.
-    // Si la DB los permite como NULL (como muestra tu imagen), no hay problema.
-}
- 
+    /**
+     * FUNCIÓN AÑADIDA: Requerida por Cursos.php para el listado
+     * Obtiene los cursos con el nombre de la carrera y profesor.
+     */
+    public function findAllWithRelations()
+    {
+        // El findAll() aplica automáticamente el filtro de Soft Delete (deleted_at IS NULL)
+        return $this->select('cursos.*, c.nombre_carrera, p.nombre_completo as nombre_profesor')
+                    ->join('carreras c', 'c.id_carrera = cursos.id_carrera', 'left')
+                    ->join('profesores p', 'p.id_profesor = cursos.id_profesor', 'left')
+                    ->findAll(); 
+    }
+} 
