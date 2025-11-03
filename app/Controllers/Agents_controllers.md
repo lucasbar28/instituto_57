@@ -1,313 +1,114 @@
-🎮 CONTROLADORES - Sistema Académico
-🏗️ ESTRUCTURA BASE
-🎛️ BaseController (BaseController.php)
-php
-abstract class BaseController extends Controller
-{
-    protected $helpers = ['url'];
-    
-    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
-    {
-        parent::initController($request, $response, $logger);
-    }
-}
-🏠 Home (Home.php)
-Controlador de página principal
-php
-class Home extends BaseController
-{
-    public function index(): string
-    {
-        return view('home');
-    }
-}
-🔐 Login (Login.php)
-Sistema de autenticación
-Métodos:
-index() - Muestra formulario de login
+# 🎮 CONTROLADORES - Sistema Académico
+## 🏗️ ESTRUCTURA BASE
 
-auth() - Procesa autenticación
+### 🎛️ BaseController (BaseController.php)
+Clase base de la que heredan todos los demás controladores.
+* Incluye el helper `'url'` para la generación de rutas.
 
-logout() - Cierra sesión
+---
 
-Flujo de Autenticación:
-php
-public function auth()
-{
-    $model = new UsuarioModel();
-    $email = $this->request->getVar('nombre_de_usuario');
-    $password = $this->request->getVar('contrasena');
-    
-    // 1. Buscar usuario
-    $usuario = $model->where('nombre_de_usuario', $email)->first();
-    
-    // 2. Verificar contraseña
-    if ($usuario && password_verify($password, $usuario['contrasena'])) {
-        // 3. Crear sesión
-        $sesionData = [
-            'id_usuario' => $usuario['id_usuario'],
-            'username' => $usuario['nombre_de_usuario'],
-            'rol' => $usuario['rol'],
-            'isLoggedIn' => TRUE
-        ];
-        session()->set($sesionData);
-        return redirect()->to('/');
-    }
-    
-    return redirect()->back()->with('msg', 'Credenciales inválidas');
-}
-🎓 Carreras (Carreras.php)
-Gestión completa de carreras
-Métodos CRUD:
-index() - Lista carreras activas
+## 🔐 CONTROLADORES DE AUTENTICACIÓN Y ACCESO
 
-crear() - Formulario de creación
+### Login (Login.php)
+Sistema de autenticación de usuarios.
 
-guardar() - Procesa creación
+| Método | Descripción | Característica Especial |
+| :--- | :--- | :--- |
+| `index()` | Muestra el formulario de inicio de sesión. | |
+| `auth()` | Procesa la autenticación. | 1. Busca el usuario por `nombre_de_usuario`. 2. Verifica la `contrasena` usando `password_verify()`. 3. Crea la sesión con `id_usuario`, `username`, `rol` y `isLoggedIn`. |
+| `logout()` | Cierra la sesión del usuario. | |
 
-editar($id) - Formulario de edición
+---
 
-actualizar() - Procesa actualización
+## 👥 CONTROLADORES DE GESTIÓN DE PERSONAS
 
-eliminar($id) - Eliminación lógica
+### Profesores (Profesores.php)
+Gestión de datos personales y credenciales de Profesores.
 
-Ejemplo Guardar:
-php
-public function guardar()
-{
-    $carreraModel = new CarreraModel();
-    
-    if (!$this->validate([
-        'nombre_carrera' => 'required|min_length[3]|is_unique[carreras.nombre_carrera]',
-        'duracion' => 'required|integer|greater_than[0]',
-        'modalidad' => 'required',
-        'id_categoria' => 'required|integer',
-    ])) {
-        return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-    }
-    
-    $carreraModel->insert($this->request->getPost());
-    return redirect()->to('carreras')->with('mensaje', '✅ Carrera registrada');
-}
-🏷️ Categorias (Categorias.php)
-Gestión de categorías
-Métodos:
-index() - Lista todas las categorías
+| Método | Descripción | Característica Especial |
+| :--- | :--- | :--- |
+| `index()` | Muestra la lista de todos los profesores. | |
+| `crear()` | Muestra el formulario para registrar un nuevo profesor. | |
+| `guardar()` | Procesa el formulario. | Inserta el registro de Usuario y luego el de Profesor. |
+| `editar($id)` | Muestra el formulario con datos para editar. | |
+| `actualizar($id)` | Procesa la actualización del formulario. | |
+| `eliminar($id)` | **Elimina** el registro de Profesor. | Implementa una **Transacción de Base de Datos** para garantizar que se elimine tanto el registro de la tabla `profesores` como el registro de `usuarios` asociado. |
 
-crear($id=null) - Formulario dual (crear/editar)
+### Estudiantes (Estudiantes.php)
+Gestión de datos personales de Estudiantes (Alumnos).
 
-guardar() - Guarda o actualiza
+| Método | Descripción | Característica Especial |
+| :--- | :--- | :--- |
+| `index()` | Muestra la lista de estudiantes. | Obtiene y mapea las inscripciones activas para mostrar qué curso está tomando cada estudiante. |
+| `crear()` | Muestra el formulario para registrar un nuevo estudiante. | Carga la lista de Carreras disponibles. |
+| `guardar()` | Procesa el formulario e inserta el nuevo estudiante. | |
+| `editar($id)` | Muestra el formulario con datos para editar. | |
+| `actualizar($id)` | Procesa la actualización del formulario. | Actualiza los datos personales y la `id_carrera` asociada. |
+| `eliminar($id)` | Elimina el registro del estudiante. | Maneja el error de llave foránea (Error 1451) si el estudiante tiene inscripciones asociadas. |
 
-eliminar($id) - Eliminación física
+---
 
-Formulario Dual:
-php
-public function crear($id = null)
-{
-    $model = new CategoriaModel();
-    $categoria = $id ? $model->find($id) : null;
-    
-    $data = [
-        'validation' => \Config\Services::validation(),
-        'page_title' => $id ? 'Editar Categoría' : 'Crear Categoría',
-        'categoria' => $categoria,
-        'id' => $id
-    ];
-    return view('categorias_form', $data);
-}
-📚 Cursos (Cursos.php)
-Gestión de cursos académicos
-Métodos Helper:
-php
-protected function findAllWithRelations()
-{
-    return $this->cursoModel
-        ->select('cursos.*, p.nombre_completo as nombre_profesor, c.nombre_carrera')
-        ->join('profesores p', 'p.id_profesor = cursos.id_profesor', 'left')
-        ->join('carreras c', 'c.id_carrera = cursos.id_carrera', 'left')
-        ->findAll();
-}
+## 📚 CONTROLADORES DE GESTIÓN ACADÉMICA
 
-protected function loadDropdownData()
-{
-    return [
-        'profesores' => (new ProfesorModel())->findAll(),
-        'carreras' => (new CarreraModel())->findAllActive(),
-    ];
-}
-Métodos CRUD:
-index() - Lista cursos con relaciones
+### Carreras (Carreras.php)
+Gestión de las Carreras Académicas.
 
-crear() - Formulario con dropdowns
+| Método | Descripción | Característica Especial |
+| :--- | :--- | :--- |
+| `index()` | Muestra la lista de carreras. | Utiliza el método `findAllActive()` del modelo para filtrar solo las carreras con `estado = 1` (Activas). |
+| `crear()` | Muestra el formulario de creación. | Carga la lista de Categorías. |
+| `guardar()` | Procesa el formulario e inserta la nueva carrera. | |
+| `editar($id)` | Muestra el formulario con datos para edición. | Carga la lista de Categorías. |
+| `actualizar($id)` | Procesa la actualización. | |
+| `eliminar($id)` | Ejecuta la eliminación. | Realiza una **Eliminación Lógica** (`update` al campo `estado` a 0) en lugar de la eliminación física. |
 
-guardar() - Crea nuevo curso
+### Categorias (Categorias.php)
+Gestión de Categorías para agrupar Carreras.
 
-editar($id) - Formulario de edición
+| Método | Descripción | Característica Especial |
+| :--- | :--- | :--- |
+| `index()` | Muestra la lista de todas las categorías. | |
+| `crear($id)` | Muestra el formulario (se usa para Crear o Editar). | Pasa la categoría si se recibe un ID, sino pasa `null`. |
+| `guardar()` | Procesa el formulario. | Realiza la lógica de **Inserción o Actualización** basándose en si se recibe un ID en los datos POST. |
+| `eliminar($id)` | Elimina físicamente la categoría. | Utiliza el método `delete()` estándar. |
 
-actualizar() - Actualiza curso
+### Cursos (Cursos.php)
+Gestión de los Cursos Académicos.
 
-eliminar($id) - Soft delete
+| Método | Descripción | Característica Especial |
+| :--- | :--- | :--- |
+| `index()` | Muestra la lista de cursos. | Usa el método interno `findAllWithRelations()` que realiza `JOIN`s para obtener el nombre de la Carrera y el Profesor. |
+| `crear()` | Muestra el formulario de creación. | Carga las listas de Profesores y Carreras disponibles. |
+| `guardar()` | Procesa el formulario e inserta el nuevo curso. | |
+| `editar($id)` | Muestra el formulario con datos para edición. | Carga las listas de Profesores y Carreras disponibles. |
+| `actualizar($id)` | Procesa la actualización. | |
+| `eliminar($id)` | Ejecuta la eliminación. | Utiliza **Soft Delete** (marca el campo `deleted_at`) en el modelo del curso. |
 
-👨‍🎓 Estudiantes (Estudiantes.php)
-Gestión de estudiantes con inscripciones
-Métodos CRUD:
-index() - Lista estudiantes + datos relacionados
+### Inscripcion (Inscripcion.php)
+Controlador para gestionar la inscripción de Estudiantes a Cursos.
 
-crear() - Formulario de creación
+| Método | Descripción | Característica Especial |
+| :--- | :--- | :--- |
+| `inscribir()` | Procesa la solicitud POST de inscripción. | 1. Recibe `id_alumno` e `id_curso`. 2. Asigna fecha de inscripción (`fecha_inscripcion`) y estado (`Activo`). 3. Inserta el registro. |
+| `desinscribir()` | Procesa la solicitud POST para desinscribir. | 1. Busca la última inscripción activa del alumno para el curso. 2. Realiza un **Soft Delete** y actualiza el campo `estado` a 'Inactivo'. |
 
-guardar() - Procesa creación
+---
 
-editar($id) - Formulario de edición
+## 🔄 PATRONES COMUNES (BaseController / Código CodeIgniter)
 
-actualizar() - Procesa actualización
-
-eliminar($id) - Eliminación física
-
-Estructura de Datos en Index:
-php
-public function index()
-{
-    $estudianteModel = new EstudianteModel();
-    $carreraModel = new CarreraModel();
-    $cursoModel = new CursoModel();
-    $inscripcionModel = new InscripcionModel();
-    
-    // Mapeo de datos para vista
-    $carreras_map = array_column($carreras, 'nombre_carrera', 'id_carrera');
-    $inscripciones_por_alumno = [];
-    
-    $data = [
-        'estudiantes' => $estudianteModel->findAll(),
-        'carreras_map' => $carreras_map,
-        'cursos' => $cursoModel->findAll(),
-        'inscripciones_por_alumno' => $inscripciones_por_alumno
-    ];
-    
-    return view('estudiantes', $data);
-}
-👨‍🏫 Profesores (Profesores.php)
-Gestión de profesores con usuarios
-Características:
-Transacciones para consistencia
-
-Creación dual (profesor + usuario)
-
-Generación automática de contraseñas
-
-Método Guardar con Transacción:
-php
-public function guardar()
-{
-    $profesorModel = new ProfesorModel();
-    $usuarioModel = new UsuarioModel();
-    $db = \Config\Database::connect();
-    
-    $datos = $this->request->getPost();
-    
-    // Validación
-    if (!$this->validate([...])) {
-        return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-    }
-    
-    // Generar contraseña temporal
-    $contrasena_inicial = bin2hex(random_bytes(8));
-    
-    $db->transStart();
-    try {
-        // 1. Crear usuario
-        $id_usuario = $usuarioModel->insert([
-            'nombre_de_usuario' => $datos['email'],
-            'contrasena' => password_hash($contrasena_inicial, PASSWORD_DEFAULT),
-            'rol' => 'profesor',
-            'estado' => 'activo'
-        ]);
-        
-        // 2. Crear profesor
-        $profesorModel->insert([
-            'nombre_completo' => $datos['nombre_completo'],
-            'especialidad' => $datos['especialidad'],
-            'email' => $datos['email'],
-            'telefono' => $datos['telefono'],
-            'id_usuario' => $id_usuario
-        ]);
-        
-        $db->transComplete();
-        
-        return redirect()->to('profesores')->with('mensaje', 
-            '✅ Profesor creado. Credencial: ' . $datos['email'] . ' | Contraseña: ' . $contrasena_inicial);
-            
-    } catch (\Exception $e) {
-        $db->transRollback();
-        return redirect()->back()->withInput()->with('error', '❌ Error: ' . $e->getMessage());
-    }
-}
-Métodos Completos:
-index() - Lista profesores
-
-crear() - Formulario de registro
-
-guardar() - Crea profesor + usuario
-
-editar($id) - Formulario de edición
-
-actualizar() - Actualiza ambos registros
-
-eliminar($id) - Elimina profesor + usuario
-
-📝 Inscripcion (Inscripcion.php)
-Gestión de inscripciones
-Métodos:
-inscribir() - Crea nueva inscripción (POST)
-
-desinscribir($id_alumno) - Soft delete de última inscripción (GET)
-
-Método Inscribir:
-php
-public function inscribir()
-{
-    $data = $this->request->getPost(['id_alumno', 'id_curso']);
-    
-    $dataToSave = [
-        'id_alumno' => $data['id_alumno'],
-        'id_curso' => $data['id_curso'],
-        'fecha_inscripcion' => Time::now()->toDateString(),
-        'estado' => 'Activo'
-    ];
-    
-    if ($this->inscripcionModel->insert($dataToSave)) {
-        return redirect()->to('estudiantes')->with('mensaje', '✅ Alumno inscrito');
-    }
-    
-    return redirect()->back()->withInput()->with('error', '❌ Error al inscribir');
-}
-Método Desinscribir:
-php
-public function desinscribir(int $id_alumno)
-{
-    // Buscar última inscripción activa
-    $ultimaInscripcion = $this->inscripcionModel
-        ->where('id_alumno', $id_alumno)
-        ->where('deleted_at IS NULL')
-        ->orderBy('fecha_inscripcion', 'DESC')
-        ->first();
-        
-    if ($ultimaInscripcion) {
-        $this->inscripcionModel->delete($ultimaInscripcion['id_inscripcion']);
-        return redirect()->to('estudiantes')->with('mensaje', '✅ Desinscripción realizada');
-    }
-    
-    return redirect()->to('estudiantes')->with('error', '❌ No hay inscripciones activas');
-}
-🔄 PATRONES COMUNES
-✅ Validaciones
-php
+### ✅ Validaciones
+Uso del servicio `Config\Services::validation()` para verificar datos.
+```php
 if (!$this->validate([
     'campo' => 'required|min_length[3]|is_unique[tabla.campo]',
 ])) {
     return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
 }
-🔄 Redirecciones con Mensajes
-php
+🔄 Redirecciones con Mensajes (Flashdata)
+Se usan métodos with() para enviar mensajes temporales a la vista (Flashdata).
+
+PHP
+
 // Éxito
 return redirect()->to('entidad')->with('mensaje', '✅ Operación exitosa');
 
@@ -316,37 +117,31 @@ return redirect()->back()->withInput()->with('error', '❌ Error en la operació
 
 // Validación fallida
 return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-💾 Operaciones CRUD
-php
+💾 Operaciones CRUD (Modelos)
+PHP
+
 // Crear
 $model->insert($datos);
 
 // Actualizar
 $model->update($id, $datos);
 
-// Eliminar
+// Eliminar Físico (sin Soft Delete)
 $model->delete($id);
 
 // Buscar
 $registro = $model->find($id);
 $todos = $model->findAll();
 🗃️ Transacciones
-php
+Utilizado en Profesores.php para eliminar el Profesor y su Usuario.
+
+PHP
+
 $db->transStart();
 try {
     // Múltiples operaciones
     $db->transComplete();
 } catch (\Exception $e) {
     $db->transRollback();
-    // Manejar error
+    // Manejar error (ej. log_message)
 }
-📊 RESUMEN DE CONTROLADORES
-Controlador	Métodos Principales	Característica Especial
-Home	index	Página principal simple
-Login	index, auth, logout	Autenticación y sesiones
-Carreras	CRUD completo	Eliminación lógica
-Categorias	CRUD completo	Formulario dual
-Cursos	CRUD completo	Soft delete, relaciones JOIN
-Estudiantes	CRUD completo	Gestión de inscripciones integrada
-Profesores	CRUD completo	Transacciones, creación dual
-Inscripcion	inscribir, desinscribir	Gestión específica de inscripciones

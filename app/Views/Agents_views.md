@@ -1,144 +1,64 @@
-🎨 VISTAS - Sistema Académico
+🎨 VISTAS - Sistema Académico 
 📋 VISTAS PRINCIPALES
-🔐 Login (login.php)
-Formulario de autenticación centrado
+Login (login.php)
 
-Campos: email (nombre_de_usuario) y contraseña
+Autenticación centrada con CSRF
 
-Protección CSRF integrada
+Campos: nombre_de_usuario (email) y contrasena
 
-Alertas para mensajes de error/éxito
+Home (home.php, index.php)
 
-🏠 Home (home.php)
-Página principal con diseño institucional
+Página institucional con carrusel, video y navegación
 
-5 secciones: Hero, About Us, Gallery, Steps, Instituto Info
+📊 LISTADOS CRUD
+Vista	Columnas Principales	Acciones
+carreras_list.php	Nombre, Duración, Modalidad, Estado	Editar, Desactivar
+categorias_list.php	Nombre, Descripción, Fecha	Editar, Eliminar
+cursos.php	Código, Nombre, Créditos, Profesor, Carrera	Editar, Eliminar
+estudiantes.php	DNI, Nombre, Email, Carrera	Editar, Eliminar + Inscripciones
+profesores.php	Nombre, Especialidad, Email, Teléfono	Editar, Eliminar
+📝 FORMULARIOS
+Estructura uniforme:
 
-Componentes: Carrusel de imágenes, video, botones de navegación
-
-Enlaces a módulos principales
-
-📊 VISTAS DE LISTADO
-🎓 carreras_list.php
-Tabla con carreras activas
-
-Badges de estado (Activa/Inactiva)
-
-Acciones: Editar, Eliminar (lógica)
-
-🏷️ categorias_list.php
-Lista simple de categorías
-
-Columnas: ID, Nombre, Descripción, Fecha, Acciones
-
-Empty state personalizado
-
-📚 cursos.php
-Tabla con relaciones JOIN (profesor, carrera)
-
-Datos enriquecidos desde controlador
-
-Eliminación lógica con confirmación
-
-👨‍🎓 estudiantes.php
-Dos secciones: CRUD + Gestión de Inscripciones
-
-Inscripciones rápidas con dropdown
-
-Visualización de cursos inscritos
-
-Desinscripción con confirmación
-
-👨‍🏫 profesores.php
-Lista completa de profesores
-
-Eliminación con confirmación avanzada
-
-Formulario DELETE para eliminación
-
-📝 VISTAS DE FORMULARIOS
-🎓 carreras_form.php
-Formulario dual (crear/editar)
-
-Dropdowns: Modalidad, Categoría
-
-Estado solo visible en edición
-
-Validación visual
-
-🏷️ categorias_form.php
-Formulario minimalista (nombre + descripción)
-
-Modo creación/edición automático
-
-Validación en tiempo real
-
-📚 cursos_form.php
-Grid de 3 columnas para organización
-
-Dropdowns relacionados: Profesores, Carreras
-
-Campos: Nombre, Código, Créditos, Cupo, Descripción
-
-Validación completa
-
-👨‍🎓 estudiantes_form.php
-Campo DNI corregido (dni_matricula)
-
-Dropdown de carreras dinámico
-
-Validación de unicidad (DNI, email)
-
-👨‍🏫 profesores_form.php
-Formulario simplificado (sin contraseña)
-
-Grid 2 columnas
-
-Campos esenciales para perfil docente
-
-🎨 PATRONES DE DISEÑO
-🔧 Componentes Reutilizables
 php
-<!-- Estructura base -->
 <?= $this->extend('templates/layout') ?>
 <?= $this->section('content') ?>
-<!-- Contenido -->
+<!-- Form dual (crear/editar) -->
 <?= $this->endSection() ?>
+Formularios disponibles:
 
-<!-- Alertas -->
-<?= view('templates/_alerts') ?>
+carreras_form.php - Con dropdowns: Modalidad, Categoría
 
-<!-- Botones de acción -->
-<a href="#" class="btn-action btn-edit"><i class="fas fa-edit"></i> Editar</a>
-<a href="#" class="btn-action btn-delete"><i class="fas fa-trash"></i> Eliminar</a>
-📱 Grids Responsive
-form-grid - Básico
+categorias_form.php - Minimalista (nombre + descripción)
 
-form-grid-2-col - 2 columnas
+cursos_form.php - Grid 3 cols + relaciones
 
-form-grid-3 - 3 columnas
+estudiantes_form.php - Con DNI y carrera
 
-form-group-full - Ancho completo
+profesores_form.php - Grid 2 cols sin contraseña
 
-✅ Validación Visual
+🎨 PATRONES COMUNES
+Componentes:
+
 php
-<input class="form-control <?= $has_error('campo') ?>" >
-<small class="invalid-feedback-text"><?= $validation->getError('campo') ?></small>
-🚀 FLUJOS PRINCIPALES
-Login → Home
+<?= view('templates/_alerts') ?>
+<a class="btn-action btn-edit"><i class="fas fa-edit"></i> Editar</a>
+<a class="btn-action btn-delete"><i class="fas fa-trash"></i> Eliminar</a>
+Grids CSS:
 
-Home → Módulos (Estudiantes, Carreras, Cursos, etc.)
+form-grid (básico)
 
-Lista → Crear → Formulario → Guardar → Lista actualizada
+form-grid-2-col
 
-Lista → Editar → Formulario → Actualizar → Lista actualizada
+form-grid-3
 
+form-group-full
+
+🔄 FLUJOS
+text
+Login → Home → Módulos
+Lista → Crear/Editar → Guardar → Lista actualizada
 Estudiantes → Inscripción rápida → Desinscripción
-
-📊 RESUMEN
-Tipo	Vistas	Característica Principal
-Auth	login	Autenticación
-Principal	home	Página institucional
-Listas	5 vistas	Tablas con CRUD
-Formularios	5 vistas	Crear/Editar dual
-Especial	estudiantes	CRUD + Inscripciones integradas
+✅ ESTADO
+Completado: 5 formularios + 7 listas + 2 principales
+Característica especial: Gestión integrada de inscripciones en estudiantes
