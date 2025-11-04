@@ -1,81 +1,68 @@
 <?= $this->extend('templates/layout') ?> 
 
 <?= $this->section('content') ?>
-
-<!-- Envuelve el contenido en un contenedor principal para centrarlo y darle margen -->
 <div class="container mt-5">
+    <h1 class="mb-4">Gestión de Categorías</h1>
 
-    <!-- Encabezado de la Página y Botón de Acción -->
-    <div class="page-header">
-        <h1>
-            <i class="fas fa-tags"></i> Lista de Categorías
-        </h1>
-        <a href="<?= base_url('categorias/crear') ?>" class="btn btn-primary">
-            <i class="fas fa-plus-circle"></i> Agregar Nueva Categoría
+    <?php if (session()->get('rol') === 'administrador'): ?>
+        <!-- Botón CREAR visible solo para el ADMINISTRADOR -->
+        <a href="<?= base_url('categorias/create') ?>" class="btn btn-success mb-3">
+            <i class="fas fa-plus-circle"></i> Nueva Categoría
         </a>
-    </div>
-
-    <!-- Muestra mensajes flash (éxito o error) -->
-    <?php if (session()->getFlashdata('mensaje')): ?>
-        <div class="section-box mb-4 alert alert-success">
-            <p><?= session()->getFlashdata('mensaje') ?></p>
-        </div>
     <?php endif; ?>
 
+    <!-- Manejo de Mensajes de Sesión -->
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
+    <?php endif; ?>
     <?php if (session()->getFlashdata('error')): ?>
-        <div class="section-box mb-4 alert alert-danger">
-            <p><?= session()->getFlashdata('error') ?></p>
-        </div>
+        <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
     <?php endif; ?>
 
-    <!-- Contenedor de la Tabla -->
-    <div class="section-box table-responsive">
-        <?php if (empty($categorias)): ?>
-            <p class="text-center text-muted p-4">
-                <i class="fas fa-inbox fa-3x mb-3"></i><br>
-                No hay categorías registradas aún. ¡Agrega la primera!
-            </p>
-        <?php else: ?>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Descripción</th>
-                        <th>Fecha Creación</th>
-                        <th class="text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre de Categoría</th>
+                    <th>Descripción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (!empty($categorias) && is_array($categorias)): ?>
                     <?php foreach ($categorias as $categoria): ?>
-                    <tr>
-                        <td><?= esc($categoria['id_categoria']) ?></td>
-                        <td><?= esc($categoria['nombre']) ?></td>
-                        <td><?= esc($categoria['descripcion']) ?: '<span class="text-muted fst-italic">Sin descripción</span>' ?></td>
-                        <td><?= esc($categoria['fecha_creacion'] ?? 'N/A') ?></td>
-                        
-                        <!-- Columna de Acciones: Usando las clases personalizadas (igual que en Carreras) -->
-                        <td class="align-middle action-buttons">
-                            
-                            <!-- Botón Editar: Usando la clase personalizada de edición (btn-edit) -->
-                            <a href="<?= base_url('categorias/editar/' . $categoria['id_categoria']) ?>" 
-                               class="btn-action btn-edit" title="Editar Categoría">
-                                <i class="fas fa-edit"></i> Editar
-                            </a>
-                            
-                            <!-- Botón Eliminar: Usando la clase personalizada de eliminación (btn-delete) -->
-                            <a href="<?= base_url('categorias/eliminar/' . $categoria['id_categoria']) ?>" 
-                               class="btn-action btn-delete" title="Eliminar Categoría"
-                               onclick="return confirm('¿Está seguro de que desea eliminar la categoría: <?= esc($categoria['nombre']) ?>? Esta acción es irreversible.')">
-                                <i class="fas fa-trash-alt"></i> Eliminar
-                            </a>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td><?= esc($categoria['id_categoria']) ?></td>
+                            <td><?= esc($categoria['nombre_categoria']) ?></td>
+                            <td><?= esc($categoria['descripcion'] ?? 'N/A') ?></td>
+                            <td>
+                                <a href="<?= base_url('categorias/show/' . $categoria['id_categoria']) ?>" class="btn btn-info btn-sm">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+
+                                <?php if (session()->get('rol') === 'administrador'): ?>
+                                    <!-- Editar y Eliminar SOLO para ADMINISTRADOR -->
+                                    <a href="<?= base_url('categorias/edit/' . $categoria['id_categoria']) ?>" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </a>
+                                    <a href="<?= base_url('categorias/delete/' . $categoria['id_categoria']) ?>" 
+                                       class="btn btn-danger btn-sm" 
+                                       onclick="return confirm('¿Está seguro de eliminar la categoría: <?= esc($categoria['nombre_categoria']) ?>?');">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </a>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
                     <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php endif; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="4" class="text-center">No se encontraron categorías.</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
     </div>
 </div>
-
 <?= $this->endSection() ?>
+ 

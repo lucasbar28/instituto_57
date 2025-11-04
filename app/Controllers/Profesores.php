@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\ProfesorModel;
 use App\Models\UsuarioModel;
+use App\Models\CursoModel; 
 use App\Controllers\BaseController; 
 use CodeIgniter\Database\Exceptions\DatabaseException; 
 
@@ -21,7 +22,6 @@ class Profesores extends BaseController
             'title'      => 'Lista de Profesores',
         ];
 
-        // Muestra la vista 'profesores' (lista)
         return view('profesores', $data);
     }
 
@@ -31,31 +31,41 @@ class Profesores extends BaseController
     public function crear()
     {
         $data = [
-            'validation' => \Config\Services::validation(), // Para mostrar errores
+            'validation' => \Config\Services::validation(), 
             'title'      => 'Registrar Nuevo Profesor',
         ];
-        // Muestra la vista del formulario
         return view('profesores_form', $data);
     }
 
     /**
+     * Función auxiliar para generar contraseña temporal (MOVEMOS AQUÍ)
+     */
+    private function generateRandomPassword($length = 12) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*';
+        $password = '';
+        for ($i = 0; $i < $length; $i++) {
+            $password .= $characters[rand(0, strlen($characters) - 1)];
+        }
+        return $password;
+    }
+
+    /**
      * Procesa el formulario, guarda el nuevo usuario (credenciales) y el profesor (datos personales).
-     * NOTA: La contraseña inicial se genera de forma segura y aleatoria.
      */
     public function guardar()
     {
         $profesorModel = new ProfesorModel();
         $usuarioModel = new UsuarioModel();
-        $db = \Config\Database::connect(); // Conexión para transacciones
+        $db = \Config\Database::connect(); 
         
         $datos = $this->request->getPost();
 
-        // --- 1. REGLAS DE VALIDACIÓN (DNI_O_SIMILAR ELIMINADO) ---
-        // Se valida contra ambas tablas para asegurar la unicidad del email.
+        // --- 1. REGLAS DE VALIDACIÓN ---
         if (!$this->validate([
             'nombre_completo' => 'required|min_length[3]|max_length[255]',
             'especialidad'    => 'required|min_length[3]|max_length[150]',
-            'email'           => 'required|valid_email|is_unique[profesores.email]|is_unique[usuarios.nombre_de_usuario]',
+            // El email es el nombre_de_usuario
+            'email'           => 'required|valid_email|is_unique[profesores.email]|is_unique[usuarios.nombre_de_usuario]', 
             'telefono'        => 'permit_empty|max_length[20]',
         ],
         [
@@ -68,14 +78,16 @@ class Profesores extends BaseController
 
         // --- 2. PREPARAR DATOS Y USAR TRANSACCIÓN ---
         
-        // **IMPORTANTE:** Generamos una contraseña temporal segura y aleatoria.
-        $contrasena_inicial = bin2hex(random_bytes(8)); 
+        // Generamos una contraseña temporal segura usando la nueva función auxiliar
+        $contrasena_inicial = $this->generateRandomPassword(12); 
         
+        // DATOS DE USUARIO: Aquí integramos la lógica de contraseña temporal
         $usuarioData = [
             'nombre_de_usuario' => $datos['email'],
-            'contrasena'        => password_hash($contrasena_inicial, PASSWORD_DEFAULT),
+            'contrasena'        => $contrasena_inicial, // El UsuarioModel la hasheará automáticamente
             'rol'               => 'profesor',
-            'estado'            => 'activo'
+            'estado'            => 1, // 'activo' (usamos 1 para consistencia en la BD)
+            'cambio_contrasena_obligatorio' => 1 // <--- CAMBIO CRUCIAL: FORZAR CAMBIO AL LOGIN
         ];
         
         $profesorData = [
@@ -88,20 +100,15 @@ class Profesores extends BaseController
         $db->transStart();
 
         try {
-            // A. Guardar el usuario y obtener el ID
             $id_usuario = $usuarioModel->insert($usuarioData);
             
-            // Si el modelo de usuario falló (ej: error en la BD o validación final)
             if (!$id_usuario) {
-                // Si el modelo retorna errores de validación, usarlos, sino usar un error genérico
                 $error_detalle = $usuarioModel->errors() ? implode(', ', $usuarioModel->errors()) : "Error desconocido al insertar usuario.";
                 throw new DatabaseException("No se pudo insertar el registro del usuario: " . $error_detalle);
             }
 
-            // B. Asignar el ID de usuario al profesor
             $profesorData['id_usuario'] = $id_usuario;
             
-            // C. Guardar el registro del profesor
             if (!$profesorModel->insert($profesorData)) {
                 $error_detalle = $profesorModel->errors() ? implode(', ', $profesorModel->errors()) : "Error desconocido al insertar profesor.";
                 throw new DatabaseException("No se pudo insertar el registro del profesor: " . $error_detalle);
@@ -110,15 +117,14 @@ class Profesores extends BaseController
             $db->transComplete();
             
             if ($db->transStatus() === FALSE) {
-                // Esto maneja errores de la BD que no fueron capturados por el 'insert()'
                 throw new DatabaseException("La transacción de guardado falló. Estado de la BD: FALSE.");
             }
             
-            // Mensaje de éxito con la contraseña inicial generada
-            return redirect()->to(base_url('profesores'))->with('mensaje', '✅ Profesor y usuario creados con éxito. Credencial: ' . $datos['email'] . ' | Contraseña Temporal: ' . $contrasena_inicial);
+            // Informamos al admin la contraseña temporal generada
+            $mensaje = '✅ Profesor y usuario creados con éxito. Contraseña Temporal: <strong>' . $contrasena_inicial . '</strong>. Se le pedirá cambiarla al iniciar sesión.';
+            return redirect()->to(base_url('profesores'))->with('mensaje', $mensaje);
 
         } catch (\Exception $e) {
-            // Se revierte si el 'insert' falló o si el 'transStatus' es FALSE
             if ($db->transStatus() === TRUE) {
                 $db->transRollback();
             }
@@ -126,10 +132,52 @@ class Profesores extends BaseController
             return redirect()->back()->withInput()->with('error', '❌ Error al registrar el profesor o el usuario: ' . $e->getMessage());
         }
     }
+    
+    /**
+     * Muestra los detalles de un profesor específico. (Ruta: GET /profesores/show/ID)
+     */
+    public function ver($id = null)
+    {
+        $profesorModel = new ProfesorModel();
+
+        if ($id === null) {
+            return redirect()->to(base_url('profesores'))->with('error', 'ID de profesor no especificado.');
+        }
+
+        // Obtener el profesor
+        $profesor = $profesorModel->find($id);
+
+        if (empty($profesor)) {
+            // Lanza una excepción 404 si el profesor no existe
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('No se encontró el profesor con ID: ' . $id);
+        }
+
+        // Además, deberíamos obtener el email de la tabla 'usuarios' usando el 'id_usuario'
+        $usuarioModel = new UsuarioModel();
+        $usuario = $usuarioModel->find($profesor['id_usuario']);
+
+        // Agregar el email (nombre_de_usuario) y el estado de cambio obligatorio
+        if ($usuario) {
+             $profesor['email'] = $usuario['nombre_de_usuario'];
+             // Agregamos el flag de seguridad para verlo en el detalle si se desea
+             $profesor['cambio_obligatorio'] = (bool)$usuario['cambio_contrasena_obligatorio']; 
+        } else {
+             $profesor['email'] = 'Usuario no encontrado';
+             $profesor['cambio_obligatorio'] = false;
+        }
+
+
+        $data = [
+            'profesor' => $profesor,
+            'title'    => 'Detalle del Profesor: ' . $profesor['nombre_completo']
+        ];
+
+        // Esta vista DEBE estar en app/Views/profesores/ver.php
+        return view('profesores/ver', $data); 
+    }
 
     /**
      * Muestra el formulario para editar un profesor existente.
-     * @param int $id ID del profesor a editar.
      */
     public function editar($id)
     {
@@ -142,7 +190,7 @@ class Profesores extends BaseController
         }
 
         $data = [
-            'profesor'   => $profesor, // Pasa el objeto profesor a la vista
+            'profesor'   => $profesor, 
             'validation' => \Config\Services::validation(),
             'title'      => 'Editar Profesor',
         ];
@@ -152,8 +200,6 @@ class Profesores extends BaseController
     
     /**
      * Procesa el formulario de edición y actualiza el registro del profesor.
-     * La actualización de credenciales (usuario) queda fuera de este flujo por seguridad,
-     * se asume que se gestiona en un módulo de usuarios separado.
      */
     public function actualizar()
     {
@@ -165,20 +211,18 @@ class Profesores extends BaseController
         
         $id_profesor = $datos['id_profesor'];
 
-        // Obtiene el registro actual para chequear el ID de usuario
         $profesor_actual = $profesorModel->find($id_profesor);
         if (!$profesor_actual) {
             return redirect()->to(base_url('profesores'))->with('error', '❌ Error al actualizar: Profesor no encontrado.');
         }
         $id_usuario = $profesor_actual['id_usuario'];
 
-        // --- REGLAS DE VALIDACIÓN para Actualizar ---
-        // 1. Validar unicidad del email, EXCLUYENDO el registro actual del profesor
-        // 2. Validar unicidad del email, EXCLUYENDO el registro actual del usuario
+        // --- REGLAS DE VALIDACIÓN ---
         if (!$this->validate([
             'nombre_completo' => 'required|min_length[3]|max_length[255]',
             'especialidad'    => 'required|min_length[3]|max_length[150]',
-            'email'           => "required|valid_email|is_unique[profesores.email,id,{$id_profesor}]|is_unique[usuarios.nombre_de_usuario,id,{$id_usuario}]",
+            // CORRECCIÓN: Usa las PK correctas ('id_profesor' y 'id_usuario')
+            'email'           => "required|valid_email|is_unique[profesores.email,id_profesor,{$id_profesor}]|is_unique[usuarios.nombre_de_usuario,id_usuario,{$id_usuario}]",
             'telefono'        => 'permit_empty|max_length[20]',
         ],
         [
@@ -197,7 +241,6 @@ class Profesores extends BaseController
             'telefono'        => $datos['telefono'],
         ];
 
-        // Solo se actualiza el email/nombre_de_usuario en la tabla 'usuarios'
         $usuarioData = [
             'nombre_de_usuario' => $datos['email'], 
         ];
@@ -206,10 +249,7 @@ class Profesores extends BaseController
         $db->transStart();
         
         try {
-            // A. Actualizar el registro del profesor
             $profesorModel->update($id_profesor, $profesorData);
-
-            // B. Actualizar el nombre de usuario (email) en la tabla 'usuarios'
             $usuarioModel->update($id_usuario, $usuarioData);
 
             $db->transComplete();
@@ -229,8 +269,6 @@ class Profesores extends BaseController
 
     /**
      * Elimina el registro del profesor y su usuario asociado.
-     * Esta operación DEBE ser transaccional.
-     * @param int $id ID del profesor a eliminar.
      */
     public function eliminar($id)
     {
@@ -238,7 +276,6 @@ class Profesores extends BaseController
         $usuarioModel = new UsuarioModel();
         $db = \Config\Database::connect();
         
-        // 1. Obtener el registro para conseguir el id_usuario
         $profesor = $profesorModel->find($id);
 
         if (!$profesor) {
@@ -247,16 +284,16 @@ class Profesores extends BaseController
         
         $id_usuario = $profesor['id_usuario'];
 
-        $db->transStart(); // Inicia la transacción
+        $db->transStart(); 
 
         try {
-            // A. Eliminar el profesor (Registro hijo)
+            // Eliminar el profesor 
             $profesorModel->delete($id);
 
-            // B. Eliminar el usuario (Registro padre / credencial)
-            $usuarioModel->delete($id_usuario);
+            // También debemos eliminar el usuario explícitamente si no hay ON DELETE CASCADE
+            $usuarioModel->delete($id_usuario); 
             
-            $db->transComplete(); // Finaliza la transacción
+            $db->transComplete(); 
 
             if ($db->transStatus() === FALSE) {
                 throw new DatabaseException("La transacción de eliminación falló.");
@@ -267,11 +304,9 @@ class Profesores extends BaseController
         } catch (\Exception $e) {
             $db->transRollback();
             log_message('error', 'Error al eliminar profesor: ' . $e->getMessage());
-            // Mensaje específico si hay cursos asociados (dependencia)
-            if (strpos($e->getMessage(), '1451') !== false) { // 1451 es el error de llave foránea en MySQL
-                return redirect()->to(base_url('profesores'))->with('error', '❌ Error: No se puede eliminar el profesor porque tiene cursos asignados. Desasigne los cursos primero.');
-            }
+            
             return redirect()->to(base_url('profesores'))->with('error', '❌ Error al eliminar el profesor y su credencial: ' . $e->getMessage());
         }
     }
 }
+ 

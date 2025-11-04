@@ -1,94 +1,72 @@
-<?php 
-/**
- * Vista: Lista de Carreras con opciones de CRUD.
- * Extiende el layout principal 'templates/layout'.
- * * CORRECCIÓN: Se ajusta la lógica para mostrar el estado de la carrera
- * como "Activa" o "Inactiva" en lugar del valor numérico (1 o 0).
- */
-?>
 <?= $this->extend('templates/layout') ?> 
 
 <?= $this->section('content') ?>
-
 <div class="container mt-5">
-    
-    <!-- 1. ALERTAS (Mensajes de éxito/error) -->
-    <?= view('templates/_alerts') ?>
+    <h1 class="mb-4">Gestión de Carreras</h1>
 
-    <!-- 2. TÍTULO Y BOTÓN DE CREACIÓN (Usando estilos consistentes) -->
-    <div class="d-flex flex-column align-items-center justify-content-center mb-5">
-        <!-- Título principal -->
-        <h1 class="display-5 fw-bold text-primary mb-3">Lista de Carreras (Activas)</h1>
-        
-        <!-- Botón de Creación -->
-        <a href="<?= base_url('carreras/crear') ?>" class="btn btn-primary btn-lg shadow-sm">
-            <i class="fas fa-plus-circle"></i> Registrar Nueva Carrera
+    <?php if (session()->get('rol') === 'administrador'): ?>
+        <!-- Botón CREAR visible solo para el ADMINISTRADOR -->
+        <a href="<?= base_url('carreras/create') ?>" class="btn btn-success mb-3">
+            <i class="fas fa-plus-circle"></i> Nueva Carrera
         </a>
-    </div>
+    <?php endif; ?>
 
-    <!-- 3. CONTENEDOR DE LA TABLA -->
+    <!-- Manejo de Mensajes de Sesión -->
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
+    <?php endif; ?>
+    <?php if (session()->getFlashdata('error')): ?>
+        <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
+    <?php endif; ?>
+
     <div class="table-responsive">
-        <table class="data-table"> 
-            
-            <!-- ENCABEZADO -->
-            <thead> 
+        <table class="table table-hover table-striped">
+            <thead class="thead-dark">
                 <tr>
-                    <th class="col-1">ID</th>
-                    <th class="col-4">Nombre de Carrera</th>
-                    <th class="col-1 text-center">Duración (Años)</th>
-                    <th class="col-2 text-center">Modalidad</th>
-                    <th class="col-1 text-center">Estado</th>
-                    <th class="col-2 text-center">Acciones</th>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Título</th>
+                    <th>Acreditación</th>
+                    <!-- La columna de acciones solo se muestra si el usuario es administrador o si hay acciones de 'Ver' -->
+                    <th>Acciones</th> 
                 </tr>
             </thead>
-            
-            <!-- CUERPO DE LA TABLA -->
             <tbody>
-                <?php if (empty($carreras)): ?>
-                    <tr>
-                        <td colspan="6" class="text-center py-4">No hay carreras activas registradas.</td>
-                    </tr>
-                <?php else: ?>
+                <?php if (!empty($carreras) && is_array($carreras)): ?>
                     <?php foreach ($carreras as $carrera): ?>
-                    <tr>
-                        <!-- DATOS DE LA CARRERA -->
-                        <td class="align-middle"><?= esc($carrera['id_carrera']) ?></td>
-                        <td class="align-middle"><?= esc($carrera['nombre_carrera']) ?></td> 
-                        <td class="align-middle text-center"><?= esc($carrera['duracion'] ?? 'N/A') ?></td>
-                        <td class="align-middle text-center"><?= esc($carrera['modalidad'] ?? 'N/A') ?></td>
-                        
-                        <!-- ESTADO (Badge) - LÓGICA CORREGIDA -->
-                        <td class="align-middle text-center">
-                            <?php 
-                                // Determinar la clase de Bootstrap y el texto a mostrar basado en el valor 1 o 0
-                                $is_active = isset($carrera['estado']) && $carrera['estado'] == 1;
-                                $estado_class = $is_active ? 'bg-success' : 'bg-danger'; 
-                                $estado_text = $is_active ? 'Activa' : 'Inactiva';
-                            ?>
-                            <span class="badge <?= $estado_class ?> text-white p-2 rounded-pill">
-                                <?= esc($estado_text) ?>
-                            </span>
-                        </td>
-                        
-                        <!-- ACCIONES: USANDO CLASES PERSONALIZADAS (btn-action, btn-edit, btn-delete) -->
-                        <td class="align-middle action-buttons"> 
-                            <!-- Botón Editar -->
-                            <a href="<?= base_url("carreras/editar/{$carrera['id_carrera']}") ?>" class="btn-action btn-edit" title="Editar Carrera">
-                                <i class="fas fa-edit"></i> Editar
-                            </a>
-                            <!-- Botón Eliminar (Eliminación Lógica) -->
-                            <a href="<?= base_url("carreras/eliminar/{$carrera['id_carrera']}") ?>" class="btn-action btn-delete" title="Eliminar Carrera" onclick="return confirm('¿Está seguro de desactivar (eliminación lógica) esta carrera?')">
-                                <i class="fas fa-trash"></i> Desactivar
-                            </a>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td><?= esc($carrera['id_carrera']) ?></td>
+                            <td><?= esc($carrera['nombre_carrera']) ?></td>
+                            <td><?= esc($carrera['titulo']) ?></td>
+                            <td><?= esc($carrera['acreditacion']) ?></td>
+                            <td>
+                                <!-- La acción VER es la que queda disponible para todos los roles permitidos por el filtro -->
+                                <a href="<?= base_url('carreras/show/' . $carrera['id_carrera']) ?>" class="btn btn-info btn-sm">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+
+                                <?php if (session()->get('rol') === 'administrador'): ?>
+                                    <!-- Editar y Eliminar SOLO para ADMINISTRADOR -->
+                                    <a href="<?= base_url('carreras/edit/' . $carrera['id_carrera']) ?>" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </a>
+                                    <a href="<?= base_url('carreras/delete/' . $carrera['id_carrera']) ?>" 
+                                       class="btn btn-danger btn-sm" 
+                                       onclick="return confirm('¿Está seguro de eliminar la carrera: <?= esc($carrera['nombre_carrera']) ?>?');">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </a>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
                     <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="5" class="text-center">No se encontraron carreras.</td>
+                    </tr>
                 <?php endif; ?>
             </tbody>
         </table>
     </div>
-
 </div>
-
 <?= $this->endSection() ?>
  

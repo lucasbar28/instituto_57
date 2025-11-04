@@ -1,6 +1,7 @@
 <?php
 
 use CodeIgniter\Router\RouteCollection;
+use App\Controllers\Perfil; // Importamos el controlador Perfil para usarlo en las rutas
 
 /**
  * @var RouteCollection $routes
@@ -9,31 +10,28 @@ $routes->get('/', 'Home::index');
 
 // Rutas de Login y Autenticación
 $routes->get('login', 'Login::index');
-$routes->post('login/auth', 'Login::auth');
+$routes->post('login', 'Login::auth'); 
 $routes->get('logout', 'Login::logout');
 
 // ==========================================================================
-// RUTAS DE GESTIÓN (CRUD COMPLETO)
+// RUTAS DE GESTIÓN (CRUD COMPLETO) - APLICANDO FILTROS DE ROLES
 // ==========================================================================
 
-// --- PROFESORES ---
-$routes->group('profesores', static function ($routes) {
-    // Listar todos
+// --- PROFESORES (CRUD solo para Administrador) ---
+// Aplicamos el filtro 'role:administrador' para proteger todo el grupo CRUD
+$routes->group('profesores', ['filter' => 'role:administrador'], static function ($routes) {
     $routes->get('/', 'Profesores::index'); 
-    // Crear (Formulario GET y Guardar POST)
-    $routes->get('crear', 'Profesores::crear');
+    $routes->get('crear', 'Profesores::crear'); 
     $routes->post('guardar', 'Profesores::guardar');
-    // Editar (Formulario GET)
+    $routes->get('ver/(:num)', 'Profesores::ver/$1'); 
     $routes->get('editar/(:num)', 'Profesores::editar/$1'); 
-    // Actualizar (Procesar formulario POST)
     $routes->post('actualizar', 'Profesores::actualizar');
-    // Eliminar (Eliminación lógica/física)
     $routes->get('eliminar/(:num)', 'Profesores::eliminar/$1'); 
 });
 
 
-// --- CARRERAS ---
-$routes->group('carreras', static function ($routes) {
+// --- CARRERAS (CRUD solo para Administrador) ---
+$routes->group('carreras', ['filter' => 'role:administrador'], static function ($routes) {
     $routes->get('/', 'Carreras::index');
     $routes->get('crear', 'Carreras::crear');
     $routes->post('guardar', 'Carreras::guardar');
@@ -43,8 +41,8 @@ $routes->group('carreras', static function ($routes) {
 });
 
 
-// --- CATEGORÍAS ---
-$routes->group('categorias', static function ($routes) {
+// --- CATEGORÍAS (CRUD solo para Administrador) ---
+$routes->group('categorias', ['filter' => 'role:administrador'], static function ($routes) {
     $routes->get('/', 'Categorias::index'); 
     $routes->get('crear', 'Categorias::crear');
     $routes->post('guardar', 'Categorias::guardar');
@@ -54,8 +52,11 @@ $routes->group('categorias', static function ($routes) {
 });
 
 
-// --- CURSOS ---
-$routes->group('cursos', static function ($routes) {
+// --- CURSOS (CRUD para Administrador y vista para Profesor/Alumno si es necesario,
+//             pero se protege el CRUD completo solo para Admin) ---
+$routes->group('cursos', ['filter' => 'role:administrador'], static function ($routes) {
+    // Si necesitas que profesores/alumnos vean la lista, se haría:
+    // $routes->get('/', 'Cursos::index', ['filter' => 'role:administrador,profesor,alumno']);
     $routes->get('/', 'Cursos::index');
     $routes->get('crear', 'Cursos::crear');
     $routes->post('guardar', 'Cursos::guardar');
@@ -65,8 +66,8 @@ $routes->group('cursos', static function ($routes) {
 });
 
 
-// --- ESTUDIANTES (Alumnos) ---
-$routes->group('estudiantes', static function ($routes) {
+// --- ESTUDIANTES (Alumnos) (CRUD solo para Administrador) ---
+$routes->group('estudiantes', ['filter' => 'role:administrador'], static function ($routes) {
     $routes->get('/', 'Estudiantes::index');
     $routes->get('crear', 'Estudiantes::crear');
     $routes->post('guardar', 'Estudiantes::guardar');
@@ -76,13 +77,31 @@ $routes->group('estudiantes', static function ($routes) {
 });
 
 
-// --- INSCRIPCIONES ---
-$routes->group('inscripciones', static function ($routes) {
-    // Procesar la inscripción de un alumno a un curso (POST)
+// --- INSCRIPCIONES (Acceso a la lógica de Inscripción) ---
+// Esto dependerá de quién puede inscribir. Asumo que es el Administrador.
+$routes->group('inscripciones', ['filter' => 'role:administrador'], static function ($routes) {
     $routes->post('inscribir', 'Inscripcion::inscribir');
-    
-    // Nueva ruta: Desinscribir un alumno (Eliminación lógica/Soft Delete) (GET)
-    // Espera el ID del alumno en la URL. El controlador se encargará de buscar
-    // la última inscripción activa de ese alumno y hacer el Soft Delete.
     $routes->get('desinscribir/(:num)', 'Inscripcion::desinscribir/$1');
 });
+
+
+// Rutas de Autenticación y Registro (No necesitan filtro, son públicas)
+$routes->get('registro', 'Registro::index');
+$routes->post('registro/alumno', 'Registro::registroAlumno'); 
+
+// ==========================================================================
+// RUTAS DE ADMINISTRACIÓN (Dashboard)
+// ==========================================================================
+// Ahora usamos el filtro 'role' para una mejor gestión de roles
+$routes->group('admin', ['filter' => 'role:administrador'], static function ($routes) {
+    $routes->get('dashboard', 'Admin\Dashboard::index'); 
+});
+
+// ==========================================================================
+// RUTAS DE PERFIL (CAMBIO DE CONTRASEÑA)
+// ==========================================================================
+// Se mantiene el filtro 'auth', pero el RoleFilter (que incluye la lógica
+// de cambio obligatorio) se encargará de forzar la redirección si es necesario.
+$routes->get('perfil/cambio-contrasena', 'Perfil::cambioContrasena', ['filter' => 'auth']);
+$routes->post('perfil/actualizar-contrasena', 'Perfil::actualizarContrasena', ['filter' => 'auth']);
+ 

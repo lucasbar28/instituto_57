@@ -1,88 +1,60 @@
-<?php
+<?php 
 /**
- * Vista del Formulario de Inicio de Sesión (Login)
- * Se asegura de usar los nombres de campo correctos para el controlador (nombre_de_usuario y contrasena)
+ * Vista: Formulario de Inicio de Sesión.
+ * Extiende el layout principal 'templates/layout'.
  */
 ?>
 <?= $this->extend('templates/layout') ?> 
 
 <?= $this->section('content') ?>
 
-<div class="login-container">
-    <div class="login-card">
-        <h1 class="text-center mb-4">Iniciar Sesión</h1>
-        
-        <?php 
-        // Mostrar mensaje de error (usando 'msg' ya que es lo que el controlador envía)
-        if (session()->getFlashdata('msg')): 
-        ?>
-            <div class="alert-danger text-center mb-4">
-                <?= session()->getFlashdata('msg') ?>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="font-weight-light my-4"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</h3>
+                </div>
+                <div class="card-body">
+                    
+                    <!-- 1. ALERTAS (Mensajes de éxito/error) -->
+                    <?= view('templates/_alerts') ?>
+
+                    <form action="<?= base_url('login') ?>" method="post">
+                        <?= csrf_field() ?>
+                        
+                        <!-- Nombre de Usuario / Identificador -->
+                        <div class="form-group mb-3">
+                            <label class="small mb-1" for="nombre_de_usuario">Nombre de Usuario / Identificador</label>
+                            <input class="form-control py-4" id="nombre_de_usuario" name="nombre_de_usuario" type="text" placeholder="Ingrese su nombre de usuario o DNI" 
+                                value="<?= old('nombre_de_usuario') ?>" required>
+                            <?php if (session('errors.nombre_de_usuario')): ?>
+                                <div class="invalid-feedback d-block"><?= session('errors.nombre_de_usuario') ?></div>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Contraseña -->
+                        <div class="form-group mb-4">
+                            <label class="small mb-1" for="inputPassword">Contraseña</label>
+                            <input class="form-control py-4" id="inputPassword" name="password" type="password" placeholder="Ingrese su contraseña" required>
+                            <?php if (session('errors.password')): ?>
+                                <div class="invalid-feedback d-block"><?= session('errors.password') ?></div>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
+                            <!-- Enlace de registro -->
+                            <a class="small" href="<?= base_url('registro') ?>">¿No tienes cuenta? Regístrate aquí</a>
+                            
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                Entrar <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        <?php endif; ?>
-
-        <?php if (session()->getFlashdata('mensaje')): ?>
-            <div class="alert-success text-center mb-4">
-                <?= session()->getFlashdata('mensaje') ?>
-            </div>
-        <?php endif; ?>
-
-        <form action="<?= base_url('login/auth') ?>" method="post">
-            <!-- CAMPO CSRF ESENCIAL para evitar el error 403 de seguridad -->
-            <?= csrf_field() ?> 
-
-            <div class="form-group">
-                <label for="nombre_de_usuario">Usuario (Email):</label>
-                <!-- CAMPO CORREGIDO: ahora usa name="nombre_de_usuario" -->
-                <input type="email" name="nombre_de_usuario" class="form-control" required value="<?= old('nombre_de_usuario') ?>" placeholder="jefe@instituto.com">
-            </div>
-
-            <div class="form-group">
-                <label for="contrasena">Contraseña:</label>
-                <!-- CAMPO CORREGIDO: ahora usa name="contrasena" -->
-                <input type="password" name="contrasena" class="form-control" required placeholder="Contraseña">
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-block mt-4">Entrar</button>
-        </form>
+        </div>
     </div>
 </div>
 
-<style>
-/* Estilos específicos para la página de login, centrando el formulario */
-.login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 80vh; /* Centra en la mayor parte de la pantalla */
-    padding: 20px;
-}
-
-.login-card {
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px; /* Tamaño máximo del formulario */
-}
-
-.alert-danger {
-    background-color: #fdd8d8;
-    color: #cc0000;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #cc0000;
-}
-
-.alert-success {
-    background-color: #d8fdd8;
-    color: #00cc00;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #00cc00;
-}
-</style>
-
-<?= $this->endSection() ?>
- 
+<?= $this->endSection() ?> 

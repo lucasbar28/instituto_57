@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\CategoriaModel;
 use CodeIgniter\Controller;
+use CodeIgniter\Database\Exceptions\DatabaseException; 
 
 class Categorias extends BaseController
 {
@@ -19,74 +20,110 @@ class Categorias extends BaseController
             'page_title' => 'Lista de Categorías'
         ];
 
-        // NOTA: Se asume que tu archivo de vista se llama 'categorias_list.php' o 'categorias/index.php'.
-        // Si tu archivo se llama 'categorias.php' (como pusiste en el ejemplo de la vista), 
-        // debes cambiar 'categorias_list' por 'categorias' aquí. Usaré 'categorias_list' como estándar.
         return view('categorias_list', $data); 
     }
 
     /**
      * Muestra el formulario para crear una nueva categoría.
-     * También se usa como formulario de edición si se pasa un ID.
      */
-    public function crear($id = null)
+    public function crear()
     {
-        $model = new CategoriaModel();
-        $categoria = $id ? $model->find($id) : null;
-
         $data = [
             'validation' => \Config\Services::validation(),
-            'page_title' => $id ? 'Editar Categoría' : 'Crear Categoría',
-            'categoria'  => $categoria, // Pasa los datos de la categoría si estamos editando
-            'id'         => $id
+            'page_title' => 'Crear Categoría',
+            'categoria'  => null, // Modo Creación
         ];
+
         return view('categorias_form', $data);
     }
 
     /**
-     * Procesa los datos del formulario y guarda la nueva categoría o actualiza una existente.
+     * Procesa los datos del formulario y guarda la nueva categoría en la DB.
      */
     public function guardar()
     {
         $categoriaModel = new CategoriaModel();
         $datos = $this->request->getPost();
-        $id = $datos['id_categoria'] ?? null; // Obtiene el ID si existe (para edición)
 
-        // --- Reglas de Validación ---
-        $regla_unicidad = $id ? 
-            'required|min_length[3]|max_length[100]|is_unique[categorias.nombre,id_categoria,{id_categoria}]' : 
-            'required|min_length[3]|max_length[100]|is_unique[categorias.nombre]';
-
-        if (! $this->validate([
-            'nombre' => $regla_unicidad, // Regla adaptada para evitar duplicados, excepto el actual
-            'descripcion' => 'permit_empty' // Se mantiene opcional
-        ], 
-        [
-            'nombre' => [
-                'is_unique' => 'Ya existe una categoría con este nombre. Por favor, ingrese un nombre diferente.'
-            ]
-        ])) {
+        // Validamos usando las reglas del Modelo (is_unique)
+        if (!$this->validate(
+            ['nombre' => 'required|min_length[3]|max_length[100]|is_unique[categorias.nombre]'],
+            ['nombre' => ['is_unique' => 'Ya existe una categoría con este nombre.']]
+        )) {
             // Si la validación falla, regresa al formulario con los datos y errores
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+            $data = [
+                'validation' => $this->validator,
+                'page_title' => 'Crear Categoría',
+                'categoria'  => null,
+            ];
+            return view('categorias_form', $data);
+            // return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // --- Inserción/Actualización de Datos ---
         $datos_a_guardar = [
             'nombre'      => $datos['nombre'],
             'descripcion' => $datos['descripcion'], 
         ];
 
-        if ($id) {
-            $categoriaModel->update($id, $datos_a_guardar);
-            $mensaje = '✅ Categoría actualizada con éxito!';
-        } else {
-            $categoriaModel->insert($datos_a_guardar);
-            $mensaje = '✅ Categoría registrada con éxito!';
+        $categoriaModel->insert($datos_a_guardar);
+        
+        return redirect()->to(base_url('categorias'))->with('mensaje', '✅ Categoría registrada con éxito!');
+    }
+
+    /**
+     * Muestra el formulario para editar una categoría.
+     */
+    public function editar($id)
+    {
+        $model = new CategoriaModel();
+        $categoria = $model->find($id);
+
+        if (!$categoria) {
+            return redirect()->to(base_url('categorias'))->with('error', '❌ Categoría no encontrada.');
         }
 
-        // Redirección exitosa (redirige a la lista de categorías)
-        return redirect()->to(base_url('categorias'))->with('mensaje', $mensaje);
+        $data = [
+            'validation' => \Config\Services::validation(),
+            'page_title' => 'Editar Categoría',
+            'categoria'  => $categoria, // Pasa los datos para edición
+        ];
+
+        return view('categorias_form', $data);
     }
+
+    /**
+     * Procesa la actualización de una categoría.
+     */
+    public function actualizar()
+    {
+        $categoriaModel = new CategoriaModel();
+        $datos = $this->request->getPost();
+        $id = $datos['id_categoria']; // Asumimos campo oculto
+
+        // Validamos (ignorando el ID actual en 'is_unique')
+        if (!$this->validate(
+            ['nombre' => "required|min_length[3]|max_length[100]|is_unique[categorias.nombre,id_categoria,{$id}]"],
+            ['nombre' => ['is_unique' => 'Ya existe una categoría con este nombre.']]
+        )) {
+            $data = [
+                'validation' => $this->validator,
+                'page_title' => 'Editar Categoría',
+                'categoria'  => $categoriaModel->find($id),
+            ];
+            return view('categorias_form', $data);
+            // return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        $datos_a_guardar = [
+            'nombre'      => $datos['nombre'],
+            'descripcion' => $datos['descripcion'], 
+        ];
+
+        $categoriaModel->update($id, $datos_a_guardar);
+        
+        return redirect()->to(base_url('categorias'))->with('mensaje', '✅ Categoría actualizada con éxito!');
+    }
+
 
     /**
      * Elimina una categoría por su ID.
@@ -95,13 +132,19 @@ class Categorias extends BaseController
     {
         $categoriaModel = new CategoriaModel();
 
-        if ($categoriaModel->delete($id)) {
-             // Redirección exitosa
-             return redirect()->to(base_url('categorias'))->with('mensaje', '🗑️ Categoría eliminada con éxito!');
-        } else {
-             // Manejo de error si no se encuentra o no se puede eliminar
-             return redirect()->to(base_url('categorias'))->with('error', '❌ Error al eliminar la categoría o no se encontró el registro.');
+        try {
+            if ($categoriaModel->delete($id)) {
+                 return redirect()->to(base_url('categorias'))->with('mensaje', '🗑️ Categoría eliminada con éxito!');
+            } else {
+                 return redirect()->to(base_url('categorias'))->with('error', '❌ Error: Categoría no encontrada o no se pudo eliminar.');
+            }
+        } catch (\Exception $e) {
+            if (strpos($e->getMessage(), '1451') !== false) {
+                 return redirect()->to(base_url('categorias'))->with('error', '❌ Error: No se puede eliminar la categoría porque tiene Carreras asociadas. Desasocie las Carreras primero.');
+            }
+
+            log_message('error', 'Error al eliminar categoría: ' . $e->getMessage());
+            return redirect()->to(base_url('categorias'))->with('error', '❌ Error inesperado al intentar eliminar.');
         }
     }
-}
- 
+} 

@@ -1,22 +1,22 @@
 :root {
   --color-bg: #f9fafb;
   --color-bg-light: #ffffff;
-  --color-accent: #0e7490; /* azul petróleo */
-  --color-accent-hover: #155e75; /* más oscuro */
-  --color-text: #111827;
-  --color-muted: #6b7280;
+  --color-accent: #4ecdf0; /* azul petróleo */
+  --color-accent-hover: #11596e; /* más oscuro */
+  --color-text: #155e75;
+  --color-muted: #628ce0;
   --color-highlight: #fbbf24; /* un dorado sutil tipo carpincho */
   --border-radius: 0.75rem;
-  --box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-  --transition: all 0.3s ease;
+  --box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  --transition: all 0.4s ease;
 
   /* AGREGAR: degradado primario usado en botones y elementos */
-  --gradient-primary: linear-gradient(90deg, #0ea5a4 0%, #0369a1 100%);
+  --gradient-primary: linear-gradient(90deg, #0ea5a4 0%, #80c9f0 100%);
 }
 
 /* Estilos base */
 body {
-  font-family: 'Inter', Arial, sans-serif;
+  font-family: 'Encode Sans', Inter, Arial, sans-serif;
   line-height: 1.6;
   color: var(--color-text);
   background-color: var(--color-bg);
@@ -66,7 +66,7 @@ body {
 
 .navbar-logo {
   color: var(--color-accent);
-  font-weight: 700;
+  font-weight: 1200;
   font-size: 1.5rem;
   text-decoration: none;
 }
@@ -79,7 +79,8 @@ body {
 .navbar-links a {
   color: var(--color-text);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 1.1rem;
   transition: var(--transition);
 }
 
@@ -89,10 +90,22 @@ body {
 }
 
 .navbar-links a.active {
-  color: var(--color-accent);
+  text-decoration: none;
   font-weight: 600;
-  border-bottom: 2px solid var(--color-accent); /* Indicador de página activa */
-  padding-bottom: 3px;
+  color: var(--color-accent-hover);
+  position: relative; /* necesario para ::after posicionado */
+}
+
+.navbar-links a.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;       /* separacion debajo del texto */
+  height: 3px;
+  background: var(--gradient-primary);
+  border-radius: 2px;
+  width: 100%;
 }
 
 /* ENCABEZADOS DE PÁGINA */
@@ -426,12 +439,8 @@ body {
   .hero-subtitle {
     font-size: 1.2rem;
   }
-  
-  .steps-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .slide img {
+   
+    .slide img {
     height: 300px;
   }
 
@@ -559,26 +568,16 @@ body {
 
 /* AJUSTES CLAVE DE CSS para que el video local sea grande y responsivo */
 
-/* El contenedor mantiene las sombras y los bordes */
 .video-container {
-    /* Quitamos 'position: relative', 'padding-bottom: 56.25%', y 'height: 0' que eran para iframes */
-    position: relative; 
-    height: auto; 
-    overflow: hidden;
-    border-radius: 8px; 
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
-    
-    /* Asegura el centrado y el ancho máximo */
-    margin: 0 auto; 
-    max-width: 100%; /* El video no excederá el ancho de su columna en el grid */
+    width: 100%; 
+    height: auto;
+    max-width: 100%; 
 }
+
 .local-video {
     width: 100%;
-    max-width: 800px; /* Tamaño grande */
-    height: auto;
-    margin: 0 auto; /* Centrado horizontal */
-    display: block; /* Necesario para que el centrado funcione */
-    /* ... sombra y bordes ... */
+    height: auto; 
+    display: block; 
 }
 
 /* El elemento de video en sí */
@@ -598,7 +597,8 @@ body {
 
 .about-content-grid {
     display: grid;
-    gap: 40px;
+    gap: 30px;
+    grid-template-columns: 1fr 1fr;
     align-items: center;
     margin: 0 auto;
     max-width: 1200px; 
@@ -724,7 +724,7 @@ body {
 
 .steps-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Tarjetas más anchas */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Tarjetas más anchas */
   gap: 2.5rem; /* Más espacio */
   max-width: 1200px;
   margin: 0 auto;
@@ -922,3 +922,11 @@ body {
     text-align: left; /* Asegura que el contenido dentro de cada grupo se alinee a la izquierda */
 }
 /* Fin de SweetAlert2 personalizado */
+
+.text-center {
+  text-align: center;       /* centra el texto horizontalmente */
+  margin-left: auto;        /* opcional: centra el bloque si tiene ancho */
+  margin-right: auto;
+  max-width: 900px;         /* opcional: limita el ancho para mejor lectura */
+  line-height: 1.6;         /* opcional: mejora legibilidad */
+}
