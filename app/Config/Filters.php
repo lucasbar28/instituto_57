@@ -9,8 +9,9 @@ use CodeIgniter\Filters\DebugToolbar;
 use CodeIgniter\Filters\Honeypot;
 use CodeIgniter\Filters\InvalidChars;
 use CodeIgniter\Filters\SecureHeaders;
-// Importamos el filtro personalizado para roles
+// Importamos los filtros personalizados
 use App\Filters\RoleFilter; 
+use App\Filters\AuthFilter; // <--- Importamos la clase AuthFilter que creamos
 
 class Filters extends BaseConfig
 {
@@ -25,13 +26,16 @@ class Filters extends BaseConfig
         'honeypot'      => Honeypot::class,
         'invalidchars'  => InvalidChars::class,
         'secureheaders' => SecureHeaders::class,
-        'auth'          => RoleFilter::class, // <-- Alias del filtro de roles
+        
+        // CORRECCIÓN: Definir 'auth' para el filtro de autenticación simple (AuthFilter)
+        // y 'role' para el filtro que necesita argumentos de rol (RoleFilter).
+        'auth'          => AuthFilter::class,
+        'role'          => RoleFilter::class, // <--- Este es el alias que tus rutas esperan
     ];
 
     /**
      * Lista de filtros que se aplican a cada grupo de rutas.
-     *
-     * @var array
+     * (El resto de tu archivo es correcto)
      */
     public array $globals = [
         'before' => [
@@ -46,46 +50,12 @@ class Filters extends BaseConfig
         ],
     ];
 
-    /**
-     * Lista de clases de filtro a aplicar a métodos HTTP específicos.
-     *
-     * @var array
-     */
     public array $methods = [];
 
-    /**
-     * Filtros que se aplican a grupos específicos de rutas, 
-     * usados por el método $routes->group().
-     *
-     * Esta propiedad es usada por el sistema de ruteo, pero tu la definiste
-     * para organizar tus rutas protegidas.
-     * * Nota: Normalmente, solo se usa 'aliases' y 'groups' en Routes.php,
-     * no es habitual definir todas las rutas protegidas aquí.
-     * * @var array
-     */
     public array $filters = [
-        'auth' => [
-            'before' => [
-                'dashboard', 
-                'admin/*',
-                'profesor/*',
-                
-                'alumnos', 'alumnos/*',
-                'profesores', 'profesores/*',
-                'carreras', 'carreras/*',
-                'categorias', 'categorias/*',
-                'cursos', 'cursos/*',
-                'calendario', 'calendario/*',
-                'campus', 'campus/*',
-            ],
-        ],
+        // Esta sección debe permanecer vacía para aplicar los filtros con argumentos en Routes.php
     ];
 
-    /**
-     * Lista de filtros para ignorar en ciertas rutas.
-     *
-     * @var array
-     */
     public array $excludes = [];
 }
  

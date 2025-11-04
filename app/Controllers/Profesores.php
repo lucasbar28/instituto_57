@@ -22,7 +22,6 @@ class Profesores extends BaseController
             'title'      => 'Lista de Profesores',
         ];
 
-        // CAMBIO: Ahora carga la vista 'profesores' (que está en app/Views/profesores.php)
         return view('profesores', $data);
     }
 
@@ -36,6 +35,18 @@ class Profesores extends BaseController
             'title'      => 'Registrar Nuevo Profesor',
         ];
         return view('profesores_form', $data);
+    }
+
+    /**
+     * Función auxiliar para generar contraseña temporal (MOVEMOS AQUÍ)
+     */
+    private function generateRandomPassword($length = 12) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*';
+        $password = '';
+        for ($i = 0; $i < $length; $i++) {
+            $password .= $characters[rand(0, strlen($characters) - 1)];
+        }
+        return $password;
     }
 
     /**
@@ -53,7 +64,8 @@ class Profesores extends BaseController
         if (!$this->validate([
             'nombre_completo' => 'required|min_length[3]|max_length[255]',
             'especialidad'    => 'required|min_length[3]|max_length[150]',
-            'email'           => 'required|valid_email|is_unique[profesores.email]|is_unique[usuarios.nombre_de_usuario]',
+            // El email es el nombre_de_usuario
+            'email'           => 'required|valid_email|is_unique[profesores.email]|is_unique[usuarios.nombre_de_usuario]', 
             'telefono'        => 'permit_empty|max_length[20]',
         ],
         [
@@ -66,14 +78,16 @@ class Profesores extends BaseController
 
         // --- 2. PREPARAR DATOS Y USAR TRANSACCIÓN ---
         
-        // Generamos una contraseña temporal segura
-        $contrasena_inicial = bin2hex(random_bytes(8)); 
+        // Generamos una contraseña temporal segura usando la nueva función auxiliar
+        $contrasena_inicial = $this->generateRandomPassword(12); 
         
+        // DATOS DE USUARIO: Aquí integramos la lógica de contraseña temporal
         $usuarioData = [
             'nombre_de_usuario' => $datos['email'],
-            'contrasena'        => password_hash($contrasena_inicial, PASSWORD_DEFAULT),
+            'contrasena'        => $contrasena_inicial, // El UsuarioModel la hasheará automáticamente
             'rol'               => 'profesor',
-            'estado'            => 'activo'
+            'estado'            => 1, // 'activo' (usamos 1 para consistencia en la BD)
+            'cambio_contrasena_obligatorio' => 1 // <--- CAMBIO CRUCIAL: FORZAR CAMBIO AL LOGIN
         ];
         
         $profesorData = [
@@ -107,7 +121,8 @@ class Profesores extends BaseController
             }
             
             // Informamos al admin la contraseña temporal generada
-            return redirect()->to(base_url('profesores'))->with('mensaje', '✅ Profesor y usuario creados con éxito. Contraseña Temporal: ' . $contrasena_inicial);
+            $mensaje = '✅ Profesor y usuario creados con éxito. Contraseña Temporal: <strong>' . $contrasena_inicial . '</strong>. Se le pedirá cambiarla al iniciar sesión.';
+            return redirect()->to(base_url('profesores'))->with('mensaje', $mensaje);
 
         } catch (\Exception $e) {
             if ($db->transStatus() === TRUE) {
@@ -141,11 +156,14 @@ class Profesores extends BaseController
         $usuarioModel = new UsuarioModel();
         $usuario = $usuarioModel->find($profesor['id_usuario']);
 
-        // Agregar el email del usuario para la vista de detalle
+        // Agregar el email (nombre_de_usuario) y el estado de cambio obligatorio
         if ($usuario) {
              $profesor['email'] = $usuario['nombre_de_usuario'];
+             // Agregamos el flag de seguridad para verlo en el detalle si se desea
+             $profesor['cambio_obligatorio'] = (bool)$usuario['cambio_contrasena_obligatorio']; 
         } else {
              $profesor['email'] = 'Usuario no encontrado';
+             $profesor['cambio_obligatorio'] = false;
         }
 
 
@@ -269,12 +287,11 @@ class Profesores extends BaseController
         $db->transStart(); 
 
         try {
-            // Eliminar el profesor (esto debería, a su vez, eliminar el usuario
-            // si tienes configurado ON DELETE CASCADE en la FK de profesores.id_usuario)
+            // Eliminar el profesor 
             $profesorModel->delete($id);
 
-            // Nota: Si la FK tiene ON DELETE CASCADE, la siguiente línea es redundante
-            // $usuarioModel->delete($id_usuario); 
+            // También debemos eliminar el usuario explícitamente si no hay ON DELETE CASCADE
+            $usuarioModel->delete($id_usuario); 
             
             $db->transComplete(); 
 

@@ -1,116 +1,87 @@
-<?php
-
-namespace App\Filters;
+<?php namespace App\Filters;
 
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 
 /**
- * Filtro personalizado para verificar la autenticación y los permisos de rol.
- * Si el usuario no está logueado, lo redirige al login.
- * Si está logueado, verifica si tiene permiso para acceder a la ruta.
+ * Filtro de Roles
+ * * Verifica si el usuario autenticado tiene un rol permitido para acceder
+ * a la ruta y aplica la lógica de cambio de contraseña obligatorio.
  */
 class RoleFilter implements FilterInterface
 {
     /**
-     * Lógica de pre-ejecución (antes de que se ejecute el controlador)
+     * Lógica ejecutada ANTES de que se ejecute el controlador.
      */
     public function before(RequestInterface $request, $arguments = null)
     {
         $session = session();
         
-        // 1. Verificar Autenticación
-        // Si el usuario no ha iniciado sesión, redirigir al login.
-        if (! $session->get('isLoggedIn')) {
-            $session->setFlashdata('error', 'Debe iniciar sesión para acceder a esta página.');
+        // 1. Verificación de Autenticación 
+        if (!$session->get('isLoggedIn')) {
+            $session->setFlashdata('error', 'Debes iniciar sesión para acceder.');
             return redirect()->to(base_url('login'));
         }
 
-        // 2. Obtener el Rol del usuario (debe estar en la sesión)
-        $userRole = $session->get('rol');
-
-        // 3. Permiso Total para Administrador
-        // Si es administrador, permite el acceso a todas las rutas protegidas.
-        if ($userRole === 'administrador') {
-            return; // Permite el acceso
+        // --- EXCLUSIÓN DE RUTA CRÍTICA (CORRECCIÓN: Usar getUri()) ---
+        // Obtenemos la URI actual para verificar si estamos en la página de cambio de contraseña
+        try {
+            // Forma correcta de acceder a la URI en CodeIgniter 4
+            $currentUri = $request->getUri()->getPath();
+        } catch (\Exception $e) {
+            // Manejo de errores por si la request no tiene URI (poco probable en filtros)
+            log_message('error', 'Error al obtener URI en RoleFilter: ' . $e->getMessage());
+            $currentUri = ''; 
         }
 
-        // 4. Determinar la Ruta Actual y el método (GET, POST, etc.)
-        $currentUrl = uri_string(); // Obtiene la URI actual (ej: 'carreras/editar/5')
-        $requestMethod = $request->getMethod(); // Obtiene el método HTTP (ej: 'get', 'post')
+        // La comparación debe ser flexible para incluir la ruta de cambio de contraseña.
+        // Asume que la ruta es 'perfil/cambio-contrasena'
+        $isChangePasswordPage = strpos($currentUri, 'perfil/cambio-contrasena') !== false;
         
-        // Definir las rutas de SOLO LECTURA permitidas para profesores y alumnos
-        // Estas son las rutas que SIEMPRE deben ser accesibles (GET)
-        $accessibleRoutes = [
-            'alumnos',
-            'profesores',
-            'carreras',
-            'categorias',
-            'cursos',
-            'calendario',
-            'campus',
-        ];
-
-        // 5. Aplicar Restricción de SÓLO LECTURA (GET) para Alumnos y Profesores
+        // ----------------------------------------------------------------------
+        // 2. Verificación de Cambio de Contraseña Obligatorio
+        // ----------------------------------------------------------------------
         
-        // Buscamos si la URL actual comienza con alguna de las rutas accesibles
-        $isAccessibleRoute = false;
-        foreach ($accessibleRoutes as $route) {
-            // Ejemplo: 'carreras' está en 'carreras/editar/5' o 'carreras'
-            if (str_starts_with($currentUrl, $route)) {
-                $isAccessibleRoute = true;
-                break;
-            }
-        }
-        
-        // Si es una ruta accesible para lectura...
-        if ($isAccessibleRoute) {
+        // Si el cambio de contraseña es obligatorio Y NO estamos en la página de cambio:
+        if ($session->get('cambio_obligatorio') == 1 && !$isChangePasswordPage) {
             
-            // --- Regla del Requerimiento: Profesor y Alumno solo ven listados (GET) ---
-            if ($userRole === 'profesor' || $userRole === 'alumno') {
-                
-                // Si el método NO es GET (es POST, PUT, DELETE, etc. que implica C/U/D), lo bloqueamos.
-                if ($requestMethod !== 'get') {
-                    $session->setFlashdata('error', 'Acceso denegado. Usted no tiene permisos para crear, editar o eliminar.');
-                    return redirect()->back();
-                }
-                
-                // Si es GET, verificamos que el rol tenga permiso de lectura para esa ruta específica.
-                $hasReadPermission = false;
-                
-                if ($userRole === 'alumno') {
-                    // Rutas permitidas para el ALUMNO (solo lectura)
-                    $alumnoRoutes = ['alumnos', 'carreras', 'cursos', 'calendario', 'campus'];
-                    if (in_array($route, $alumnoRoutes)) {
-                        $hasReadPermission = true;
-                    }
-                }
+            // Redirección forzada. Esto evita el bucle infinito.
+            return redirect()->to(base_url('perfil/cambio-contrasena'))
+                             ->with('warning', 'Debe cambiar su contraseña antes de continuar. Acceso restringido.');
+        }
 
-                if ($userRole === 'profesor') {
-                    // Rutas permitidas para el PROFESOR (solo lectura)
-                    $profesorRoutes = ['profesores', 'carreras', 'categorias', 'cursos', 'calendario', 'campus'];
-                    if (in_array($route, $profesorRoutes)) {
-                        $hasReadPermission = true;
-                    }
-                }
-                
-                if ($hasReadPermission) {
-                    return; // Permite el acceso de solo lectura
-                }
+        // ----------------------------------------------------------------------
+        // 3. Verificación de Roles
+        // ----------------------------------------------------------------------
+        
+        $user_role = $session->get('rol');
+        
+        // Si hay roles definidos en los argumentos Y el rol del usuario NO está en la lista de permitidos
+        if (!empty($arguments) && !in_array($user_role, $arguments)) {
+            
+            $session->setFlashdata('error', 'Acceso denegado. Tu rol (' . $user_role . ') no está autorizado para esta área.');
+            
+            // Redirigir al dashboard específico
+            switch ($user_role) {
+                case 'administrador':
+                    return redirect()->to(base_url('admin/dashboard'));
+                case 'profesor':
+                    return redirect()->to(base_url('profesores')); 
+                case 'alumno':
+                    return redirect()->to(base_url('estudiantes'));
+                default:
+                    return redirect()->to(base_url('/'));
             }
         }
-        
-        // Si llegamos aquí, la ruta no está permitida para este rol
-        $session->setFlashdata('error', 'Acceso denegado. No tiene permisos suficientes para ver o gestionar esta sección.');
-        return redirect()->to(base_url('dashboard')); // Redirigir a su dashboard por defecto o al inicio.
     }
 
     /**
-     * Lógica de post-ejecución (después de que se ejecute el controlador)
+     * Lógica ejecutada DESPUÉS de que se ejecuta el controlador.
      */
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        // No hay lógica post-ejecución necesaria para la autenticación
+        // No se requiere ninguna acción después
     }
 }
+ 
