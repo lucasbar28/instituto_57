@@ -22,12 +22,12 @@ $routes->group('profesores', static function ($routes) {
     $routes->get('/', 'Profesores::index'); 
     
     // Crear (Formulario GET)
-    $routes->get('create', 'Profesores::crear'); 
+    // CONSISTENCIA: Cambiado 'create' a 'crear'
+    $routes->get('crear', 'Profesores::crear'); 
     // Guardar (Procesar formulario POST)
     $routes->post('guardar', 'Profesores::guardar');
     
-    // CORRECCIÓN DE RUTA: Mostrar/Ver detalle de un registro (GET: /profesores/ver/4)
-    // Cambiado de 'show' a 'ver' para coincidir con la URL de la vista.
+    // Mostrar/Ver detalle de un registro (GET: /profesores/ver/4)
     $routes->get('ver/(:num)', 'Profesores::ver/$1'); 
     
     // Editar (Formulario GET para editar)
@@ -35,9 +35,7 @@ $routes->group('profesores', static function ($routes) {
     // Actualizar (Procesar formulario POST)
     $routes->post('actualizar', 'Profesores::actualizar');
     
-    // Eliminar (Eliminación lógica/física)
-    // Nota: Es más seguro usar GET para eliminación simple sin formularios de confirmación
-    // Aunque CodeIgniter recomienda POST/DELETE, el método GET es común para acciones de URL directas.
+    // Eliminar
     $routes->get('eliminar/(:num)', 'Profesores::eliminar/$1'); 
 });
 

@@ -1,74 +1,91 @@
-<?= $this->extend('layout/main') ?>
+<?php 
+/**
+ * Vista: Muestra los detalles de un profesor específico.
+ * Extiende el layout principal 'templates/layout'.
+ * Variables esperadas:
+ * - $profesor: Array de datos del profesor, incluyendo el campo 'email' (nombre_de_usuario).
+ * - $title: Título de la página.
+ */
+?>
+<?= $this->extend('templates/layout') ?> 
+
 <?= $this->section('content') ?>
 
 <div class="container mt-5">
-    <div class="row">
-        <div class="col-12">
-            <!-- Título y Botón de Volver -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h2 text-primary">
-                    <i class="bi bi-person-badge-fill me-2"></i><?= esc($title) ?>
-                </h1>
-                <a href="<?= base_url('profesores') ?>" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> Volver a la Lista
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tarjeta de Detalles del Profesor -->
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card shadow-sm mb-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-lg">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Información General</h5>
+                    <h3 class="font-weight-light my-3">
+                        <i class="fas fa-id-card-alt"></i> Detalle del Profesor
+                    </h3>
                 </div>
                 <div class="card-body">
-                    <dl class="row">
-                        <dt class="col-sm-4 text-muted">ID Profesor:</dt>
-                        <dd class="col-sm-8"><?= esc($profesor['id_profesor']) ?></dd>
-
-                        <dt class="col-sm-4 text-muted">Nombre Completo:</dt>
-                        <dd class="col-sm-8 text-dark fw-bold"><?= esc($profesor['nombre_completo']) ?></dd>
+                    
+                    <h4 class="mb-4 text-primary"><?= esc($profesor['nombre_completo']) ?></h4>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- Datos Personales y Académicos -->
+                            <h5 class="mt-3 mb-3 text-secondary border-bottom pb-2"><i class="fas fa-info-circle me-2"></i>Información Principal</h5>
+                            
+                            <dl class="row detail-list">
+                                <dt class="col-sm-5">ID Profesor:</dt>
+                                <dd class="col-sm-7 fw-bold"><?= esc($profesor['id_profesor']) ?></dd>
+                                
+                                <dt class="col-sm-5">Especialidad:</dt>
+                                <dd class="col-sm-7"><?= esc($profesor['especialidad']) ?></dd>
+                                
+                                <dt class="col-sm-5">Teléfono:</dt>
+                                <dd class="col-sm-7"><?= esc($profesor['telefono'] ?? 'N/A') ?></dd>
+                            </dl>
+                        </div>
                         
-                        <dt class="col-sm-4 text-muted">Especialidad:</dt>
-                        <dd class="col-sm-8"><?= esc($profesor['especialidad']) ?></dd>
-                        
-                        <dt class="col-sm-4 text-muted">Email (Usuario):</dt>
-                        <dd class="col-sm-8">
-                            <a href="mailto:<?= esc($profesor['email']) ?>"><?= esc($profesor['email']) ?></a>
-                        </dd>
-                        
-                        <dt class="col-sm-4 text-muted">Teléfono:</dt>
-                        <dd class="col-sm-8"><?= esc($profesor['telefono'] ?? 'N/A') ?></dd>
-                        
-                        <dt class="col-sm-4 text-muted">ID Usuario (Credencial):</dt>
-                        <dd class="col-sm-8"><?= esc($profesor['id_usuario']) ?></dd>
-                    </dl>
+                        <div class="col-md-6">
+                            <!-- Datos de Acceso y Sistema -->
+                            <h5 class="mt-3 mb-3 text-secondary border-bottom pb-2"><i class="fas fa-lock me-2"></i>Credenciales de Sistema</h5>
+                            
+                            <dl class="row detail-list">
+                                <dt class="col-sm-5">Usuario (Email):</dt>
+                                <dd class="col-sm-7 text-break"><?= esc($profesor['email']) ?></dd>
+                                
+                                <dt class="col-sm-5">ID de Usuario:</dt>
+                                <dd class="col-sm-7"><?= esc($profesor['id_usuario']) ?></dd>
+                                
+                                <dt class="col-sm-5">Creado en:</dt>
+                                <dd class="col-sm-7"><?= esc($profesor['created_at'] ?? 'N/A') ?></dd>
+                                
+                                <dt class="col-sm-5">Última Modificación:</dt>
+                                <dd class="col-sm-7"><?= esc($profesor['updated_at'] ?? 'N/A') ?></dd>
+                            </dl>
+                        </div>
+                    </div>
+                    
                 </div>
-                <div class="card-footer d-flex justify-content-end">
-                    <a href="<?= base_url('profesores/editar/' . $profesor['id_profesor']) ?>" class="btn btn-warning me-2">
-                        <i class="bi bi-pencil-square"></i> Editar
+                <div class="card-footer d-flex justify-content-between">
+                    <a href="<?= base_url('profesores') ?>" class="btn btn-secondary">
+                        <i class="fas fa-chevron-left me-1"></i> Volver a la Lista
                     </a>
-                    <!-- Botón de Eliminar (Añadirías lógica de confirmación con JS) -->
-                    <button class="btn btn-danger" onclick="confirmDelete(<?= $profesor['id_profesor'] ?>, '<?= esc($profesor['nombre_completo']) ?>')">
-                        <i class="bi bi-trash"></i> Eliminar
-                    </button>
+                    <?php if (session()->get('rol') === 'administrador'): ?>
+                        <a href="<?= base_url('profesores/editar/' . $profesor['id_profesor']) ?>" class="btn btn-warning">
+                            <i class="fas fa-edit me-1"></i> Editar Profesor
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Script simple para confirmación de eliminación -->
-<script>
-    function confirmDelete(id, nombre) {
-        if (confirm('¿Está seguro de que desea eliminar al profesor ' + nombre + '? Esta acción es irreversible y desasignará sus cursos.')) {
-            // Si el administrador confirma, redirige a la ruta de eliminación
-            window.location.href = '<?= base_url('profesores/eliminar') ?>/' + id;
-        }
-    }
-</script>
+<style>
+.detail-list dt {
+    color: #495057;
+    font-weight: 500;
+}
+.detail-list dd {
+    margin-bottom: 10px;
+}
+</style>
 
 <?= $this->endSection() ?>
  
