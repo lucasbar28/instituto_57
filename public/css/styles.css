@@ -1,17 +1,17 @@
 :root {
   --color-bg: #f9fafb;
   --color-bg-light: #ffffff;
-  --color-accent: #0e7490; /* azul petróleo */
-  --color-accent-hover: #155e75; /* más oscuro */
-  --color-text: #111827;
-  --color-muted: #6b7280;
+  --color-accent: #4ecdf0; /* azul petróleo */
+  --color-accent-hover: #11596e; /* más oscuro */
+  --color-text: #155e75;
+  --color-muted: #628ce0;
   --color-highlight: #fbbf24; /* un dorado sutil tipo carpincho */
   --border-radius: 0.75rem;
-  --box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-  --transition: all 0.3s ease;
+  --box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  --transition: all 0.4s ease;
 
   /* AGREGAR: degradado primario usado en botones y elementos */
-  --gradient-primary: linear-gradient(90deg, #0ea5a4 0%, #0369a1 100%);
+  --gradient-primary: linear-gradient(90deg, #0ea5a4 0%, #80c9f0 100%);
 }
 
 /* Estilos base */
@@ -66,7 +66,7 @@ body {
 
 .navbar-logo {
   color: var(--color-accent);
-  font-weight: 600;
+  font-weight: 1200;
   font-size: 1.5rem;
   text-decoration: none;
 }
@@ -79,7 +79,8 @@ body {
 .navbar-links a {
   color: var(--color-text);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 1.1rem;
   transition: var(--transition);
 }
 

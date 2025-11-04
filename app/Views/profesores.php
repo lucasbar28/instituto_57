@@ -1,6 +1,38 @@
 <?= $this->extend('templates/layout') ?>
 <?= $this->section('content') ?>
 
+<section class="profesores-section steps-section">
+    <div class="container">
+        <h2 class="section-title"><i class="fas fa-chalkboard-teacher"></i> Gestión Pedagógica: Rol del Profesor</h2>
+        <p class="section-subtitle">Herramientas esenciales para el dictado, la evaluación y la comunicación con tus estudiantes.</p>
+        
+        <div class="steps-grid">
+            
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Carga de Calificaciones</h3>
+                <p>Ingresa notas finales o parciales y retroalimenta el desempeño de tus estudiantes.</p>
+                <a href="<?= base_url('profesores/notas') ?>" class="step-link">Cargar Notas <i class="fas fa-arrow-right"></i></a>
+            </div>
+            
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>Registro de Asistencia</h3>
+                <p>Lleva el control diario de la presencia de los alumnos en tus diferentes cátedras.</p>
+                <a href="<?= base_url('profesores/asistencia') ?>" class="step-link">Tomar Lista <i class="fas fa-arrow-right"></i></a>
+            </div>
+            
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>Compartir Contenido</h3>
+                <p>Sube archivos, links y materiales didácticos accesibles para todos tus cursos.</p>
+                <a href="<?= base_url('profesores/contenido') ?>" class="step-link">Subir Material <i class="fas fa-arrow-right"></i></a>
+            </div>
+            
+        </div>
+    </div> 
+</section>
+
 <div class="container mt-5">
     <!-- Mensajes de Sesión (Éxito o Error) -->
     <?php if (session()->getFlashdata('mensaje')): ?>
