@@ -110,12 +110,12 @@
 <section class="steps-section">
   <div class="container">
     <h2 class="section-title">I.S.F.D. y T. N°57 “Juana Paula Manso”</h2>
-    
+  </div> 
     <!-- Imagen -->
-    <img src="<?= base_url('img/instituto.png') ?>" alt="Foto del Instituto 57" class="img-fluid mb-4 img-instituto step-card">
-
-    <p >El Instituto Superior de Formación Docente y Técnica N.º 57 "Juana Paula Manso" es una institución pública y gratuita ubicada en Chascomús, Buenos Aires. Forma parte de la Región Educativa XVII y depende de la Dirección General de Cultura y Educación de la Provincia. Ofrece una amplia gama de carreras docentes y técnicas de nivel superior, brindando títulos oficiales y de calidad.</p> 
-    <p >Su historia se remonta a 1972, y desde entonces ha evolucionado para responder a las necesidades educativas de la comunidad, incluyendo extensiones en Ranchos y Lezama. Comprometido con la formación integral, el instituto promueve la innovación pedagógica y la inclusión social, consolidándose como un referente en la región.</p>
+  <div class="intro text-center">
+    <img src="<?= base_url('img/instituto.png') ?>" alt="Foto del Instituto 57" class=".intro img step-card">
+    <p class="text-center">El Instituto Superior de Formación Docente y Técnica N.º 57 "Juana Paula Manso" es una institución pública y gratuita ubicada en Chascomús, Buenos Aires. Forma parte de la Región Educativa XVII y depende de la Dirección General de Cultura y Educación de la Provincia. Ofrece una amplia gama de carreras docentes y técnicas de nivel superior, brindando títulos oficiales y de calidad.</p> 
+    <p class="text-center">Su historia se remonta a 1972, y desde entonces ha evolucionado para responder a las necesidades educativas de la comunidad, incluyendo extensiones en Ranchos y Lezama. Comprometido con la formación integral, el instituto promueve la innovación pedagógica y la inclusión social, consolidándose como un referente en la región.</p>
   </div>
 </section>
 <section class="steps-section">
