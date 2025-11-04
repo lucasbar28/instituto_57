@@ -438,12 +438,8 @@ body {
   .hero-subtitle {
     font-size: 1.2rem;
   }
-  
-  .steps-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .slide img {
+   
+    .slide img {
     height: 300px;
   }
 
@@ -727,7 +723,7 @@ body {
 
 .steps-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Tarjetas más anchas */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Tarjetas más anchas */
   gap: 2.5rem; /* Más espacio */
   max-width: 1200px;
   margin: 0 auto;

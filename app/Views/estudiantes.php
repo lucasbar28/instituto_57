@@ -13,6 +13,34 @@
     <!-- 1. ALERTAS (Mensajes de éxito/error) -->
     <?= view('templates/_alerts') ?>
 
+    <!-- 1.B APP -->
+    <section class="steps-section">
+    <div class="container">
+        <h2 class="section-title"><i class="fas fa-user-graduate"></i> Mi Vida Académica: Rol del Alumno</h2>
+        <p class="section-subtitle">Accede y gestiona tu información, calificaciones y materiales de estudio desde tu perfil.</p>
+        <div class="steps-grid">
+                <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Consulta de Notas</h3>
+                <p>Visualiza tus calificaciones de exámenes y trabajos prácticos en tiempo real.</p>
+                <a href="<?= base_url('alumnos/notas') ?>" class="step-link">Ver Notas <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>Material de Cátedra</h3>
+                <p>Descarga apuntes, presentaciones y bibliografía compartida por tus profesores.</p>
+                <a href="<?= base_url('alumnos/material') ?>" class="step-link">Acceder a Archivos <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>Seguimiento de Asistencia</h3>
+                <p>Verifica tu porcentaje de asistencia a clases y justifica inasistencias.</p>
+                <a href="<?= base_url('alumnos/asistencia') ?>" class="step-link">Revisar Asistencia <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div> 
+</section>
+
     <!-- 2. SECCIÓN PRINCIPAL: LISTA DE ESTUDIANTES (CRUD) -->
     <h1 class="text-center mb-4">Gestión de Estudiantes</h1>
     
