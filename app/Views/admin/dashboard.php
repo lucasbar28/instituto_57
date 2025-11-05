@@ -26,9 +26,9 @@
             </header>
 
             <main class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">    
                 <!-- Tarjeta 1: Profesores -->
-                <div class="card bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-500">
+                <div class="step-card-d bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-500">
                     <h2 class="text-xl font-bold text-gray-800 mb-2">Gestión de Profesores</h2>
                     <p class="text-gray-600 mb-4">Administrar la lista de docentes activos e inactivos.</p>
                     <a href="<?= base_url('profesores') ?>" class="text-blue-600 hover:text-blue-800 font-semibold flex items-center">
@@ -38,7 +38,7 @@
                 </div>
 
                 <!-- Tarjeta 2: Carreras -->
-                <div class="card bg-white p-6 rounded-xl shadow-md border-t-4 border-green-500">
+                <div class="step-card-d bg-white p-6 rounded-xl shadow-md border-t-4 border-green-500">
                     <h2 class="text-xl font-bold text-gray-800 mb-2">Gestión de Carreras</h2>
                     <p class="text-gray-600 mb-4">Agregar, editar o eliminar las ofertas académicas.</p>
                     <a href="<?= base_url('carreras') ?>" class="text-green-600 hover:text-green-800 font-semibold flex items-center">
@@ -48,7 +48,7 @@
                 </div>
 
                 <!-- Tarjeta 3: Estudiantes -->
-                <div class="card bg-white p-6 rounded-xl shadow-md border-t-4 border-purple-500">
+                <div class="step-card-d bg-white p-6 rounded-xl shadow-md border-t-4 border-purple-500">
                     <h2 class="text-xl font-bold text-gray-800 mb-2">Gestión de Estudiantes</h2>
                     <p class="text-gray-600 mb-4">Administrar alumnos, inscripciones y datos personales.</p>
                     <a href="<?= base_url('estudiantes') ?>" class="text-purple-600 hover:text-purple-800 font-semibold flex items-center">
@@ -58,7 +58,7 @@
                 </div>
 
                 <!-- Tarjeta 4: Cursos -->
-                 <div class="card bg-white p-6 rounded-xl shadow-md border-t-4 border-yellow-500">
+                 <div class="step-card-d bg-white p-6 rounded-xl shadow-md border-t-4 border-yellow-500">
                     <h2 class="text-xl font-bold text-gray-800 mb-2">Gestión de Cursos</h2>
                     <p class="text-gray-600 mb-4">Administrar asignaturas, categorías y cursos ofrecidos.</p>
                     <a href="<?= base_url('cursos') ?>" class="text-yellow-600 hover:text-yellow-800 font-semibold flex items-center">
@@ -66,6 +66,7 @@
                         <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </a>
                 </div>
+            </div>
                 
             </main>
         </div>
