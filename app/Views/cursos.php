@@ -35,7 +35,7 @@
                     <?php foreach ($cursos as $curso): ?>
                         <tr>
                             <td><?= esc($curso['id_curso']) ?></td>
-                            <td><?= esc($curso['nombre_curso']) ?></td>
+                            <td><?= esc($curso['nombre']) ?></td>
                             <td><?= esc($curso['duracion_horas']) ?></td>
                             <td><?= esc($curso['nombre_carrera'] ?? 'N/A') ?></td>
                             <td>
@@ -50,7 +50,7 @@
                                     </a>
                                     <a href="<?= base_url('cursos/delete/' . $curso['id_curso']) ?>" 
                                        class="btn btn-danger btn-sm" 
-                                       onclick="return confirm('¿Está seguro de eliminar el curso: <?= esc($curso['nombre_curso']) ?>?');">
+                                       onclick="return confirm('¿Está seguro de eliminar el curso: <?= esc($curso['nombre']) ?>?');">
                                         <i class="fas fa-trash"></i> Eliminar
                                     </a>
                                 <?php endif; ?>
