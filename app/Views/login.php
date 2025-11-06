@@ -8,12 +8,12 @@
 
 <?= $this->section('content') ?>
 
-<div class="container mt-5">
+<div class="container mt-5 step-card-login">
     <div class="row justify-content-center">
         <div class="col-md-7 col-lg-5">
             <div class="card shadow-lg border-0 rounded-lg">
                 <div class="card-header bg-primary text-white text-center">
-                    <h3 class="font-weight-light my-4"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</h3>
+                    <h3 class="font-weight-light my-4"><i class="fas fa-sign-in-alt "></i> Iniciar Sesión</h3>
                 </div>
                 <div class="card-body">
                     
