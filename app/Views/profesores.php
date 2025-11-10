@@ -66,7 +66,7 @@
                 </div>
             <?php else: ?>
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped">
+                    <table class="data-table">
                         <thead class="thead-dark">
                             <tr>
                                 <th>ID</th>
