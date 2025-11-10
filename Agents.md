@@ -498,3 +498,55 @@ app/
     ├── estudiantes_form.php
     ├── profesores.php
     └── profesores_form.php
+
+
+## 🔒 FILTROS Y RUTAS (Capas de Seguridad y Acceso)
+
+Esta sección detalla cómo se protegen las rutas y se gestiona el acceso mediante el sistema de **Filtros** de CodeIgniter 4.
+
+### 🎚️ **Definición de Filtros (`Config/Filters.php`)**
+
+Se definen dos alias clave para proteger las rutas, importando las clases personalizadas:
+
+| Alias | Clase | Propósito |
+| :--- | :--- | :--- |
+| `auth` | **AuthFilter** | Verificación de **sesión iniciada** simple (`isLoggedIn`). |
+| `role` | **RoleFilter** | Verificación de `isLoggedIn`, **cambio de contraseña obligatorio**, y **roles permitidos** (recibe argumentos). |
+
+### 🚦 **Lógica de Filtros (`App/Filters/`)**
+
+Los filtros ejecutan su lógica **ANTES** (`before`) de que se ejecute el controlador:
+
+#### 1. AuthFilter (`AuthFilter.php`)
+* **Verificación Simple:** Comprueba si `session()->get('isLoggedIn')` es `false`.
+* **Acción:** Si no ha iniciado sesión, redirige a `base_url('login')` con un mensaje de error *flashdata*.
+
+#### 2. RoleFilter (`RoleFilter.php`)
+Este filtro aplica tres niveles de seguridad secuenciales:
+
+1.  **Verificación de Autenticación:** Si el usuario no está `isLoggedIn`, redirige a `/login`.
+2.  **Verificación de Cambio Obligatorio:** Si `session()->get('cambio_obligatorio') == 1` Y la URI actual (`$request->getUri()->getPath()`) **NO** es la página de cambio de contraseña (`perfil/cambio-contrasena`), **fuerza la redirección** a esa página con un mensaje de advertencia.
+3.  **Verificación de Roles:** Si se pasan argumentos de roles (ej: `administrador`) y el rol del usuario (`$user_role`) **NO** está en la lista permitida, se deniega el acceso y se redirige al *dashboard* específico de su rol (ej: `admin/dashboard`, `profesores`, etc.).
+
+### 🗺️ **Definición de Rutas (`Config/Routes.php`)**
+
+Las rutas utilizan los alias definidos en `Filters.php` para proteger el acceso:
+
+* **Rutas de Autenticación:** `login` y `logout` son públicas.
+* **Rutas Protegidas por Rol:** El CRUD completo para `profesores`, `carreras`, `categorias`, `cursos`, `estudiantes` e `inscripciones` está agrupado y protegido usando el filtro `role` con el argumento `administrador`.
+    ```php
+    $routes->group('profesores', ['filter' => 'role:administrador'], static function ($routes) {
+        // ... Rutas de CRUD
+    });
+    ```
+* **Rutas de Perfil/Seguridad:** Las rutas de cambio de contraseña (`perfil/cambio-contrasena`, `perfil/actualizar-contrasena`) se protegen con el filtro `auth` (verificación simple de inicio de sesión).
+
+---
+
+## 🔄 FLUJO DE TRABAJO PRINCIPAL
+
+| Flujo | Capas Involucradas | Resumen de Pasos |
+| :--- | :--- | :--- |
+| **Autenticación** | Vista → Controlador → Modelo → Filtro | `login.php` → `Login::auth()` → `UsuarioModel` → Crea Sesión → Rutas Protegidas por `RoleFilter`. |
+| **CRUD (Admin)** | Ruta/Filtro → Controlador → Modelo → Vista | Solicitud a `/profesores/eliminar/1` → `RoleFilter` aprueba (si es admin) → `Profesores::eliminar()` → Usa **Transacción** con `ProfesorModel` y `UsuarioModel` → Redirige a lista. |
+| **Eliminación Lógica** | Controlador → Modelo | `Carreras::eliminar()` llama al método del `CarreraModel` para actualizar el campo `estado` a `0`. |
