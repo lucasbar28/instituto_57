@@ -47,9 +47,15 @@ class Estudiantes extends BaseController
             // CORRECCIÓN: Usar 'nombre' (el alias 'nombre_curso' ya no se usa en el Modelo simple)
             $curso_nombre = $cursos_map[$inscripcion['id_curso']] ?? null;
 
+            // Si id_curso no es válido (null/0/empty), saltamos esa inscripción
+            if (empty($inscripcion['id_curso']) || ! is_numeric($inscripcion['id_curso'])) {
+                // No agregamos entradas sin curso válido; la vista mostrará "No inscrito" si no hay inscripciones válidas
+                continue;
+            }
+
             // Si no está en el mapa (p.ej. por soft-deletes o datos fuera de sincronía),
             // intentamos recuperar el registro desde el modelo incluyendo borrados.
-            if (empty($curso_nombre) && ! empty($inscripcion['id_curso'])) {
+            if (empty($curso_nombre)) {
                 $cursoBuscado = $cursoModel->withDeleted()->find($inscripcion['id_curso']);
                 if (! empty($cursoBuscado)) {
                     $curso_nombre = $cursoBuscado['nombre'] ?? ($cursoBuscado['nombre_curso'] ?? null);

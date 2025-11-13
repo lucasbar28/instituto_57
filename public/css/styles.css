@@ -377,6 +377,40 @@ body {
 
 .action-buttons .icon-gap { margin-left: 0.5rem; }
 
+/* Forzar estilos en botones bootstrap pequeños dentro de .action-buttons
+   Esto cubre vistas que aún usan "btn btn-sm" y asegura aspecto circular */
+.action-buttons .btn.btn-sm {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 44px !important;
+  height: 44px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  box-shadow: 0 6px 14px rgba(16,24,40,0.06) !important;
+  font-size: 1.05rem !important;
+}
+
+.action-buttons a.btn.btn-sm, .action-buttons button.btn.btn-sm {
+  color: var(--color-text) !important;
+  background: var(--color-bg-light) !important;
+  border: none !important;
+}
+
+/* Color variants for legacy btn classes inside action-buttons */
+.action-buttons .btn-warning {
+  background: #f59e0b !important; /* naranja */
+  color: white !important;
+}
+.action-buttons .btn-danger {
+  background: #dc2626 !important; /* rojo */
+  color: white !important;
+}
+.action-buttons .btn-success {
+  background: var(--gradient-primary) !important; /* verde/degradado */
+  color: white !important;
+}
+
 
 /* TARJETAS */
 .student-card {
