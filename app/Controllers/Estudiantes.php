@@ -26,8 +26,19 @@ class Estudiantes extends BaseController
 
         $carreras_map = array_column($carreras, 'nombre_carrera', 'id_carrera');
 
-        // CORRECCIÓN: El modelo de Cursos usa 'nombre'
-        $cursos_map = array_column($cursos, 'nombre', 'id_curso');
+        // Construimos un mapa id_curso => 'COD - Nombre' para mostrar código y nombre
+        $cursos_map = [];
+        foreach ($cursos as $curso) {
+            $idc = isset($curso['id_curso']) ? (int) $curso['id_curso'] : null;
+            if ($idc === null) continue;
+            $codigo = trim((string) ($curso['codigo'] ?? ''));
+            $nombre = trim((string) ($curso['nombre'] ?? ($curso['nombre_curso'] ?? '')));
+            $display = $nombre;
+            if ($codigo !== '') {
+                $display = $codigo . ' - ' . $display;
+            }
+            $cursos_map[$idc] = $display;
+        }
 
         $inscripciones_raw = $inscripcionModel->findAll(); // Model auto-filtra soft deletes
 
