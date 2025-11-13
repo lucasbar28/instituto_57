@@ -34,8 +34,22 @@ class Estudiantes extends BaseController
         $inscripciones_por_alumno = [];
         foreach ($inscripciones_raw as $inscripcion) {
             // CORRECCIÓN: Usar 'nombre' (el alias 'nombre_curso' ya no se usa en el Modelo simple)
-            $curso_nombre = $cursos_map[$inscripcion['id_curso']] ?? 'Curso Desconocido'; 
-            
+            $curso_nombre = $cursos_map[$inscripcion['id_curso']] ?? null;
+
+            // Si no está en el mapa (p.ej. por soft-deletes o datos fuera de sincronía),
+            // intentamos recuperar el registro desde el modelo incluyendo borrados.
+            if (empty($curso_nombre) && ! empty($inscripcion['id_curso'])) {
+                $cursoBuscado = $cursoModel->withDeleted()->find($inscripcion['id_curso']);
+                if (! empty($cursoBuscado)) {
+                    $curso_nombre = $cursoBuscado['nombre'] ?? ($cursoBuscado['nombre_curso'] ?? null);
+                    // Actualizamos el mapa en memoria para próximas iteraciones
+                    $cursos_map[(int) $inscripcion['id_curso']] = $curso_nombre;
+                }
+            }
+
+            // Fallback final
+            $curso_nombre = $curso_nombre ?? 'Curso Desconocido';
+
             if (isset($inscripcion['id_alumno'])) {
                 $inscripciones_por_alumno[$inscripcion['id_alumno']][] = [
                     'id_inscripcion' => $inscripcion['id_inscripcion'],

@@ -343,6 +343,40 @@ body {
   transform: translateY(-1px);
 }
 
+/* Botones icono circulares (estilo consistente para acciones: ver/editar/eliminar) */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: var(--color-bg-light);
+  border-radius: 50%;
+  box-shadow: 0 6px 14px rgba(16,24,40,0.06);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  color: var(--color-text);
+  font-size: 1.05rem;
+}
+
+.icon-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(16,24,40,0.12);
+}
+
+.icon-btn .fa-eye,
+.icon-btn .fa-edit,
+.icon-btn .fa-trash {
+  pointer-events: none; /* icono no captura clicks */
+}
+
+.icon-btn--view { color: #055160; /* azul petróleo oscuro */ }
+.icon-btn--edit { color: #f59e0b; /* naranja */ }
+.icon-btn--delete { color: #dc2626; /* rojo */ }
+
+.action-buttons .icon-gap { margin-left: 0.5rem; }
+
 
 /* TARJETAS */
 .student-card {

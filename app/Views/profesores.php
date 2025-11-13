@@ -84,21 +84,24 @@
                                     <td><?= esc($profesor['especialidad']) ?></td>
                                     <td><?= esc($profesor['telefono'] ?? 'N/A') ?></td>
                                     <td>
-                                        <!-- Botón de Ver (Visible para Administrador y Profesor, si el filtro lo permite) -->
-                                        <a href="<?= base_url('profesores/ver/' . $profesor['id_profesor']) ?>" class="btn btn-sm btn-info" title="Ver Detalles">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-
-                                        <?php if (session()->get('rol') === 'administrador'): ?>
-                                            <!-- Botones de Edición y Eliminación (SOLO ADMINISTRADOR) -->
-                                            <a href="<?= base_url('profesores/editar/' . $profesor['id_profesor']) ?>" class="btn btn-sm btn-warning" title="Editar">
-                                                <i class="fas fa-edit"></i>
+                                        <div class="action-buttons">
+                                            <!-- Botón de Ver (Visible para Administrador y Profesor, si el filtro lo permite) -->
+                                            <a href="<?= base_url('profesores/ver/' . $profesor['id_profesor']) ?>" class="icon-btn icon-btn--view" title="Ver detalles" aria-label="Ver detalles">
+                                                <i class="fas fa-eye"></i>
                                             </a>
-                                            <!-- Botón de Eliminar (Requiere JS para confirmación) -->
-                                            <button class="btn btn-sm btn-danger" onclick="confirmDelete(<?= $profesor['id_profesor'] ?>, '<?= esc($profesor['nombre_completo']) ?>')" title="Eliminar">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        <?php endif; ?>
+
+                                            <?php if (session()->get('rol') === 'administrador'): ?>
+                                                <!-- Botones de Edición y Eliminación (SOLO ADMINISTRADOR) con estilo consistente -->
+                                                <a href="<?= base_url('profesores/editar/' . $profesor['id_profesor']) ?>" class="icon-btn icon-btn--edit" title="Editar profesor" aria-label="Editar profesor">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+
+                                                <!-- Botón de Eliminar (Requiere JS para confirmación) -->
+                                                <button class="icon-btn icon-btn--delete" onclick="confirmDelete(<?= $profesor['id_profesor'] ?>, '<?= esc($profesor['nombre_completo']) ?>')" title="Eliminar profesor" aria-label="Eliminar profesor">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
