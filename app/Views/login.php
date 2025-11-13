@@ -8,7 +8,7 @@
 
 <?= $this->section('content') ?>
 
-<div class="container mt-5 step-card-login">
+<div class="container mt-5 step-card-reg">
     <div class="row justify-content-center">
         <div class="col-md-7 col-lg-5">
             <div class="card shadow-lg border-0 rounded-lg">

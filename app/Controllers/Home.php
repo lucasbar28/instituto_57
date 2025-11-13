@@ -9,9 +9,10 @@ class Home extends BaseController
      * Cargo la vista principal (Home) del sitio.
      * La ruta asociada a esta función es '/' en app/Config/Routes.php
      */
-    public function index(): string
+    public function index()
     {
-        // La vista ahora se llama 'home.php', por lo que cargamos 'home'
-        return view('home');
+    // Mostrar alert una vez (flash)
+    session()->setFlashdata('show_alert', true);
+    return view('home');
     }
 } 

@@ -1,7 +1,6 @@
 <?= $this->extend('templates/layout') ?> 
 
 <?= $this->section('content') ?>
-
 <header class="hero-section">
   <div class="hero-content">
     <h1><i class="fas fa-graduation-cap"></i> Instituto Superior de Formación Docente y Técnica N° 57</h1>
