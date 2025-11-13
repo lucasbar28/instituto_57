@@ -68,6 +68,16 @@ class Estudiantes extends BaseController
             'page_title' => 'Lista de Estudiantes'
         ];
 
+        // Modo debug: si se solicita ?debug_insc=1 devolvemos un JSON con las
+        // inscripciones agrupadas (útil para diagnosticar casos de "Curso Desconocido").
+        if ($this->request->getGet('debug_insc') == '1') {
+            // Limitar salida a primeras 200 entradas para no saturar el navegador
+            $sample = array_slice($inscripciones_por_alumno, 0, 200, true);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode($sample, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
         return view('estudiantes', $data);
     }
     
