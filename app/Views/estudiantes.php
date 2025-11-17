@@ -166,16 +166,11 @@ $rol = session()->get('rol'); // Obtenemos el rol del usuario para restringir la
                                     
                                     <select name="id_curso" class="form-control" style="width: 100%; max-width: 250px;" required>
                                         <option value="">Seleccione Curso</option>
-                                        <?php 
-                                        // Filtrar cursos solo de la carrera del estudiante
-                                        $id_carrera_estudiante = $estudiante['id_carrera'];
-                                        $cursos_estudiante = $cursos_por_carrera[$id_carrera_estudiante] ?? [];
-                                        
-                                        foreach ($cursos_estudiante as $curso): 
-                                            $codigo = !empty($curso['codigo']) ? $curso['codigo'] . ' - ' : '';
-                                            $anio_texto = !empty($curso['anio']) ? ' (Año ' . $curso['anio'] . ')' : '';
-                                            $nombre_completo = $codigo . $curso['nombre'] . $anio_texto;
-                                        ?>
+                                        <?php foreach ($cursos as $curso): ?>
+                                            <?php 
+                                                $codigo = !empty($curso['codigo']) ? $curso['codigo'] . ' - ' : '';
+                                                $nombre_completo = $codigo . $curso['nombre'];
+                                            ?>
                                             <option value="<?= esc($curso['id_curso']) ?>">
                                                 <?= esc($nombre_completo) ?>
                                             </option>

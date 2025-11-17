@@ -25,14 +25,6 @@ class Estudiantes extends BaseController
         $cursos = $cursoModel->findAll();
 
         $carreras_map = array_column($carreras, 'nombre_carrera', 'id_carrera');
-        
-        // Construir mapa de cursos por carrera para filtrar en la vista
-        $cursos_por_carrera = [];
-        foreach ($cursos as $curso) {
-            if (!empty($curso['id_carrera'])) {
-                $cursos_por_carrera[$curso['id_carrera']][] = $curso;
-            }
-        }
 
         // Construir mapa de cursos con código y nombre
         $cursos_map = [];
@@ -75,8 +67,7 @@ class Estudiantes extends BaseController
         $data = [
             'estudiantes' => $estudiantes,
             'carreras_map' => $carreras_map,
-            'cursos' => $cursos,
-            'cursos_por_carrera' => $cursos_por_carrera, // Nuevo: cursos filtrados por carrera
+            'cursos' => $cursos, 
             'inscripciones_por_alumno' => $inscripciones_por_alumno,
             'page_title' => 'Lista de Estudiantes'
         ];
