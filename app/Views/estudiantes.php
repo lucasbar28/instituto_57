@@ -100,12 +100,12 @@ $rol = session()->get('rol'); // Obtenemos el rol del usuario para restringir la
                         
                         <!-- Columna de Acciones (Editar/Eliminar) - SOLO ADMINISTRADOR -->
                         <?php if ($rol === 'administrador'): ?>
-                        <td class="align-middle action-buttons">
-                            <a href="<?= base_url("estudiantes/editar/{$estudiante['id_alumno']}") ?>" class="btn-action btn-edit" title="Editar Alumno">
-                                <i class="fas fa-edit"></i> Editar
+                        <td class="align-middle">
+                            <a href="<?= base_url("estudiantes/editar/{$estudiante['id_alumno']}") ?>" class="btn btn-sm btn-warning" title="Editar">
+                                <i class="fas fa-edit"></i>
                             </a>
-                            <a href="<?= base_url("estudiantes/eliminar/{$estudiante['id_alumno']}") ?>" class="btn-action btn-delete" title="Eliminar Alumno" onclick="return confirm('¿Está seguro de eliminar a este estudiante?')">
-                                <i class="fas fa-trash"></i> Eliminar
+                            <a href="<?= base_url("estudiantes/eliminar/{$estudiante['id_alumno']}") ?>" class="btn btn-sm btn-danger" title="Eliminar" onclick="return confirm('¿Está seguro de eliminar a este estudiante?')">
+                                <i class="fas fa-trash"></i>
                             </a>
                         </td>
                         <?php endif; ?>
@@ -149,17 +149,13 @@ $rol = session()->get('rol'); // Obtenemos el rol del usuario para restringir la
                             
                             <!-- Cursos Inscritos -->
                             <td class="align-middle">
-                                <?php 
-                                $cursos_inscritos_str = 'No inscrito en cursos.';
-                                if (!empty($inscripciones_por_alumno[$estudiante['id_alumno']])): 
-                                    $nombres_cursos = [];
-                                    foreach ($inscripciones_por_alumno[$estudiante['id_alumno']] as $inscripcion):
-                                        $nombres_cursos[] = esc($cursos_map[$inscripcion['id_curso']] ?? 'Curso Desconocido');
-                                    endforeach;
-                                    $cursos_inscritos_str = implode(', ', $nombres_cursos);
-                                endif;
-                                echo $cursos_inscritos_str;
-                                ?>
+                                <?php if (!empty($inscripciones_por_alumno[$estudiante['id_alumno']])): ?>
+                                    <?php foreach ($inscripciones_por_alumno[$estudiante['id_alumno']] as $inscripcion): ?>
+                                        <?= esc($inscripcion['nombre_curso']) ?><br>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <span class="text-muted">No inscrito en cursos.</span>
+                                <?php endif; ?>
                             </td>
 
                             <!-- Formulario de Inscripción Rápida -->
@@ -168,16 +164,25 @@ $rol = session()->get('rol'); // Obtenemos el rol del usuario para restringir la
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="id_alumno" value="<?= esc($estudiante['id_alumno']) ?>">
                                     
-                                    <select name="id_curso" class="form-control" style="width: 100%; max-width: 200px;" required>
+                                    <select name="id_curso" class="form-control" style="width: 100%; max-width: 250px;" required>
                                         <option value="">Seleccione Curso</option>
-                                        <?php foreach ($cursos as $curso): ?>
+                                        <?php 
+                                        // Filtrar cursos solo de la carrera del estudiante
+                                        $id_carrera_estudiante = $estudiante['id_carrera'];
+                                        $cursos_estudiante = $cursos_por_carrera[$id_carrera_estudiante] ?? [];
+                                        
+                                        foreach ($cursos_estudiante as $curso): 
+                                            $codigo = !empty($curso['codigo']) ? $curso['codigo'] . ' - ' : '';
+                                            $anio_texto = !empty($curso['anio']) ? ' (Año ' . $curso['anio'] . ')' : '';
+                                            $nombre_completo = $codigo . $curso['nombre'] . $anio_texto;
+                                        ?>
                                             <option value="<?= esc($curso['id_curso']) ?>">
-                                                <?= esc($curso['nombre']) ?>
+                                                <?= esc($nombre_completo) ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
                                     
-                                    <button type="submit" class="btn-action btn-edit" title="Inscribir">
+                                    <button type="submit" class="btn btn-sm btn-primary" title="Inscribir">
                                         <i class="fas fa-check"></i>
                                     </button>
                                 </form>
@@ -187,7 +192,7 @@ $rol = session()->get('rol'); // Obtenemos el rol del usuario para restringir la
                             <td class="align-middle">
                                 <?php if (!empty($inscripciones_por_alumno[$estudiante['id_alumno']])): ?>
                                     <a href="<?= base_url('inscripciones/desinscribir/' . esc($estudiante['id_alumno'])) ?>" 
-                                       class="btn-action btn-delete" 
+                                       class="btn btn-sm btn-danger" 
                                        title="Desinscribir de su último curso"
                                        onclick="return confirm('¿Desea desinscribir a <?= esc($estudiante['nombre_completo']) ?> de su último curso?')">
                                         <i class="fas fa-minus-circle"></i>

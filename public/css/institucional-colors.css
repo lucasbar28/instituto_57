@@ -1,0 +1,185 @@
+/* ============================================
+   COLORES INSTITUCIONALES - Instituto 57
+   Azul violeta y negro - Override completo
+   ============================================ */
+
+/* Redefinir TODOS los botones con colores institucionales */
+.btn-info,
+.btn-primary,
+.btn.btn-primary,
+.btn.btn-info {
+  background-color: #5b21b6 !important; /* Violeta oscuro */
+  border-color: #5b21b6 !important;
+  color: white !important;
+}
+
+.btn-info:hover,
+.btn-primary:hover,
+.btn.btn-primary:hover,
+.btn.btn-info:hover {
+  background-color: #4c1d95 !important;
+  border-color: #4c1d95 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(91, 33, 182, 0.3) !important;
+}
+
+.btn-warning,
+.btn.btn-warning {
+  background-color: #7c3aed !important; /* Violeta medio */
+  border-color: #7c3aed !important;
+  color: white !important;
+}
+
+.btn-warning:hover,
+.btn.btn-warning:hover {
+  background-color: #6d28d9 !important;
+  border-color: #6d28d9 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(124, 58, 237, 0.3) !important;
+}
+
+.btn-danger,
+.btn.btn-danger {
+  background-color: #1f2937 !important; /* Negro grisáceo */
+  border-color: #1f2937 !important;
+  color: white !important;
+}
+
+.btn-danger:hover,
+.btn.btn-danger:hover {
+  background-color: #111827 !important;
+  border-color: #111827 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(31, 41, 55, 0.4) !important;
+}
+
+.btn-success,
+.btn.btn-success {
+  background-color: #8b5cf6 !important; /* Violeta claro */
+  border-color: #8b5cf6 !important;
+  color: white !important;
+}
+
+.btn-success:hover,
+.btn.btn-success:hover {
+  background-color: #7c3aed !important;
+  border-color: #7c3aed !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Asegurar que los botones pequeños mantengan tamaño uniforme - tamaño original profesores */
+.btn-sm,
+.btn.btn-sm {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 0.2rem !important;
+  vertical-align: middle !important;
+}
+
+/* Mejorar espaciado en celdas de acciones */
+td.align-middle,
+td {
+  white-space: nowrap;
+}
+
+td .btn + .btn {
+  margin-left: 0.25rem !important;
+}
+
+/* Ajustar formularios inline en tablas */
+form.d-flex {
+  gap: 0.5rem !important;
+  align-items: center !important;
+}
+
+/* Select más compacto */
+.form-control {
+  padding: 0.375rem 0.75rem !important;
+}
+
+/* ============================================
+   AJUSTES DE TABLA - Optimizar ancho
+   ============================================ */
+
+/* Tabla debe ocupar todo el ancho pero sin overflow */
+.data-table {
+  table-layout: fixed !important; /* Forzar ancho fijo de columnas */
+  width: 100% !important;
+}
+
+/* Columnas específicas con ancho controlado */
+.data-table th:first-child,
+.data-table td:first-child {
+  width: 5% !important; /* ID más estrecho */
+}
+
+.data-table th:nth-child(2),
+.data-table td:nth-child(2) {
+  width: 12% !important; /* DNI */
+}
+
+.data-table th:nth-child(3),
+.data-table td:nth-child(3) {
+  width: 20% !important; /* Nombre */
+}
+
+.data-table th:nth-child(4),
+.data-table td:nth-child(4) {
+  width: 22% !important; /* Email */
+}
+
+.data-table th:nth-child(5),
+.data-table td:nth-child(5) {
+  width: 30% !important; /* Carrera */
+}
+
+.data-table th:last-child,
+.data-table td:last-child {
+  width: 11% !important; /* Acciones */
+  text-align: center !important;
+}
+
+/* Texto que exceda debe cortarse con ellipsis */
+.data-table td {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Excepción para columna de cursos inscritos - permitir wrap */
+.data-table tbody tr td:nth-child(2) {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+}
+
+/* Asegurar que el contenedor tenga ancho correcto */
+.table-responsive {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* Botones de acción en celdas - tamaño original profesores, bien centrados */
+.data-table .btn-sm {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle !important;
+}
+
+/* Asegurar centrado vertical en celdas de tabla */
+.data-table td {
+  vertical-align: middle !important;
+}
+
+/* Centrar los botones dentro de la celda de acciones */
+.data-table td:last-child {
+  text-align: center !important;
+}

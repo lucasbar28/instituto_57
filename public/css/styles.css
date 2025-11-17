@@ -775,6 +775,8 @@ body {
   font-weight: bold;
   margin: 0 auto 1.5rem; /* Más espacio */
   box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Sombra para el número */
+  position: relative; /* Asegura que permanezca dentro del card */
+  z-index: 1; /* Por encima del fondo pero dentro del card */
 }
 
 .step-card h3 {
@@ -929,4 +931,63 @@ body {
   margin-right: auto;
   max-width: 900px;         /* opcional: limita el ancho para mejor lectura */
   line-height: 1.6;         /* opcional: mejora legibilidad */
+}
+/* ============================================
+   COLORES INSTITUCIONALES - Instituto 57
+   Azul violeta y negro
+   ============================================ */
+
+/* Redefinir colores de botones Bootstrap con colores institucionales */
+.btn-info,
+.btn-primary {
+  background-color: #5b21b6 !important; /* Violeta oscuro */
+  border-color: #5b21b6 !important;
+  color: white !important;
+}
+
+.btn-info:hover,
+.btn-primary:hover {
+  background-color: #4c1d95 !important; /* Violeta m�s oscuro */
+  border-color: #4c1d95 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(91, 33, 182, 0.3) !important;
+}
+
+.btn-warning {
+  background-color: #7c3aed !important; /* Violeta medio */
+  border-color: #7c3aed !important;
+  color: white !important;
+}
+
+.btn-warning:hover {
+  background-color: #6d28d9 !important; /* Violeta medio oscuro */
+  border-color: #6d28d9 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(124, 58, 237, 0.3) !important;
+}
+
+.btn-danger {
+  background-color: #1f2937 !important; /* Negro gris�ceo */
+  border-color: #1f2937 !important;
+  color: white !important;
+}
+
+.btn-danger:hover {
+  background-color: #111827 !important; /* Negro m�s oscuro */
+  border-color: #111827 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(31, 41, 55, 0.4) !important;
+}
+
+.btn-success {
+  background-color: #8b5cf6 !important; /* Violeta claro */
+  border-color: #8b5cf6 !important;
+  color: white !important;
+}
+
+.btn-success:hover {
+  background-color: #7c3aed !important;
+  border-color: #7c3aed !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3) !important;
 }

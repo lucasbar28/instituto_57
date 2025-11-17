@@ -25,21 +25,47 @@ class Estudiantes extends BaseController
         $cursos = $cursoModel->findAll();
 
         $carreras_map = array_column($carreras, 'nombre_carrera', 'id_carrera');
+        
+        // Construir mapa de cursos por carrera para filtrar en la vista
+        $cursos_por_carrera = [];
+        foreach ($cursos as $curso) {
+            if (!empty($curso['id_carrera'])) {
+                $cursos_por_carrera[$curso['id_carrera']][] = $curso;
+            }
+        }
 
-        // CORRECCIÓN: El modelo de Cursos usa 'nombre'
-        $cursos_map = array_column($cursos, 'nombre', 'id_curso');
+        // Construir mapa de cursos con código y nombre
+        $cursos_map = [];
+        foreach ($cursos as $curso) {
+            $codigo = !empty($curso['codigo']) ? $curso['codigo'] . ' - ' : '';
+            $cursos_map[$curso['id_curso']] = $codigo . $curso['nombre'];
+        }
 
-        $inscripciones_raw = $inscripcionModel->findAll(); // Model auto-filtra soft deletes
+        $inscripciones_raw = $inscripcionModel->findAll();
 
         $inscripciones_por_alumno = [];
         foreach ($inscripciones_raw as $inscripcion) {
-            // CORRECCIÓN: Usar 'nombre' (el alias 'nombre_curso' ya no se usa en el Modelo simple)
-            $curso_nombre = $cursos_map[$inscripcion['id_curso']] ?? 'Curso Desconocido'; 
+            $id_curso = $inscripcion['id_curso'];
+            
+            // Intentar obtener el nombre del curso
+            if (isset($cursos_map[$id_curso])) {
+                $curso_nombre = $cursos_map[$id_curso];
+            } else {
+                // Si no está en el mapa, intentar buscar incluso si está soft-deleted
+                $curso_deleted = $cursoModel->withDeleted()->find($id_curso);
+                if ($curso_deleted) {
+                    $codigo = !empty($curso_deleted['codigo']) ? $curso_deleted['codigo'] . ' - ' : '';
+                    $curso_nombre = $codigo . $curso_deleted['nombre'] . ' (Inactivo)';
+                } else {
+                    // El curso realmente no existe, saltar esta inscripción
+                    continue;
+                }
+            }
             
             if (isset($inscripcion['id_alumno'])) {
                 $inscripciones_por_alumno[$inscripcion['id_alumno']][] = [
                     'id_inscripcion' => $inscripcion['id_inscripcion'],
-                    'id_curso'       => $inscripcion['id_curso'],
+                    'id_curso'       => $id_curso,
                     'nombre_curso'   => $curso_nombre,
                     'fecha_inscripcion' => $inscripcion['fecha_inscripcion']
                 ];
@@ -49,7 +75,8 @@ class Estudiantes extends BaseController
         $data = [
             'estudiantes' => $estudiantes,
             'carreras_map' => $carreras_map,
-            'cursos' => $cursos, 
+            'cursos' => $cursos,
+            'cursos_por_carrera' => $cursos_por_carrera, // Nuevo: cursos filtrados por carrera
             'inscripciones_por_alumno' => $inscripciones_por_alumno,
             'page_title' => 'Lista de Estudiantes'
         ];

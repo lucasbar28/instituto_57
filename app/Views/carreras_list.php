@@ -37,23 +37,24 @@
                         <tr>
                             <td><?= esc($carrera['id_carrera']) ?></td>
                             <td><?= esc($carrera['nombre_carrera']) ?></td>
-                            <td><?= esc($carrera['titulo']) ?></td>
-                            <td><?= esc($carrera['acreditacion']) ?></td>
+                            <td><?= esc($carrera['titulo'] ?? '') ?></td>
+                            <td><?= esc($carrera['acreditacion'] ?? '') ?></td>
                             <td>
                                 <!-- La acción VER es la que queda disponible para todos los roles permitidos por el filtro -->
-                                <a href="<?= base_url('carreras/show/' . $carrera['id_carrera']) ?>" class="btn btn-info btn-sm">
-                                    <i class="fas fa-eye"></i> Ver
+                                <a href="<?= base_url('carreras/show/' . $carrera['id_carrera']) ?>" class="btn btn-info btn-sm" title="Ver">
+                                    <i class="fas fa-eye"></i>
                                 </a>
 
                                 <?php if (session()->get('rol') === 'administrador'): ?>
                                     <!-- Editar y Eliminar SOLO para ADMINISTRADOR -->
-                                    <a href="<?= base_url('carreras/edit/' . $carrera['id_carrera']) ?>" class="btn btn-warning btn-sm">
-                                        <i class="fas fa-edit"></i> Editar
+                                    <a href="<?= base_url('carreras/edit/' . $carrera['id_carrera']) ?>" class="btn btn-warning btn-sm" title="Editar">
+                                        <i class="fas fa-edit"></i>
                                     </a>
                                     <a href="<?= base_url('carreras/delete/' . $carrera['id_carrera']) ?>" 
                                        class="btn btn-danger btn-sm" 
+                                       title="Eliminar"
                                        onclick="return confirm('¿Está seguro de eliminar la carrera: <?= esc($carrera['nombre_carrera']) ?>?');">
-                                        <i class="fas fa-trash"></i> Eliminar
+                                        <i class="fas fa-trash"></i>
                                     </a>
                                 <?php endif; ?>
                             </td>

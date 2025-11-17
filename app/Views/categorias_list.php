@@ -37,19 +37,20 @@
                             <td><?= esc($categoria['nombre_categoria']) ?></td>
                             <td><?= esc($categoria['descripcion'] ?? 'N/A') ?></td>
                             <td>
-                                <a href="<?= base_url('categorias/show/' . $categoria['id_categoria']) ?>" class="btn btn-info btn-sm">
-                                    <i class="fas fa-eye"></i> Ver
+                                <a href="<?= base_url('categorias/show/' . $categoria['id_categoria']) ?>" class="btn btn-info btn-sm" title="Ver">
+                                    <i class="fas fa-eye"></i>
                                 </a>
 
                                 <?php if (session()->get('rol') === 'administrador'): ?>
                                     <!-- Editar y Eliminar SOLO para ADMINISTRADOR -->
-                                    <a href="<?= base_url('categorias/edit/' . $categoria['id_categoria']) ?>" class="btn btn-warning btn-sm">
-                                        <i class="fas fa-edit"></i> Editar
+                                    <a href="<?= base_url('categorias/edit/' . $categoria['id_categoria']) ?>" class="btn btn-warning btn-sm" title="Editar">
+                                        <i class="fas fa-edit"></i>
                                     </a>
                                     <a href="<?= base_url('categorias/delete/' . $categoria['id_categoria']) ?>" 
                                        class="btn btn-danger btn-sm" 
+                                       title="Eliminar"
                                        onclick="return confirm('¿Está seguro de eliminar la categoría: <?= esc($categoria['nombre_categoria']) ?>?');">
-                                        <i class="fas fa-trash"></i> Eliminar
+                                        <i class="fas fa-trash"></i>
                                     </a>
                                 <?php endif; ?>
                             </td>
